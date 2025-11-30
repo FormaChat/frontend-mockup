@@ -1,0 +1,1 @@
+// # App initialization, starts router, renders first page
