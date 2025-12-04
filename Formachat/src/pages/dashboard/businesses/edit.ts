@@ -8,30 +8,23 @@ export async function renderBusinessEdit(businessId: string): Promise<HTMLElemen
   const container = document.createElement('div');
   container.className = 'business-edit';
   
-  // Show loading spinner while fetching business
   const spinner = createLoadingSpinner('Loading business...');
   container.appendChild(spinner);
   
   try {
-    // Fetch business data
     const business = await getBusinessById(businessId);
-    
-    // Remove spinner
     hideLoadingSpinner(spinner);
     
-    // Breadcrumb
     const breadcrumb = createBreadcrumb([
       { label: 'Businesses', path: '#/dashboard/businesses' },
       { label: business.basicInfo.businessName }
     ]);
     container.appendChild(breadcrumb);
     
-    // Page heading
     const heading = document.createElement('h1');
     heading.textContent = `Edit: ${business.basicInfo.businessName}`;
     container.appendChild(heading);
     
-    // Create form with pre-filled data
     const form = createEditForm(business);
     container.appendChild(form);
     
@@ -49,9 +42,6 @@ export async function renderBusinessEdit(businessId: string): Promise<HTMLElemen
   return container;
 }
 
-/**
- * Create edit form with pre-filled data
- */
 function createEditForm(business: Business): HTMLElement {
   const form = document.createElement('form');
   form.className = 'business-form';
@@ -60,35 +50,98 @@ function createEditForm(business: Business): HTMLElement {
   // SECTION 1: BASIC INFORMATION
   // ========================================
   
-  const section1 = document.createElement('section');
-  section1.className = 'form-section';
+  const section1 = createSection('1. Basic Information');
   
-  const section1Title = document.createElement('h2');
-  section1Title.textContent = '1. Basic Information';
-  section1.appendChild(section1Title);
-  
-  // Business Name
-  const nameField = createFormField('text', 'businessName', 'Business Name', true, '', business.basicInfo.businessName);
+  const nameField = createFormField({
+    type: 'text',
+    name: 'businessName',
+    label: 'Business Name',
+    required: true,
+    maxLength: 100,
+    value: business.basicInfo.businessName,
+    helpText: 'The official name of your business'
+  });
   section1.appendChild(nameField);
   
-  // Business Description
-  const descField = createFormField('textarea', 'businessDescription', 'Business Description', true, '', business.basicInfo.businessDescription);
+  const descField = createFormField({
+    type: 'textarea',
+    name: 'businessDescription',
+    label: 'Business Description',
+    required: true,
+    maxLength: 500,
+    value: business.basicInfo.businessDescription,
+    helpText: 'A brief overview of what your business does'
+  });
   section1.appendChild(descField);
   
-  // Business Type
-  const typeField = createSelectField('businessType', 'Business Type', [
-    'E-commerce', 'Real Estate', 'Restaurant', 'Hotel', 
-    'Service-based', 'Tech/SaaS', 'Healthcare', 'Education', 'Other'
-  ], true, business.basicInfo.businessType);
-  section1.appendChild(typeField);
+  // Business Type with conditional "Other" input
+  const typeWrapper = document.createElement('div');
+  typeWrapper.className = 'form-field-group';
   
-  // Operating Hours
-  const hoursField = createFormField('text', 'operatingHours', 'Operating Hours', true, '', business.basicInfo.operatingHours);
+  const knownTypes = ['E-commerce', 'Real Estate', 'Restaurant', 'Hotel', 'Service-based', 'Tech/SaaS', 'Healthcare', 'Education'];
+  const isOtherType = !knownTypes.includes(business.basicInfo.businessType);
+  
+  const typeField = createSelectField({
+    name: 'businessType',
+    label: 'Business Type',
+    options: [...knownTypes, 'Other'],
+    required: true,
+    selectedValue: isOtherType ? 'Other' : business.basicInfo.businessType
+  });
+  typeWrapper.appendChild(typeField);
+  
+  const otherTypeField = createFormField({
+    type: 'text',
+    name: 'businessTypeOther',
+    label: 'Please specify',
+    placeholder: 'Enter your business type',
+    value: isOtherType ? business.basicInfo.businessType : ''
+  });
+  otherTypeField.style.display = isOtherType ? 'block' : 'none';
+  otherTypeField.dataset.conditional = 'true';
+  typeWrapper.appendChild(otherTypeField);
+  
+  const typeSelect = typeField.querySelector('select') as HTMLSelectElement;
+  typeSelect.addEventListener('change', () => {
+    if (typeSelect.value === 'Other') {
+      otherTypeField.style.display = 'block';
+      (otherTypeField.querySelector('input') as HTMLInputElement).required = true;
+    } else {
+      otherTypeField.style.display = 'none';
+      (otherTypeField.querySelector('input') as HTMLInputElement).required = false;
+    }
+  });
+  
+  section1.appendChild(typeWrapper);
+  
+  const hoursField = createFormField({
+    type: 'text',
+    name: 'operatingHours',
+    label: 'Operating Hours',
+    required: true,
+    value: business.basicInfo.operatingHours,
+    helpText: 'When is your business available?'
+  });
   section1.appendChild(hoursField);
   
-  // Location
-  const locationField = createFormField('text', 'location', 'Location', true, '', business.basicInfo.location);
+  const locationField = createFormField({
+    type: 'text',
+    name: 'location',
+    label: 'Location',
+    required: true,
+    value: business.basicInfo.location,
+    helpText: 'Primary business location'
+  });
   section1.appendChild(locationField);
+  
+  const timezoneField = createSelectField({
+    name: 'timezone',
+    label: 'Timezone (Optional)',
+    options: ['America/New_York', 'America/Chicago', 'America/Denver', 'America/Los_Angeles', 'Europe/London', 'Europe/Paris', 'Asia/Tokyo', 'Australia/Sydney'],
+    required: false,
+    selectedValue: business.basicInfo.timezone || ''
+  });
+  section1.appendChild(timezoneField);
   
   form.appendChild(section1);
   
@@ -96,22 +149,71 @@ function createEditForm(business: Business): HTMLElement {
   // SECTION 2: PRODUCTS & SERVICES
   // ========================================
   
-  const section2 = document.createElement('section');
-  section2.className = 'form-section';
+  const section2 = createSection('2. Products & Services');
   
-  const section2Title = document.createElement('h2');
-  section2Title.textContent = '2. Products & Services';
-  section2.appendChild(section2Title);
-  
-  // Offerings
-  const offeringsField = createFormField('textarea', 'offerings', 'What do you offer?', true, '', business.productsServices.offerings);
+  const offeringsField = createFormField({
+    type: 'textarea',
+    name: 'offerings',
+    label: 'What do you offer?',
+    required: true,
+    maxLength: 1000,
+    value: business.productsServices.offerings,
+    helpText: 'Detailed description of your offerings'
+  });
   section2.appendChild(offeringsField);
   
-  // Service Delivery (checkboxes)
-  const deliveryField = createCheckboxGroup('serviceDelivery', 'Service Delivery Options', [
-    'Delivery', 'Pickup', 'In-person', 'Online/Virtual'
-  ], business.productsServices.serviceDelivery);
+  const popularItemsSection = createDynamicArraySection({
+    title: 'Popular Items (Optional)',
+    name: 'popularItems',
+    fields: [
+      { type: 'text', name: 'name', label: 'Item Name', required: true },
+      { type: 'textarea', name: 'description', label: 'Description', required: false },
+      { type: 'number', name: 'price', label: 'Price', required: false, placeholder: '0.00' }
+    ],
+    helpText: 'Add your most popular products or services',
+    existingData: business.productsServices.popularItems
+  });
+  section2.appendChild(popularItemsSection);
+  
+  const deliveryField = createCheckboxGroup({
+    name: 'serviceDelivery',
+    label: 'Service Delivery Options',
+    options: ['Delivery', 'Pickup', 'In-person', 'Online/Virtual'],
+    checkedValues: business.productsServices.serviceDelivery,
+    helpText: 'How do customers receive your products/services?'
+  });
   section2.appendChild(deliveryField);
+  
+  // Pricing Display
+  const pricingWrapper = document.createElement('div');
+  pricingWrapper.className = 'form-field-group';
+  
+  const canDiscussPricing = business.productsServices.pricingDisplay?.canDiscussPricing ?? true;
+  
+  const pricingToggle = createCheckboxField({
+    name: 'canDiscussPricing',
+    label: 'Allow chatbot to discuss pricing',
+    defaultChecked: canDiscussPricing,
+    helpText: 'Enable if you want the chatbot to share pricing information'
+  });
+  pricingWrapper.appendChild(pricingToggle);
+  
+  const pricingNoteField = createFormField({
+    type: 'textarea',
+    name: 'pricingNote',
+    label: 'Pricing Note (Optional)',
+    placeholder: 'e.g., Bulk discounts available, Custom quotes for enterprise...',
+    value: business.productsServices.pricingDisplay?.pricingNote || ''
+  });
+  pricingNoteField.style.display = canDiscussPricing ? 'block' : 'none';
+  
+  const pricingCheckbox = pricingToggle.querySelector('input') as HTMLInputElement;
+  pricingCheckbox.addEventListener('change', () => {
+    pricingNoteField.style.display = pricingCheckbox.checked ? 'block' : 'none';
+  });
+  
+  pricingWrapper.appendChild(pricingNoteField);
+  section2.appendChild(pricingWrapper);
   
   form.appendChild(section2);
   
@@ -119,22 +221,73 @@ function createEditForm(business: Business): HTMLElement {
   // SECTION 3: CUSTOMER SUPPORT
   // ========================================
   
-  const section3 = document.createElement('section');
-  section3.className = 'form-section';
+  const section3 = createSection('3. Customer Support');
   
-  const section3Title = document.createElement('h2');
-  section3Title.textContent = '3. Customer Support';
-  section3.appendChild(section3Title);
+  const faqsSection = createDynamicArraySection({
+    title: 'Frequently Asked Questions (Optional)',
+    name: 'faqs',
+    fields: [
+      { type: 'text', name: 'question', label: 'Question', required: true },
+      { type: 'textarea', name: 'answer', label: 'Answer', required: true }
+    ],
+    helpText: 'Add common questions your customers ask',
+    existingData: business.customerSupport.faqs
+  });
+  section3.appendChild(faqsSection);
   
-  // Chatbot Tone
-  const toneField = createSelectField('chatbotTone', 'Chatbot Tone', [
-    'Friendly', 'Professional', 'Casual', 'Formal', 'Playful'
-  ], true, business.customerSupport.chatbotTone);
+  const refundField = createFormField({
+    type: 'textarea',
+    name: 'refundPolicy',
+    label: 'Refund Policy',
+    required: true,
+    value: business.customerSupport.policies.refundPolicy,
+    helpText: 'How do you handle refunds?'
+  });
+  section3.appendChild(refundField);
+  
+  const cancellationField = createFormField({
+    type: 'textarea',
+    name: 'cancellationPolicy',
+    label: 'Cancellation Policy (Optional)',
+    value: business.customerSupport.policies.cancellationPolicy || ''
+  });
+  section3.appendChild(cancellationField);
+  
+  const importantPoliciesField = createFormField({
+    type: 'textarea',
+    name: 'importantPolicies',
+    label: 'Other Important Policies (Optional)',
+    value: business.customerSupport.policies.importantPolicies || ''
+  });
+  section3.appendChild(importantPoliciesField);
+  
+  const toneField = createSelectField({
+    name: 'chatbotTone',
+    label: 'Chatbot Tone',
+    options: ['Friendly', 'Professional', 'Casual', 'Formal', 'Playful'],
+    required: true,
+    selectedValue: business.customerSupport.chatbotTone,
+    helpText: 'How should your chatbot communicate?'
+  });
   section3.appendChild(toneField);
   
-  // Refund Policy
-  const refundField = createFormField('textarea', 'refundPolicy', 'Refund Policy', true, '', business.customerSupport.policies.refundPolicy);
-  section3.appendChild(refundField);
+  const greetingField = createFormField({
+    type: 'textarea',
+    name: 'chatbotGreeting',
+    label: 'Custom Greeting (Optional)',
+    value: business.customerSupport.chatbotGreeting || '',
+    helpText: 'Customize the first message customers see'
+  });
+  section3.appendChild(greetingField);
+  
+  const restrictionsField = createFormField({
+    type: 'textarea',
+    name: 'chatbotRestrictions',
+    label: 'Chatbot Restrictions (Optional)',
+    value: business.customerSupport.chatbotRestrictions || '',
+    helpText: 'What should the chatbot NOT do or promise?'
+  });
+  section3.appendChild(restrictionsField);
   
   form.appendChild(section3);
   
@@ -142,31 +295,71 @@ function createEditForm(business: Business): HTMLElement {
   // SECTION 4: CONTACT & ESCALATION
   // ========================================
   
-  const section4 = document.createElement('section');
-  section4.className = 'form-section';
+  const section4 = createSection('4. Contact & Escalation');
   
-  const section4Title = document.createElement('h2');
-  section4Title.textContent = '4. Contact & Escalation';
-  section4.appendChild(section4Title);
+  const contactMethodsSection = createDynamicArraySection({
+    title: 'Contact Methods',
+    name: 'contactMethods',
+    fields: [
+      { 
+        type: 'select', 
+        name: 'method', 
+        label: 'Method', 
+        required: true,
+        options: ['Email', 'Phone', 'WhatsApp', 'Live Chat', 'Social Media']
+      },
+      { type: 'text', name: 'value', label: 'Contact Details', required: true, placeholder: 'Enter email, phone, etc.' }
+    ],
+    helpText: 'How can customers reach you?',
+    minItems: 1,
+    existingData: business.contactEscalation.contactMethods
+  });
+  section4.appendChild(contactMethodsSection);
   
-  // Contact Method
-  const primaryContact = business.contactEscalation.contactMethods[0];
-  const contactMethodField = createSelectField('contactMethod', 'Preferred Contact Method', [
-    'Email', 'Phone', 'WhatsApp', 'Live Chat', 'Social Media'
-  ], true, primaryContact?.method);
-  section4.appendChild(contactMethodField);
+  const escalationTitle = document.createElement('h3');
+  escalationTitle.textContent = 'Escalation Contact';
+  escalationTitle.className = 'subsection-title';
+  section4.appendChild(escalationTitle);
   
-  // Contact Value
-  const contactValueField = createFormField('text', 'contactValue', 'Contact Details', true, '', primaryContact?.value);
-  section4.appendChild(contactValueField);
+  const escalationHelp = document.createElement('p');
+  escalationHelp.textContent = 'Who should be contacted for complex issues the chatbot cannot handle?';
+  escalationHelp.className = 'help-text';
+  section4.appendChild(escalationHelp);
   
-  // Escalation Contact Name
-  const escalationNameField = createFormField('text', 'escalationName', 'Escalation Contact Name', true, '', business.contactEscalation.escalationContact.name);
+  const escalationNameField = createFormField({
+    type: 'text',
+    name: 'escalationName',
+    label: 'Contact Name',
+    required: true,
+    value: business.contactEscalation.escalationContact.name
+  });
   section4.appendChild(escalationNameField);
   
-  // Escalation Email
-  const escalationEmailField = createFormField('email', 'escalationEmail', 'Escalation Contact Email', true, '', business.contactEscalation.escalationContact.email);
+  const escalationEmailField = createFormField({
+    type: 'email',
+    name: 'escalationEmail',
+    label: 'Contact Email',
+    required: true,
+    value: business.contactEscalation.escalationContact.email
+  });
   section4.appendChild(escalationEmailField);
+  
+  const escalationPhoneField = createFormField({
+    type: 'tel',
+    name: 'escalationPhone',
+    label: 'Contact Phone (Optional)',
+    value: business.contactEscalation.escalationContact.phone || ''
+  });
+  section4.appendChild(escalationPhoneField);
+  
+  const capabilitiesField = createCheckboxGroup({
+    name: 'chatbotCapabilities',
+    label: 'Chatbot Capabilities',
+    options: ['Answer FAQs', 'Book apointments', 'Generate leads', 'Handle Complaints', 'Provide product info', 'Process orders'],
+    checkedValues: business.contactEscalation.chatbotCapabilities,
+    helpText: 'What should your chatbot be able to do?'
+  });
+  section4.appendChild(capabilitiesField);
   
   form.appendChild(section4);
   
@@ -180,13 +373,11 @@ function createEditForm(business: Business): HTMLElement {
   submitButton.className = 'btn-primary';
   form.appendChild(submitButton);
   
-  // Error message container
   const errorContainer = document.createElement('div');
   errorContainer.className = 'error-message';
   errorContainer.style.display = 'none';
   form.appendChild(errorContainer);
   
-  // Handle form submission
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     await handleUpdateBusiness(business._id, form, submitButton, errorContainer);
@@ -195,9 +386,6 @@ function createEditForm(business: Business): HTMLElement {
   return form;
 }
 
-/**
- * Handle business update
- */
 async function handleUpdateBusiness(
   businessId: string,
   form: HTMLFormElement,
@@ -205,83 +393,114 @@ async function handleUpdateBusiness(
   errorContainer: HTMLElement
 ): Promise<void> {
   try {
-    // Disable form
     submitButton.disabled = true;
     submitButton.textContent = 'Saving...';
     errorContainer.style.display = 'none';
     
-    // Get form data
     const formData = new FormData(form);
     
-    // Build update request object
+    let businessType = formData.get('businessType') as string;
+    if (businessType === 'Other') {
+      businessType = formData.get('businessTypeOther') as string;
+    }
+    
     const updateData: UpdateBusinessRequest = {
       basicInfo: {
         businessName: formData.get('businessName') as string,
         businessDescription: formData.get('businessDescription') as string,
-        businessType: formData.get('businessType') as any,
+        businessType: businessType as any,
         operatingHours: formData.get('operatingHours') as string,
-        location: formData.get('location') as string
+        location: formData.get('location') as string,
+        timezone: (formData.get('timezone') as string) || undefined
       },
       productsServices: {
         offerings: formData.get('offerings') as string,
-        serviceDelivery: formData.getAll('serviceDelivery') as any[]
+        popularItems: collectArrayData(form, 'popularItems'),
+        serviceDelivery: formData.getAll('serviceDelivery') as any[],
+        pricingDisplay: {
+          canDiscussPricing: formData.get('canDiscussPricing') === 'on',
+          pricingNote: (formData.get('pricingNote') as string) || undefined
+        }
       },
       customerSupport: {
+        faqs: collectArrayData(form, 'faqs'),
         policies: {
-          refundPolicy: formData.get('refundPolicy') as string
+          refundPolicy: formData.get('refundPolicy') as string,
+          cancellationPolicy: (formData.get('cancellationPolicy') as string) || undefined,
+          importantPolicies: (formData.get('importantPolicies') as string) || undefined
         },
-        chatbotTone: formData.get('chatbotTone') as any
+        chatbotTone: formData.get('chatbotTone') as any,
+        chatbotGreeting: (formData.get('chatbotGreeting') as string) || undefined,
+        chatbotRestrictions: (formData.get('chatbotRestrictions') as string) || undefined
       },
       contactEscalation: {
-        contactMethods: [{
-          method: formData.get('contactMethod') as any,
-          value: formData.get('contactValue') as string
-        }],
+        contactMethods: collectArrayData(form, 'contactMethods'),
         escalationContact: {
           name: formData.get('escalationName') as string,
-          email: formData.get('escalationEmail') as string
-        }
+          email: formData.get('escalationEmail') as string,
+          phone: (formData.get('escalationPhone') as string) || undefined
+        },
+        chatbotCapabilities: formData.getAll('chatbotCapabilities') as any[]
       }
     };
     
-    // Update business
     await updateBusiness(businessId, updateData);
     
-    // Success - redirect to businesses list
     alert('Business updated successfully!');
     window.location.hash = '#/dashboard/businesses';
     
   } catch (error: any) {
-    // Show error
     errorContainer.textContent = error.message || 'Failed to update business';
     errorContainer.style.display = 'block';
-    
-    // Re-enable form
     submitButton.disabled = false;
     submitButton.textContent = 'Save Changes';
-    
     console.error('Update business error:', error);
   }
 }
 
-/**
- * Helper: Create form field with value
- */
-function createFormField(
-  type: string,
-  name: string,
-  label: string,
-  required: boolean = false,
-  placeholder: string = '',
-  value: string = ''
-): HTMLElement {
+// ========================================
+// HELPER FUNCTIONS (Same as create.ts)
+// ========================================
+
+function createSection(title: string): HTMLElement {
+  const section = document.createElement('section');
+  section.className = 'form-section';
+  
+  const titleElement = document.createElement('h2');
+  titleElement.textContent = title;
+  section.appendChild(titleElement);
+  
+  return section;
+}
+
+interface FormFieldOptions {
+  type: string;
+  name: string;
+  label: string;
+  required?: boolean;
+  maxLength?: number;
+  placeholder?: string;
+  helpText?: string;
+  value?: string;
+}
+
+function createFormField(options: FormFieldOptions): HTMLElement {
+  const { type, name, label, required = false, maxLength, placeholder = '', helpText, value = '' } = options;
+  
   const fieldWrapper = document.createElement('div');
   fieldWrapper.className = 'form-field';
   
   const labelElement = document.createElement('label');
-  labelElement.textContent = label;
+  labelElement.textContent = label + (required ? ' *' : '');
   labelElement.htmlFor = name;
   fieldWrapper.appendChild(labelElement);
+  
+  if (helpText) {
+    const helpElement = document.createElement('span');
+    helpElement.className = 'help-text';
+    helpElement.textContent = helpText;
+    fieldWrapper.appendChild(helpElement);
+  }
   
   let inputElement: HTMLInputElement | HTMLTextAreaElement;
   
@@ -299,42 +518,64 @@ function createFormField(
   inputElement.required = required;
   inputElement.value = value;
   
-  fieldWrapper.appendChild(inputElement);
+  if (maxLength) {
+    inputElement.maxLength = maxLength;
+    
+    const counter = document.createElement('span');
+    counter.className = 'char-counter';
+    counter.textContent = `${value.length}/${maxLength}`;
+    
+    inputElement.addEventListener('input', () => {
+      counter.textContent = `${inputElement.value.length}/${maxLength}`;
+    });
+    
+    fieldWrapper.appendChild(inputElement);
+    fieldWrapper.appendChild(counter);
+  } else {
+    fieldWrapper.appendChild(inputElement);
+  }
   
   return fieldWrapper;
 }
 
-/**
- * Helper: Create select field with selected value
- */
-function createSelectField(
-  name: string,
-  label: string,
-  options: string[],
-  required: boolean = false,
-  selectedValue: string = ''
-): HTMLElement {
+interface SelectFieldOptions {
+  name: string;
+  label: string;
+  options: string[];
+  required?: boolean;
+  helpText?: string;
+  selectedValue?: string;
+}
+
+function createSelectField(options: SelectFieldOptions): HTMLElement {
+  const { name, label, options: selectOptions, required = false, helpText, selectedValue = '' } = options;
+  
   const fieldWrapper = document.createElement('div');
   fieldWrapper.className = 'form-field';
   
   const labelElement = document.createElement('label');
-  labelElement.textContent = label;
+  labelElement.textContent = label + (required ? ' *' : '');
   labelElement.htmlFor = name;
   fieldWrapper.appendChild(labelElement);
+  
+  if (helpText) {
+    const helpElement = document.createElement('span');
+    helpElement.className = 'help-text';
+    helpElement.textContent = helpText;
+    fieldWrapper.appendChild(helpElement);
+  }
   
   const select = document.createElement('select');
   select.name = name;
   select.id = name;
   select.required = required;
   
-  // Add default option
   const defaultOption = document.createElement('option');
   defaultOption.value = '';
   defaultOption.textContent = '-- Select --';
   select.appendChild(defaultOption);
   
-  // Add options
-  options.forEach(option => {
+  selectOptions.forEach(option => {
     const optionElement = document.createElement('option');
     optionElement.value = option;
     optionElement.textContent = option;
@@ -347,15 +588,17 @@ function createSelectField(
   return fieldWrapper;
 }
 
-/**
- * Helper: Create checkbox group with checked values
- */
-function createCheckboxGroup(
-  name: string,
-  label: string,
-  options: string[],
-  checkedValues: string[] = []
-): HTMLElement {
+interface CheckboxGroupOptions {
+  name: string;
+  label: string;
+  options: string[];
+  helpText?: string;
+  checkedValues?: string[];
+}
+
+function createCheckboxGroup(options: CheckboxGroupOptions): HTMLElement {
+  const { name, label, options: checkboxOptions, helpText, checkedValues = [] } = options;
+  
   const fieldWrapper = document.createElement('div');
   fieldWrapper.className = 'form-field';
   
@@ -363,11 +606,19 @@ function createCheckboxGroup(
   labelElement.textContent = label;
   fieldWrapper.appendChild(labelElement);
   
+  if (helpText) {
+    const helpElement = document.createElement('span');
+    helpElement.className = 'help-text';
+    helpElement.textContent = helpText;
+    fieldWrapper.appendChild(helpElement);
+  }
+  
   const checkboxContainer = document.createElement('div');
   checkboxContainer.className = 'checkbox-group';
   
-  options.forEach(option => {
+  checkboxOptions.forEach(option => {
     const checkboxWrapper = document.createElement('div');
+    checkboxWrapper.className = 'checkbox-item';
     
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
@@ -388,4 +639,221 @@ function createCheckboxGroup(
   fieldWrapper.appendChild(checkboxContainer);
   
   return fieldWrapper;
+}
+
+function createCheckboxField(options: { name: string; label: string; defaultChecked?: boolean; helpText?: string }): HTMLElement {
+  const { name, label, defaultChecked = false, helpText } = options;
+  
+  const fieldWrapper = document.createElement('div');
+  fieldWrapper.className = 'form-field checkbox-field';
+  
+  const checkboxWrapper = document.createElement('div');
+  checkboxWrapper.className = 'checkbox-item';
+  
+  const checkbox = document.createElement('input');
+  checkbox.type = 'checkbox';
+  checkbox.name = name;
+  checkbox.id = name;
+  checkbox.checked = defaultChecked;
+  
+  const checkboxLabel = document.createElement('label');
+  checkboxLabel.textContent = label;
+  checkboxLabel.htmlFor = name;
+  
+  checkboxWrapper.appendChild(checkbox);
+  checkboxWrapper.appendChild(checkboxLabel);
+  fieldWrapper.appendChild(checkboxWrapper);
+  
+  if (helpText) {
+    const helpElement = document.createElement('span');
+    helpElement.className = 'help-text';
+    helpElement.textContent = helpText;
+    fieldWrapper.appendChild(helpElement);
+  }
+  
+  return fieldWrapper;
+}
+
+interface DynamicArrayField {
+  type: string;
+  name: string;
+  label: string;
+  required?: boolean;
+  placeholder?: string;
+  options?: string[];
+}
+
+interface DynamicArrayOptions {
+  title: string;
+  name: string;
+  fields: DynamicArrayField[];
+  helpText?: string;
+  minItems?: number;
+  existingData?: any[];
+}
+
+function createDynamicArraySection(options: DynamicArrayOptions): HTMLElement {
+  const { title, name, fields, helpText, minItems = 0, existingData = [] } = options;
+  
+  const section = document.createElement('div');
+  section.className = 'dynamic-array-section';
+  section.dataset.arrayName = name;
+  
+  const header = document.createElement('div');
+  header.className = 'dynamic-array-header';
+  
+  const titleElement = document.createElement('h3');
+  titleElement.textContent = title;
+  header.appendChild(titleElement);
+  
+  if (helpText) {
+    const helpElement = document.createElement('p');
+    helpElement.className = 'help-text';
+    helpElement.textContent = helpText;
+    header.appendChild(helpElement);
+  }
+  
+  section.appendChild(header);
+  
+  const itemsContainer = document.createElement('div');
+  itemsContainer.className = 'dynamic-array-items';
+  section.appendChild(itemsContainer);
+  
+  const addButton = document.createElement('button');
+  addButton.type = 'button';
+  addButton.className = 'btn-secondary';
+  addButton.textContent = `+ Add ${title.replace(/\s*\(Optional\)/, '')}`;
+  
+  addButton.addEventListener('click', () => {
+    const item = createDynamicArrayItem(name, fields, itemsContainer, minItems);
+    itemsContainer.appendChild(item);
+  });
+  
+  section.appendChild(addButton);
+  
+  // Pre-populate with existing data
+  if (existingData.length > 0) {
+    existingData.forEach((data) => {
+      const item = createDynamicArrayItem(name, fields, itemsContainer, minItems, data);
+      itemsContainer.appendChild(item);
+    });
+  } else if (minItems > 0) {
+    for (let i = 0; i < minItems; i++) {
+      const item = createDynamicArrayItem(name, fields, itemsContainer, minItems);
+      itemsContainer.appendChild(item);
+    }
+  }
+  
+  return section;
+}
+
+function createDynamicArrayItem(
+  arrayName: string,
+  fields: DynamicArrayField[],
+  container: HTMLElement,
+  minItems: number,
+  existingData?: any
+): HTMLElement {
+  const item = document.createElement('div');
+  item.className = 'dynamic-array-item';
+  
+  const index = container.children.length;
+  
+  fields.forEach(field => {
+    const fieldName = `${arrayName}[${index}][${field.name}]`;
+    const fieldValue = existingData ? (existingData[field.name] || '') : '';
+    
+    if (field.type === 'select' && field.options) {
+      const selectField = createSelectField({
+        name: fieldName,
+        label: field.label,
+        options: field.options,
+        required: field.required,
+        selectedValue: fieldValue
+      });
+      item.appendChild(selectField);
+    } else {
+      const formField = createFormField({
+        type: field.type,
+        name: fieldName,
+        label: field.label,
+        required: field.required,
+        placeholder: field.placeholder,
+        value: String(fieldValue)
+      });
+      item.appendChild(formField);
+    }
+  });
+  
+  const removeButton = document.createElement('button');
+  removeButton.type = 'button';
+  removeButton.className = 'btn-remove';
+  removeButton.textContent = 'Remove';
+  
+  removeButton.addEventListener('click', () => {
+    if (container.children.length > minItems) {
+      item.remove();
+      reindexArrayItems(container, arrayName);
+    }
+  });
+  
+  if (minItems === 0 || container.children.length >= minItems) {
+    item.appendChild(removeButton);
+  }
+  
+  return item;
+}
+
+function reindexArrayItems(container: HTMLElement, arrayName: string): void {
+  Array.from(container.children).forEach((item, newIndex) => {
+    const inputs = item.querySelectorAll('input, textarea, select');
+    inputs.forEach(input => {
+      const nameAttr = (input as HTMLInputElement).name;
+      const fieldName = nameAttr.match(/\[([^\]]+)\]$/)?.[1];
+      if (fieldName) {
+        (input as HTMLInputElement).name = `${arrayName}[${newIndex}][${fieldName}]`;
+      }
+    });
+  });
+}
+
+function collectArrayData(form: HTMLFormElement, arrayName: string): any[] {
+  const items: any[] = [];
+  const formData = new FormData(form);
+  
+  let maxIndex = -1;
+  for (const key of formData.keys()) {
+    if (key.startsWith(`${arrayName}[`)) {
+      const match = key.match(/\[(\d+)\]/);
+      if (match) {
+        const index = parseInt(match[1]);
+        if (index > maxIndex) maxIndex = index;
+      }
+    }
+  }
+  
+  for (let i = 0; i <= maxIndex; i++) {
+    const item: any = {};
+    let hasData = false;
+    
+    for (const key of formData.keys()) {
+      if (key.startsWith(`${arrayName}[${i}]`)) {
+        const fieldMatch = key.match(/\[([^\]]+)\]$/);
+        if (fieldMatch) {
+          const fieldName = fieldMatch[1];
+          const value = formData.get(key);
+          if (value) {
+            item[fieldName] = fieldName === 'price' ? parseFloat(value as string) : value;
+            hasData = true;
+          }
+        }
+      }
+    }
+    
+    if (hasData) {
+      items.push(item);
+    }
+  }
+  
+  return items;
 }

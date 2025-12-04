@@ -2,6 +2,11 @@
 import { createBreadcrumb } from '../../../components/breadcrumb';
 import { createLoadingSpinner, hideLoadingSpinner } from '../../../components/loading-spinner';
 import { getBusinessById } from '../../../services/business.service';
+import { 
+  getAnalyticsSummary, 
+  getBusinessSessions, 
+  getBusinessLeads 
+} from '../../../services/chat.service';
 
 export async function renderAnalyticsDetail(businessId: string): Promise<HTMLElement> {
   const container = document.createElement('div');
@@ -12,8 +17,13 @@ export async function renderAnalyticsDetail(businessId: string): Promise<HTMLEle
   container.appendChild(spinner);
   
   try {
-    // Fetch business details
-    const business = await getBusinessById(businessId);
+    // Fetch business details and analytics data in parallel
+    const [business, analyticsSummary, recentSessions, recentLeads] = await Promise.all([
+      getBusinessById(businessId),
+      getAnalyticsSummary(businessId),
+      getBusinessSessions(businessId, undefined, 1, 5), // Last 5 sessions
+      getBusinessLeads(businessId, undefined, 1, 5) // Last 5 leads
+    ]);
     
     // Remove spinner
     hideLoadingSpinner(spinner);
@@ -37,76 +47,202 @@ export async function renderAnalyticsDetail(businessId: string): Promise<HTMLEle
     const statsGrid = document.createElement('div');
     statsGrid.className = 'stats-grid';
     
-    // Sessions stat
-    const sessionsCard = createStatCard('Total Sessions', '1,234', '+12% from last month');
+    // Real stats from chat service
+    const sessionsCard = createStatCard(
+      'Total Sessions', 
+      analyticsSummary.totalSessions.toString(),
+      `${analyticsSummary.activeSessions} active`
+    );
     statsGrid.appendChild(sessionsCard);
     
-    // Leads stat
-    const leadsCard = createStatCard('Total Leads', '456', '+8% from last month');
+    const leadsCard = createStatCard(
+      'Total Leads', 
+      analyticsSummary.totalLeads.toString(),
+      'Captured contacts'
+    );
     statsGrid.appendChild(leadsCard);
     
-    // Messages stat
-    const messagesCard = createStatCard('Total Messages', '5,678', '+15% from last month');
+    const messagesCard = createStatCard(
+      'Total Messages', 
+      analyticsSummary.totalMessages.toString(),
+      'Across all sessions'
+    );
     statsGrid.appendChild(messagesCard);
     
-    // Conversion rate stat
-    const conversionCard = createStatCard('Conversion Rate', '37%', '+3% from last month');
+    const conversionCard = createStatCard(
+      'Conversion Rate', 
+      `${analyticsSummary.conversionRate}%`,
+      'Sessions with contact'
+    );
     statsGrid.appendChild(conversionCard);
     
     statsSection.appendChild(statsGrid);
     container.appendChild(statsSection);
     
-    // Charts Section
-    const chartsSection = document.createElement('section');
-    chartsSection.className = 'charts-section';
-    
-    const chartsHeading = document.createElement('h2');
-    chartsHeading.textContent = 'Performance Over Time';
-    chartsSection.appendChild(chartsHeading);
-    
-    const chartPlaceholder = document.createElement('div');
-    chartPlaceholder.className = 'chart-placeholder';
-    chartPlaceholder.textContent = '[Chart will be rendered here]';
-    chartsSection.appendChild(chartPlaceholder);
-    
-    container.appendChild(chartsSection);
-    
-    // Recent Activity Section
-    const activitySection = document.createElement('section');
-    activitySection.className = 'activity-section';
-    
-    const activityHeading = document.createElement('h2');
-    activityHeading.textContent = 'Recent Activity';
-    activitySection.appendChild(activityHeading);
-    
-    const activityList = document.createElement('ul');
-    activityList.className = 'activity-list';
-    
-    // Sample activity items
-    const activities = [
-      { time: '2 hours ago', message: 'New lead captured from web chat' },
-      { time: '5 hours ago', message: 'Session started via WhatsApp' },
-      { time: '1 day ago', message: 'New lead captured from QR code scan' }
-    ];
-    
-    activities.forEach(activity => {
-      const li = document.createElement('li');
+    // Recent Sessions Section
+    if (recentSessions.length > 0) {
+      const sessionsSection = document.createElement('section');
+      sessionsSection.className = 'sessions-section';
       
-      const time = document.createElement('span');
-      time.className = 'activity-time';
-      time.textContent = activity.time;
-      li.appendChild(time);
+      const sessionsHeading = document.createElement('h2');
+      sessionsHeading.textContent = 'Recent Sessions';
+      sessionsSection.appendChild(sessionsHeading);
       
-      const message = document.createElement('span');
-      message.className = 'activity-message';
-      message.textContent = activity.message;
-      li.appendChild(message);
+      const sessionsTable = document.createElement('div');
+      sessionsTable.className = 'sessions-table';
       
-      activityList.appendChild(li);
-    });
+      // Table header
+      const tableHeader = document.createElement('div');
+      tableHeader.className = 'table-row table-header';
+      tableHeader.innerHTML = `
+        <div class="table-cell">Session ID</div>
+        <div class="table-cell">Status</div>
+        <div class="table-cell">Messages</div>
+        <div class="table-cell">Contact</div>
+        <div class="table-cell">Started</div>
+      `;
+      sessionsTable.appendChild(tableHeader);
+      
+      // Table rows
+      recentSessions.forEach(session => {
+        const row = document.createElement('div');
+        row.className = 'table-row';
+        
+        const sessionIdCell = document.createElement('div');
+        sessionIdCell.className = 'table-cell';
+        sessionIdCell.textContent = session.sessionId.substring(0, 8) + '...';
+        sessionIdCell.title = session.sessionId;
+        row.appendChild(sessionIdCell);
+        
+        const statusCell = document.createElement('div');
+        statusCell.className = 'table-cell';
+        statusCell.innerHTML = `<span class="status-badge status-${session.status}">${session.status}</span>`;
+        row.appendChild(statusCell);
+        
+        const messagesCell = document.createElement('div');
+        messagesCell.className = 'table-cell';
+        messagesCell.textContent = session.messageCount.toString();
+        row.appendChild(messagesCell);
+        
+        const contactCell = document.createElement('div');
+        contactCell.className = 'table-cell';
+        contactCell.textContent = session.contact.captured 
+          ? (session.contact.email || session.contact.phone || 'Yes')
+          : 'No';
+        row.appendChild(contactCell);
+        
+        const dateCell = document.createElement('div');
+        dateCell.className = 'table-cell';
+        dateCell.textContent = new Date(session.startedAt).toLocaleDateString();
+        row.appendChild(dateCell);
+        
+        // Make row clickable to view details
+        row.style.cursor = 'pointer';
+        row.addEventListener('click', () => {
+          // TODO: Navigate to session details page or open modal
+          alert(`View session ${session.sessionId}`);
+        });
+        
+        sessionsTable.appendChild(row);
+      });
+      
+      sessionsSection.appendChild(sessionsTable);
+      
+      // View all button
+      const viewAllBtn = document.createElement('button');
+      viewAllBtn.textContent = 'View All Sessions';
+      viewAllBtn.className = 'btn-secondary';
+      viewAllBtn.addEventListener('click', () => {
+        // TODO: Navigate to full sessions list or expand table
+        alert('View all sessions functionality - coming soon');
+      });
+      sessionsSection.appendChild(viewAllBtn);
+      
+      container.appendChild(sessionsSection);
+    }
     
-    activitySection.appendChild(activityList);
-    container.appendChild(activitySection);
+    // Recent Leads Section
+    if (recentLeads.length > 0) {
+      const leadsSection = document.createElement('section');
+      leadsSection.className = 'leads-section';
+      
+      const leadsHeading = document.createElement('h2');
+      leadsHeading.textContent = 'Recent Leads';
+      leadsSection.appendChild(leadsHeading);
+      
+      const leadsTable = document.createElement('div');
+      leadsTable.className = 'leads-table';
+      
+      // Table header
+      const tableHeader = document.createElement('div');
+      tableHeader.className = 'table-row table-header';
+      tableHeader.innerHTML = `
+        <div class="table-cell">Name</div>
+        <div class="table-cell">Email</div>
+        <div class="table-cell">Phone</div>
+        <div class="table-cell">Status</div>
+        <div class="table-cell">Captured</div>
+      `;
+      leadsTable.appendChild(tableHeader);
+      
+      // Table rows
+      recentLeads.forEach(lead => {
+        const row = document.createElement('div');
+        row.className = 'table-row';
+        
+        const nameCell = document.createElement('div');
+        nameCell.className = 'table-cell';
+        nameCell.textContent = lead.name || '-';
+        row.appendChild(nameCell);
+        
+        const emailCell = document.createElement('div');
+        emailCell.className = 'table-cell';
+        emailCell.textContent = lead.email || '-';
+        row.appendChild(emailCell);
+        
+        const phoneCell = document.createElement('div');
+        phoneCell.className = 'table-cell';
+        phoneCell.textContent = lead.phone || '-';
+        row.appendChild(phoneCell);
+        
+        const statusCell = document.createElement('div');
+        statusCell.className = 'table-cell';
+        statusCell.innerHTML = `<span class="status-badge status-${lead.status}">${lead.status}</span>`;
+        row.appendChild(statusCell);
+        
+        const dateCell = document.createElement('div');
+        dateCell.className = 'table-cell';
+        dateCell.textContent = new Date(lead.firstContactDate).toLocaleDateString();
+        row.appendChild(dateCell);
+        
+        leadsTable.appendChild(row);
+      });
+      
+      leadsSection.appendChild(leadsTable);
+      
+      // View all button
+      const viewAllBtn = document.createElement('button');
+      viewAllBtn.textContent = 'View All Leads';
+      viewAllBtn.className = 'btn-secondary';
+      viewAllBtn.addEventListener('click', () => {
+        // TODO: Navigate to full leads list
+        alert('View all leads functionality - coming soon');
+      });
+      leadsSection.appendChild(viewAllBtn);
+      
+      container.appendChild(leadsSection);
+    }
+    
+    // Empty state if no data
+    if (recentSessions.length === 0 && recentLeads.length === 0) {
+      const emptyState = document.createElement('div');
+      emptyState.className = 'empty-state';
+      emptyState.innerHTML = `
+        <p>No chat activity yet for this business.</p>
+        <p>Share your bot URL to start receiving conversations!</p>
+      `;
+      container.appendChild(emptyState);
+    }
     
   } catch (error) {
     hideLoadingSpinner(spinner);

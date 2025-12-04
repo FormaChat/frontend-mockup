@@ -49,6 +49,9 @@ import { renderChannelsDetail } from './pages/dashboard/channels/detail';
 import { renderAnalyticsIndex } from './pages/dashboard/analytics/index';
 import { renderAnalyticsDetail } from './pages/dashboard/analytics/detail';
 
+// Chat widget
+import { renderChatWidget } from './pages/public/chat-widget';
+
 // Route definition type
 type RouteHandler = () => void | Promise<void>;
 
@@ -215,6 +218,45 @@ class Router {
     this.route('/verify-email', () => {
       const content = renderVerifyEmail();
       renderTo(appRoot, content);
+    });
+
+    this.route('/chat/:businessId', async () => {
+      const params = this.getParams();
+      console.log('[Router] Loading chat widget for business:', params.businessId);
+      
+      try {
+        const content = await renderChatWidget(params.businessId);
+        renderTo(appRoot, content);
+      } catch (error) {
+        console.error('[Router] Chat widget failed to load:', error);
+        
+        // Show error in UI
+        const errorDiv = document.createElement('div');
+        errorDiv.style.cssText = `
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 100vh;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          text-align: center;
+          padding: 20px;
+        `;
+        errorDiv.innerHTML = `
+          <div>
+            <h1 style="font-size: 48px; margin-bottom: 20px;">❌</h1>
+            <h2 style="margin-bottom: 10px;">Failed to Load Chat</h2>
+            <p style="opacity: 0.9;">${error instanceof Error ? error.message : 'Unknown error occurred'}</p>
+            <button onclick="window.location.reload()" 
+              style="margin-top: 20px; padding: 10px 20px; background: white; 
+              color: #667eea; border: none; border-radius: 5px; cursor: pointer; 
+              font-weight: 600;">
+              Retry
+            </button>
+          </div>
+        `;
+        renderTo(appRoot, errorDiv);
+      }
     });
 
     // ========================================
