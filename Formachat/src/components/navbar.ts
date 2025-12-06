@@ -1,9 +1,11 @@
-// components/navbar.ts
 import { createUserProfileDropdown } from './user-profile-dropdown';
 import type { UserProfileData } from './user-profile-dropdown';
-import { getUser } from '../utils/auth.utils';
 
-export function createNavbar(): HTMLElement {
+/**
+ * Create navbar with user profile dropdown
+ * @param userProfile - User profile data to display (optional)
+ */
+export function createNavbar(userProfile?: UserProfileData | null): HTMLElement {
   const nav = document.createElement('nav');
   nav.className = 'navbar';
   
@@ -23,17 +25,16 @@ export function createNavbar(): HTMLElement {
   const rightSection = document.createElement('div');
   rightSection.className = 'navbar-right';
   
-  // Get user data from localStorage
-  const user = getUser();
-  
-  if (user) {
-    const userProfileData: UserProfileData = {
-      username: "user.name || user.email,,",
-      lastLogin: "user.lastLogin"
-    };
-    
-    const profileDropdown = createUserProfileDropdown(userProfileData);
+  // Add user profile dropdown if user data is available
+  if (userProfile) {
+    const profileDropdown = createUserProfileDropdown(userProfile);
     rightSection.appendChild(profileDropdown);
+  } else {
+    // Fallback: show a loading state or login button
+    const placeholder = document.createElement('span');
+    placeholder.textContent = 'Loading...';
+    placeholder.className = 'user-loading';
+    rightSection.appendChild(placeholder);
   }
   
   nav.appendChild(rightSection);

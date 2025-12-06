@@ -1,5 +1,3 @@
-// components/business-card.ts
-
 export interface BusinessCardData {
   id: string;
   name: string;

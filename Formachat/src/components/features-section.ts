@@ -1,5 +1,3 @@
-// components/features-section.ts
-
 export interface Feature {
   title: string;
   description: string;

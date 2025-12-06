@@ -1,23 +1,6 @@
-// # API calls: createSession(), sendMessage(), etc./**
-//  * ========================================
-//  * CHAT SERVICE (Business Owner Dashboard)
-//  * ========================================
-//  * 
-//  * Handles chat-related API calls for business owners.
-//  * These are PROTECTED endpoints - require authentication.
-//  * 
-//  * Functions:
-//  * - getBusinessSessions: Get all chat sessions for a business
-//  * - getBusinessLeads: Get all captured leads for a business
-//  * - getSessionDetails: Get detailed view of a specific session
-//  * 
-//  * Note: Public chat endpoints (create session, send message, etc.)
-//  * are used by the chat widget, not the dashboard.
-//  */
-
 import { apiGet, apiPost } from '../utils/api.utils';
-import { CHAT_ENDPOINTS } from '../config/api';
-import type { ApiResponse } from '../config/api';
+import { CHAT_ENDPOINTS } from '../config/api.config';
+import type { ApiResponse } from '../config/api.config';
 import type {
   ChatSession,
   ContactLead,
@@ -26,18 +9,9 @@ import type {
   SessionDetailsResponse,
   SessionFilters,
   LeadFilters
-} from '../types/chat';
+} from '../types/chat.types';
 
-/**
- * ========================================
- * PUBLIC CHAT FUNCTIONS (For Widget)
- * ========================================
- */
 
-/**
- * Create a new chat session
- * Used when widget first loads
- */
 export const createChatSession = async (businessId: string): Promise<{
   sessionId: string;
   visitorId: string;
@@ -61,9 +35,7 @@ export const createChatSession = async (businessId: string): Promise<{
   return response.data;
 };
 
-/**
- * Send a message and get bot response
- */
+
 export const sendChatMessage = async (
   sessionId: string,
   message: string
@@ -89,9 +61,7 @@ export const sendChatMessage = async (
   return response.data;
 };
 
-/**
- * Get message history for a session
- */
+
 export const getChatMessages = async (
   sessionId: string,
   page: number = 1,
@@ -126,9 +96,7 @@ export const getChatMessages = async (
   return response.data;
 };
 
-/**
- * End a chat session
- */
+
 export const endChatSession = async (sessionId: string): Promise<void> => {
   console.log('[ChatService] Ending session:', sessionId);
 
@@ -141,9 +109,7 @@ export const endChatSession = async (sessionId: string): Promise<void> => {
   console.log('[ChatService] ✓ Session ended');
 };
 
-/**
- * Get existing session details
- */
+
 export const getChatSession = async (sessionId: string): Promise<{
   sessionId: string;
   businessId: string;
@@ -168,38 +134,6 @@ export const getChatSession = async (sessionId: string): Promise<{
 };
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/**
- * ========================================
- * GET BUSINESS SESSIONS
- * ========================================
- * 
- * Retrieves all chat sessions for a specific business.
- * Used in Analytics page to show session history.
- * 
- * @param businessId - Business ID (MongoDB ObjectId)
- * @param filters - Optional filters (status, dates, contactCaptured)
- * @param page - Page number (default: 1)
- * @param limit - Items per page (default: 20)
- * @returns List of sessions with pagination
- * 
- * Backend Route: GET /business/:businessId/sessions
- * Auth: Required (JWT + Ownership check)
- */
 export const getBusinessSessions = async (
   businessId: string,
   filters?: SessionFilters,
@@ -208,7 +142,6 @@ export const getBusinessSessions = async (
 ): Promise<ChatSession[]> => {
   console.log('[ChatService] Fetching sessions for business:', businessId);
 
-  // Build query params
   const params = new URLSearchParams();
   params.append('page', page.toString());
   params.append('limit', limit.toString());
@@ -241,23 +174,7 @@ export const getBusinessSessions = async (
   return response.data.sessions;
 };
 
-/**
- * ========================================
- * GET BUSINESS LEADS
- * ========================================
- * 
- * Retrieves all captured leads (contacts) for a business.
- * Used in Analytics page to show lead management/CRM.
- * 
- * @param businessId - Business ID
- * @param filters - Optional filters (status, dates)
- * @param page - Page number (default: 1)
- * @param limit - Items per page (default: 50)
- * @returns List of leads with pagination
- * 
- * Backend Route: GET /business/:businessId/leads
- * Auth: Required (JWT + Ownership check)
- */
+
 export const getBusinessLeads = async (
   businessId: string,
   filters?: LeadFilters,
@@ -266,7 +183,6 @@ export const getBusinessLeads = async (
 ): Promise<ContactLead[]> => {
   console.log('[ChatService] Fetching leads for business:', businessId);
 
-  // Build query params
   const params = new URLSearchParams();
   params.append('page', page.toString());
   params.append('limit', limit.toString());
@@ -295,21 +211,7 @@ export const getBusinessLeads = async (
   return response.data.leads;
 };
 
-/**
- * ========================================
- * GET SESSION DETAILS
- * ========================================
- * 
- * Retrieves detailed information about a specific session,
- * including full conversation history.
- * 
- * @param businessId - Business ID
- * @param sessionId - Session ID
- * @returns Session details with full message history
- * 
- * Backend Route: GET /business/:businessId/session/:sessionId
- * Auth: Required (JWT + Ownership check)
- */
+
 export const getSessionDetails = async (
   businessId: string,
   sessionId: string
@@ -328,67 +230,13 @@ export const getSessionDetails = async (
   return response.data;
 };
 
-/**
- * ========================================
- * HELPER: GET SESSION COUNT
- * ========================================
- * 
- * Get total number of sessions for a business.
- * Useful for dashboard statistics.
- * 
- * @param businessId - Business ID
- * @returns Total session count
- */
-export const getSessionCount = async (businessId: string): Promise<number> => {
-  try {
-    const sessions = await getBusinessSessions(businessId, undefined, 1, 1);
-    // Note: This is a workaround. Ideally, backend should have a /stats endpoint
-    // For now, we get page 1 with limit 1, then check pagination.total
-    return sessions.length; // This won't give accurate count, needs backend update
-  } catch (error) {
-    console.error('[ChatService] Failed to get session count:', error);
-    return 0;
-  }
-};
 
-/**
- * ========================================
- * HELPER: GET LEAD COUNT
- * ========================================
- * 
- * Get total number of leads for a business.
- * Useful for dashboard statistics.
- * 
- * @param businessId - Business ID
- * @returns Total lead count
- */
-export const getLeadCount = async (businessId: string): Promise<number> => {
-  try {
-    const leads = await getBusinessLeads(businessId, undefined, 1, 1);
-    return leads.length; // Same limitation as above
-  } catch (error) {
-    console.error('[ChatService] Failed to get lead count:', error);
-    return 0;
-  }
-};
-
-/**
- * ========================================
- * HELPER: GET ANALYTICS SUMMARY
- * ========================================
- * 
- * Get summary statistics for analytics dashboard.
- * Returns key metrics like total sessions, leads, etc.
- * 
- * @param businessId - Business ID
- * @returns Analytics summary object
- */
 export interface AnalyticsSummary {
   totalSessions: number;
   activeSessions: number;
   totalLeads: number;
   totalMessages: number;
-  conversionRate: number; // Percentage of sessions that captured contact
+  conversionRate: number; 
 }
 
 export const getAnalyticsSummary = async (
@@ -397,15 +245,16 @@ export const getAnalyticsSummary = async (
   console.log('[ChatService] Fetching analytics summary for:', businessId);
 
   try {
-    // Fetch recent sessions and leads
+   
     const [allSessions, leads] = await Promise.all([
       getBusinessSessions(businessId, undefined, 1, 100),
       getBusinessLeads(businessId, undefined, 1, 100)
+      
     ]);
 
     const activeSessions = allSessions.filter(s => s.status === 'active').length;
     const totalMessages = allSessions.reduce((sum, s) => sum + s.messageCount, 0);
-    const sessionsWithContact = allSessions.filter(s => s.contact.captured).length;
+    const sessionsWithContact = allSessions.filter(s => s.contact?.captured).length;
     const conversionRate = allSessions.length > 0 
       ? (sessionsWithContact / allSessions.length) * 100 
       : 0;
@@ -423,16 +272,10 @@ export const getAnalyticsSummary = async (
   }
 };
 
-/**
- * ========================================
- * EXPORTS
- * ========================================
- */
+
 export default {
   getBusinessSessions,
   getBusinessLeads,
   getSessionDetails,
-  getSessionCount,
-  getLeadCount,
   getAnalyticsSummary
 };

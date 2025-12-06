@@ -6,21 +6,24 @@ import {
   endChatSession
 } from '../../services/chat.service';
 
-export async function renderChatWidget(businessId: string): Promise<HTMLElement> {
+export async function renderChatWidget(businessId: string, embedMode: boolean = false): Promise<HTMLElement> {
   const container = document.createElement('div');
   container.className = 'chat-widget-container';
+  
+  // Check BOTH: router param OR URL param (for direct access AND widget.js)
+  const urlParams = new URLSearchParams(window.location.search);
+  const isEmbedMode = embedMode || urlParams.get('embed') === 'true';
+  
   container.style.cssText = `
     width: 100%;
     height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: ${isEmbedMode ? 'transparent' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'};
   `;
   
-  // Check URL params
-  const urlParams = new URLSearchParams(window.location.search);
-  const isEmbedMode = urlParams.get('embed') === 'true';
+  console.log('[Chat Widget] Embed mode:', isEmbedMode, '(router:', embedMode, ', URL:', urlParams.get('embed'), ')');
   
   // Show loading
   const loadingDiv = createLoadingView();
@@ -47,7 +50,7 @@ export async function renderChatWidget(businessId: string): Promise<HTMLElement>
     // Remove loading, show chat
     container.removeChild(loadingDiv);
     
-    // Build chat UI
+    // Build chat UI - use combined isEmbedMode
     const chatUI = createChatUI(business, session, isEmbedMode);
     container.appendChild(chatUI);
     

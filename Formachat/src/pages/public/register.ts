@@ -7,7 +7,7 @@
  */
 
 import { register, verifyEmail, resendOTP } from '../../services/auth.service';
-import { OTPType } from '../../types/auth';
+import { OTPType } from '../../types/auth.types';
 
 let registeredEmail = '';
 

@@ -1,13 +1,16 @@
 // pages/dashboard/layout.ts
 import { createNavbar } from '../../components/navbar';
 import { createSidebar } from '../../components/sidebar';
+import { getUserDetails } from '../../utils/userDetails.utils';
 
-export function renderDashboardLayout(content: HTMLElement): HTMLElement {
+export async function renderDashboardLayout(content: HTMLElement): Promise<HTMLElement> {
   const container = document.createElement('div');
   container.className = 'dashboard-layout';
+
+  const userProfile = await getUserDetails();
   
   // Navbar (fixed at top)
-  const navbar = createNavbar();
+  const navbar = createNavbar(userProfile);
   container.appendChild(navbar);
   
   // Main content area (sidebar + content)

@@ -118,7 +118,7 @@ export async function renderChannelsDetail(businessId: string): Promise<HTMLElem
     floatingDesc.style.cssText = 'font-size: 14px; color: #666; margin-bottom: 15px;';
     floatingOption.appendChild(floatingDesc);
 
-    const floatingCode = `<script src="https://formachat.com/widget.js"></script>
+    const floatingCode = `<script src="http://localhost:5173/widget.js"></script>
     <script>
       FormachatWidget.init({
         businessId: '${business._id}'

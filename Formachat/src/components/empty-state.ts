@@ -1,5 +1,3 @@
-// components/empty-state.ts
-
 export interface EmptyStateConfig {
   message: string;
   buttonText?: string;

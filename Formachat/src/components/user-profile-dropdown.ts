@@ -1,4 +1,3 @@
-// components/user-profile-dropdown.ts
 import { logout } from '../utils/auth.utils';
 
 export interface UserProfileData {

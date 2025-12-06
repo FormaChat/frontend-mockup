@@ -1,5 +1,3 @@
-// components/loading-spinner.ts
-
 export function createLoadingSpinner(message: string = 'Loading...'): HTMLElement {
   const container = document.createElement('div');
   container.className = 'loading-spinner-container';

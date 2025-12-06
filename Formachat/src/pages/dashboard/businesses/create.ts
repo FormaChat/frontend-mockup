@@ -1,7 +1,7 @@
 // pages/dashboard/businesses/create.ts
 import { createBreadcrumb } from '../../../components/breadcrumb';
 import { createBusiness } from '../../../services/business.service';
-import type { CreateBusinessRequest } from '../../../types/business';
+import type { CreateBusinessRequest } from '../../../types/business.types';
 
 export async function renderBusinessCreate(): Promise<HTMLElement> {
   const container = document.createElement('div');

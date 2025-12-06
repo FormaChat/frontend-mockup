@@ -2,7 +2,7 @@
 import { createBreadcrumb } from '../../../components/breadcrumb';
 import { createLoadingSpinner, hideLoadingSpinner } from '../../../components/loading-spinner';
 import { getBusinessById, updateBusiness } from '../../../services/business.service';
-import type { UpdateBusinessRequest, Business } from '../../../types/business';
+import type { UpdateBusinessRequest, Business } from '../../../types/business.types';
 
 export async function renderBusinessEdit(businessId: string): Promise<HTMLElement> {
   const container = document.createElement('div');

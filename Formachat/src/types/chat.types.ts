@@ -1,35 +1,11 @@
-/**
- * ========================================
- * CHAT TYPE DEFINITIONS
- * ========================================
- * 
- * TypeScript interfaces for chat-related data structures.
- * Matches the Chat Service API responses.
- */
-
-/**
- * Session Status
- */
 export type SessionStatus = 'active' | 'ended' | 'abandoned';
 
-/**
- * Message Role
- */
 export type MessageRole = 'user' | 'assistant' | 'system';
 
-/**
- * Intent Type
- */
 export type IntentType = 'enquiry' | 'booking' | 'purchase' | 'support';
 
-/**
- * Lead Status
- */
 export type LeadStatus = 'new' | 'contacted' | 'qualified' | 'converted' | 'spam';
 
-/**
- * Contact Information (captured from chat)
- */
 export interface ContactInfo {
   captured: boolean;
   email?: string;
@@ -39,18 +15,12 @@ export interface ContactInfo {
   capturedInMessageId?: string;
 }
 
-/**
- * Intent Detection
- */
 export interface Intent {
   type: IntentType;
   confidence?: number;
   detectedAt?: Date;
 }
 
-/**
- * Agent Handoff (future)
- */
 export interface AgentHandoff {
   isHandedOff: boolean;
   agentType?: string;
@@ -58,9 +28,6 @@ export interface AgentHandoff {
   completedAt?: Date;
 }
 
-/**
- * Chat Session
- */
 export interface ChatSession {
   sessionId: string;
   businessId: string;
@@ -83,9 +50,6 @@ export interface ChatSession {
   tags: string[];
 }
 
-/**
- * Chat Message
- */
 export interface ChatMessage {
   _id?: string;
   sessionId: string;
@@ -113,9 +77,6 @@ export interface ChatMessage {
   timestamp: Date;
 }
 
-/**
- * Contact Lead
- */
 export interface ContactLead {
   _id: string;
   businessId: string;
@@ -141,17 +102,11 @@ export interface ContactLead {
   updatedAt: Date;
 }
 
-/**
- * Create Session Request
- */
 export interface CreateSessionRequest {
   businessId: string;
   visitorId?: string;
 }
 
-/**
- * Create Session Response
- */
 export interface CreateSessionResponse {
   sessionId: string;
   visitorId: string;
@@ -162,24 +117,16 @@ export interface CreateSessionResponse {
   };
 }
 
-/**
- * Send Message Request
- */
 export interface SendMessageRequest {
   message: string;
 }
 
-/**
- * Send Message Response
- */
 export interface SendMessageResponse {
   message: ChatMessage;
   contactCaptured: boolean;
 }
 
-/**
- * Get Messages Response
- */
+
 export interface GetMessagesResponse {
   messages: ChatMessage[];
   pagination: {
@@ -190,9 +137,6 @@ export interface GetMessagesResponse {
   };
 }
 
-/**
- * Session List Response
- */
 export interface SessionListResponse {
   sessions: ChatSession[];
   pagination: {
@@ -203,9 +147,6 @@ export interface SessionListResponse {
   };
 }
 
-/**
- * Lead List Response
- */
 export interface LeadListResponse {
   leads: ContactLead[];
   pagination: {
@@ -216,17 +157,11 @@ export interface LeadListResponse {
   };
 }
 
-/**
- * Session Details Response
- */
 export interface SessionDetailsResponse {
   session: ChatSession;
   messages: ChatMessage[];
 }
 
-/**
- * Session Filters (for business owner dashboard)
- */
 export interface SessionFilters {
   status?: SessionStatus;
   contactCaptured?: boolean;
@@ -234,9 +169,6 @@ export interface SessionFilters {
   endDate?: Date;
 }
 
-/**
- * Lead Filters (for business owner dashboard)
- */
 export interface LeadFilters {
   status?: LeadStatus;
   startDate?: Date;

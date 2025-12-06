@@ -17,7 +17,7 @@
  * }
  */
 
-import type { AuthTokens, User } from '../types/auth';
+import type { AuthTokens, User } from '../types/auth.types';
 
 // LocalStorage keys
 const TOKEN_KEY = 'formachat_tokens';
@@ -26,10 +26,22 @@ const USER_KEY = 'formachat_user';
 /**
  * Save auth tokens to localStorage
  */
-export const saveTokens = (tokens: AuthTokens): void => {
+export const saveTokens = (tokens: { accessToken: string; refreshToken: string }): void => {
   try {
-    localStorage.setItem(TOKEN_KEY, JSON.stringify(tokens));
-    console.log('[Auth] Tokens saved');
+    const authTokens: AuthTokens = {
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken
+    };
+    localStorage.setItem(TOKEN_KEY, JSON.stringify(authTokens));
+    
+    // Decode and log expiry for debugging
+    try {
+      const payload = JSON.parse(atob(tokens.accessToken.split('.')[1]));
+      const expiryDate = new Date(payload.exp * 1000);
+      console.log('[Auth]  Token saved, expires at:', expiryDate.toISOString());
+    } catch {
+      console.log('[Auth] Tokens saved');
+    }
   } catch (error) {
     console.error('[Auth] Failed to save tokens:', error);
   }
@@ -66,9 +78,6 @@ export const getRefreshToken = (): string | null => {
   return tokens?.refreshToken || null;
 };
 
-/**
- * Delete tokens from localStorage
- */
 export const deleteTokens = (): void => {
   try {
     localStorage.removeItem(TOKEN_KEY);
@@ -78,9 +87,6 @@ export const deleteTokens = (): void => {
   }
 };
 
-/**
- * Save user data to localStorage
- */
 export const saveUser = (user: User): void => {
   try {
     localStorage.setItem(USER_KEY, JSON.stringify(user));
@@ -90,9 +96,6 @@ export const saveUser = (user: User): void => {
   }
 };
 
-/**
- * Get user data from localStorage
- */
 export const getUser = (): User | null => {
   try {
     const userJson = localStorage.getItem(USER_KEY);
@@ -105,9 +108,7 @@ export const getUser = (): User | null => {
   }
 };
 
-/**
- * Delete user data from localStorage
- */
+
 export const deleteUser = (): void => {
   try {
     localStorage.removeItem(USER_KEY);
@@ -117,28 +118,20 @@ export const deleteUser = (): void => {
   }
 };
 
-/**
- * Check if user is authenticated
- * (has valid tokens in localStorage)
- */
+
 export const isAuthenticated = (): boolean => {
   const tokens = getTokens();
   return tokens !== null && !!tokens.accessToken;
 };
 
-/**
- * Logout user (clear all auth data)
- */
+
 export const logout = (): void => {
   deleteTokens();
   deleteUser();
   console.log('[Auth] User logged out');
 };
 
-/**
- * Decode JWT token (without verification)
- * Used to extract userId, email, exp from token
- */
+
 export const decodeToken = (token: string): any | null => {
   try {
     const base64Url = token.split('.')[1];
@@ -157,9 +150,7 @@ export const decodeToken = (token: string): any | null => {
   }
 };
 
-/**
- * Check if access token is expired
- */
+
 export const isTokenExpired = (token: string): boolean => {
   const decoded = decodeToken(token);
   if (!decoded || !decoded.exp) return true;
@@ -168,9 +159,30 @@ export const isTokenExpired = (token: string): boolean => {
   return decoded.exp < now;
 };
 
-/**
- * Get user ID from access token
- */
+
+export const isTokenExpiredSoon = (token: string): boolean => {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const expiryTime = payload.exp * 1000; // Convert to milliseconds
+    const currentTime = Date.now();
+    
+    const isExpiring = expiryTime - currentTime < 30000;
+    
+    if (isExpiring) {
+      console.warn('[Auth] Token expired or expiring soon', {
+        expiresAt: new Date(expiryTime).toISOString(),
+        currentTime: new Date(currentTime).toISOString(),
+        timeLeft: Math.floor((expiryTime - currentTime) / 1000) + 's'
+      });
+    }
+    
+    return isExpiring;
+  } catch (error) {
+    console.error('[Auth] Failed to parse token:', error);
+    return true; 
+  }
+};
+
 export const getUserIdFromToken = (): string | null => {
   const accessToken = getAccessToken();
   if (!accessToken) return null;
@@ -179,9 +191,6 @@ export const getUserIdFromToken = (): string | null => {
   return decoded?.userId || null;
 };
 
-/**
- * Get user email from access token
- */
 export const getUserEmailFromToken = (): string | null => {
   const accessToken = getAccessToken();
   if (!accessToken) return null;

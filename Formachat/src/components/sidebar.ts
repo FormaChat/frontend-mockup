@@ -1,5 +1,3 @@
-// components/sidebar.ts
-
 export interface SidebarItem {
   label: string;
   path: string;
@@ -52,9 +50,9 @@ export function createSidebar(): HTMLElement {
   return sidebar;
 }
 
-/**
- * Toggle sidebar visibility (for mobile/responsive)
- */
+
+//Toggle sidebar visibility (for mobile/responsive)
+
 export function toggleSidebar(sidebar: HTMLElement): void {
   sidebar.classList.toggle('collapsed');
 }

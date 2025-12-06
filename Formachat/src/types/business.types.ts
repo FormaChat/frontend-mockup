@@ -1,16 +1,3 @@
-// # Interfaces for Business, Questionnaire, etc.
-/**
- * ========================================
- * BUSINESS TYPE DEFINITIONS
- * ========================================
- * 
- * TypeScript interfaces for business-related data structures.
- * Matches the Business Service API responses.
- */
-
-/**
- * Business Types (dropdown options)
- */
 export type BusinessType = 
   | 'E-commerce' 
   | 'Real Estate' 
@@ -22,18 +9,12 @@ export type BusinessType =
   | 'Education' 
   | 'Other';
 
-/**
- * Service Delivery Options (multi-select)
- */
 export type ServiceDeliveryType = 
   | 'Delivery' 
   | 'Pickup' 
   | 'In-person' 
   | 'Online/Virtual';
 
-/**
- * Chatbot Tone Options (dropdown)
- */
 export type ChatbotTone = 
   | 'Friendly' 
   | 'Professional' 
@@ -41,9 +22,6 @@ export type ChatbotTone =
   | 'Formal' 
   | 'Playful';
 
-/**
- * Contact Method Types (dropdown)
- */
 export type ContactMethodType = 
   | 'Email' 
   | 'Phone' 
@@ -51,9 +29,7 @@ export type ContactMethodType =
   | 'Live Chat' 
   | 'Social Media';
 
-/**
- * Chatbot Capabilities (multi-select)
- */
+
 export type ChatbotCapabilityType = 
   | 'Answer FAQs' 
   | 'Book appointments' 
@@ -62,14 +38,10 @@ export type ChatbotCapabilityType =
   | 'Provide product info'
   | 'Process orders';
 
-/**
- * Vector Status
- */
+
 export type VectorStatus = 'pending' | 'completed' | 'failed' | 'frozen';
 
-/**
- * Basic Info Section
- */
+
 export interface BasicInfo {
   businessName: string;
   businessDescription: string;
@@ -79,26 +51,17 @@ export interface BasicInfo {
   timezone?: string;
 }
 
-/**
- * Popular Item
- */
 export interface PopularItem {
   name: string;
   description?: string;
   price?: number;
 }
 
-/**
- * Pricing Display Settings
- */
 export interface PricingDisplay {
   canDiscussPricing: boolean;
   pricingNote?: string;
 }
 
-/**
- * Products/Services Section
- */
 export interface ProductsServices {
   offerings: string;
   popularItems: PopularItem[];
@@ -106,26 +69,18 @@ export interface ProductsServices {
   pricingDisplay?: PricingDisplay;
 }
 
-/**
- * FAQ Item
- */
 export interface FAQ {
   question: string;
   answer: string;
 }
 
-/**
- * Policies
- */
+
 export interface Policies {
   refundPolicy: string;
   cancellationPolicy?: string;
   importantPolicies?: string;
 }
 
-/**
- * Customer Support Section
- */
 export interface CustomerSupport {
   faqs: FAQ[];
   policies: Policies;
@@ -134,35 +89,23 @@ export interface CustomerSupport {
   chatbotRestrictions?: string;
 }
 
-/**
- * Contact Method
- */
 export interface ContactMethod {
   method: ContactMethodType;
   value: string;
 }
 
-/**
- * Escalation Contact
- */
 export interface EscalationContact {
   name: string;
   email: string;
   phone?: string;
 }
 
-/**
- * Contact Escalation Section
- */
 export interface ContactEscalation {
   contactMethods: ContactMethod[];
   escalationContact: EscalationContact;
   chatbotCapabilities: ChatbotCapabilityType[];
 }
 
-/**
- * File Document (PRO+ tier)
- */
 export interface FileDocument {
   fileName: string;
   fileUrl: string;
@@ -170,9 +113,7 @@ export interface FileDocument {
   fileSize: number;
 }
 
-/**
- * File Image (PRO+ tier)
- */
+
 export interface FileImage {
   fileName: string;
   fileUrl: string;
@@ -180,17 +121,12 @@ export interface FileImage {
   category?: string;
 }
 
-/**
- * Files Section (PRO+ tier)
- */
+
 export interface Files {
   documents: FileDocument[];
   images: FileImage[];
 }
 
-/**
- * Vector Info
- */
 export interface VectorInfo {
   namespace: string;
   lastVectorUpdate: Date;
@@ -204,9 +140,6 @@ export interface VectorInfo {
   };
 }
 
-/**
- * Freeze Info
- */
 export interface FreezeInfo {
   isFrozen: boolean;
   reason?: 'trial_expired' | 'payment_failed' | 'admin_action' | 'subscription_canceled' | 'user_requested';
@@ -216,9 +149,6 @@ export interface FreezeInfo {
   autoUnfreezeAt?: Date;
 }
 
-/**
- * Complete Business Object
- */
 export interface Business {
   _id: string;
   userId: string;
@@ -235,9 +165,7 @@ export interface Business {
   updatedAt: Date;
 }
 
-/**
- * Create Business Request (all at once)
- */
+
 export interface CreateBusinessRequest {
   basicInfo: BasicInfo;
   productsServices: ProductsServices;
@@ -245,9 +173,6 @@ export interface CreateBusinessRequest {
   contactEscalation: ContactEscalation;
 }
 
-/**
- * Update Business Request (partial)
- */
 export interface UpdateBusinessRequest {
   basicInfo?: Partial<BasicInfo>;
   productsServices?: Partial<ProductsServices>;
@@ -255,9 +180,6 @@ export interface UpdateBusinessRequest {
   contactEscalation?: Partial<ContactEscalation>;
 }
 
-/**
- * Business List Response
- */
 export interface BusinessListResponse {
   businesses: Business[];
   pagination: {
@@ -268,9 +190,6 @@ export interface BusinessListResponse {
   };
 }
 
-/**
- * Business Chat Config (from internal API)
- */
 export interface BusinessChatConfig {
   allowed: boolean;
   config?: {

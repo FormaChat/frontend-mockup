@@ -1,5 +1,3 @@
-// components/delete-confirmation.ts
-
 export interface DeleteConfirmationConfig {
   itemName: string;
   onConfirm: () => void;

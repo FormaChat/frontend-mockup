@@ -7,7 +7,7 @@
  */
 
 import { verifyEmail, resendOTP } from '../../services/auth.service';
-import { OTPType } from '../../types/auth';
+import { OTPType } from '../../types/auth.types';
 
 export function renderVerifyEmail(): HTMLElement {
   const container = document.createElement('div');

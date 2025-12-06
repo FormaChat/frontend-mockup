@@ -1,5 +1,3 @@
-// components/feedback-form.ts
-
 export function createFeedbackForm(): HTMLElement {
   const container = document.createElement('div');
   container.className = 'feedback-form';

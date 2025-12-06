@@ -1,5 +1,3 @@
-// components/modal.ts
-
 export interface ModalConfig {
   title: string;
   content: HTMLElement | string;

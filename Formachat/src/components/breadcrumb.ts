@@ -1,8 +1,6 @@
-// components/breadcrumb.ts
-
 export interface BreadcrumbItem {
   label: string;
-  path?: string; // If undefined, it's the current page (not clickable)
+  path?: string; 
 }
 
 export function createBreadcrumb(items: BreadcrumbItem[]): HTMLElement {
