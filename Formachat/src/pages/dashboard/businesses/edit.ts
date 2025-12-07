@@ -768,7 +768,7 @@ function createDynamicItem(arrayName: string, fields: any[], container: HTMLElem
 // Helper to extract array data from form inputs based on naming convention
 function collectArrayData(form: HTMLFormElement, arrayName: string): any[] {
     const results: any[] = [];
-    const formData = new FormData(form);
+    
     
     // Naive regex parsing for names like popularItems[0][name]
     // A more robust way is to query the DOM

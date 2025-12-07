@@ -43,6 +43,7 @@ export const AUTH_ENDPOINTS = {
   // User Profile
   PROFILE: `${API_BASE_URLS.AUTH}/profile`,
   SESSIONS: `${API_BASE_URLS.AUTH}/sessions`,
+  FEEDBACK: `${API_BASE_URLS.AUTH}/feedback`,
   
   // Health
   HEALTH: `${API_BASE_URLS.AUTH}/health`,
@@ -77,7 +78,8 @@ export const CHAT_ENDPOINTS = {
   BUSINESS_LEADS: (businessId: string) => `${API_BASE_URLS.CHAT}/business/${businessId}/leads`,
   BUSINESS_SESSION_DETAILS: (businessId: string, sessionId: string) => 
     `${API_BASE_URLS.CHAT}/business/${businessId}/session/${sessionId}`,
-  
+  BUSINESS_DASHBOARD_SUMMARY: (businessId: string) => 
+    `${API_BASE_URLS.CHAT}/business/${businessId}/dashboard-summary`,
 } as const;
 
 

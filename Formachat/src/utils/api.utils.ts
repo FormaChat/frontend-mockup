@@ -6,8 +6,84 @@ import { generateUniqueIdempotencyKey } from './idempotency.utils';
 interface ApiFetchOptions extends RequestInit {
   skipAuth?: boolean; 
   skipIdempotency?: boolean;
+  skipCache?: boolean; // NEW: Option to bypass cache for specific requests
 }
 
+// ========================================
+// REQUEST CACHE FOR DEDUPLICATION
+// ========================================
+interface CacheEntry<T> {
+  promise: Promise<ApiResponse<T>>;
+  timestamp: number;
+}
+
+const requestCache = new Map<string, CacheEntry<any>>();
+const CACHE_DURATION = 100; // milliseconds to cache in-flight requests
+const CACHE_CLEANUP_INTERVAL = 5000; // Clean up old entries every 5 seconds
+
+// Clean up stale cache entries periodically
+setInterval(() => {
+  const now = Date.now();
+  const keysToDelete: string[] = [];
+  
+  requestCache.forEach((entry, key) => {
+    if (now - entry.timestamp > CACHE_DURATION) {
+      keysToDelete.push(key);
+    }
+  });
+  
+  keysToDelete.forEach(key => requestCache.delete(key));
+  
+  if (keysToDelete.length > 0) {
+    console.log(`[API Cache] Cleaned up ${keysToDelete.length} stale entries`);
+  }
+}, CACHE_CLEANUP_INTERVAL);
+
+/**
+ * Generate a cache key from URL and options
+ */
+function generateCacheKey(url: string, options: ApiFetchOptions): string {
+  const method = (options.method || 'GET').toUpperCase();
+  const body = options.body ? JSON.stringify(options.body) : '';
+  return `${method}:${url}:${body}`;
+}
+
+/**
+ * Get cached request or create new one
+ */
+function getCachedRequest<T>(
+  cacheKey: string,
+  requestFn: () => Promise<ApiResponse<T>>
+): Promise<ApiResponse<T>> {
+  const cached = requestCache.get(cacheKey);
+  const now = Date.now();
+  
+  // Return cached promise if it exists and is still fresh
+  if (cached && (now - cached.timestamp) < CACHE_DURATION) {
+    console.log('[API Cache] Using cached request:', cacheKey);
+    return cached.promise;
+  }
+  
+  // Create new request
+  console.log('[API Cache] Creating new request:', cacheKey);
+  const promise = requestFn().finally(() => {
+    // Remove from cache after a short delay to allow concurrent requests to use it
+    setTimeout(() => {
+      requestCache.delete(cacheKey);
+    }, CACHE_DURATION);
+  });
+  
+  requestCache.set(cacheKey, {
+    promise,
+    timestamp: now
+  });
+  
+  return promise;
+}
+
+// ========================================
+// TOKEN REFRESH
+// ========================================
 export const refreshAccessToken = async (): Promise<boolean> => {
   try {
     const refreshToken = getRefreshToken();
@@ -58,12 +134,36 @@ export const refreshAccessToken = async (): Promise<boolean> => {
   }
 };
 
-
+// ========================================
+// CORE FETCH FUNCTION
+// ========================================
 export const apiFetch = async <T = any>(
   url: string,
   options: ApiFetchOptions = {}
 ): Promise<ApiResponse<T>> => {
-  const { skipAuth = false, skipIdempotency = false, ...fetchOptions } = options;
+  const { skipAuth = false, skipIdempotency = false, skipCache = false, ...fetchOptions } = options;
+
+  // Check if this is a cacheable GET request
+  const method = (fetchOptions.method || 'GET').toUpperCase();
+  const isCacheable = method === 'GET' && !skipCache;
+  
+  if (isCacheable) {
+    const cacheKey = generateCacheKey(url, options);
+    return getCachedRequest(cacheKey, () => executeRequest(url, { skipAuth, skipIdempotency, ...fetchOptions }));
+  }
+  
+  // Non-cacheable request (POST, PUT, DELETE, etc.)
+  return executeRequest(url, { skipAuth, skipIdempotency, ...fetchOptions });
+};
+
+/**
+ * Internal function that performs the actual request
+ */
+async function executeRequest<T = any>(
+  url: string,
+  options: ApiFetchOptions & { skipAuth: boolean; skipIdempotency: boolean }
+): Promise<ApiResponse<T>> {
+  const { skipAuth, skipIdempotency, ...fetchOptions } = options;
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -85,7 +185,6 @@ export const apiFetch = async <T = any>(
     }
   }
 
-  
   const method = (fetchOptions.method || 'GET').toUpperCase();
   const needsIdempotency = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method);
   
@@ -96,7 +195,6 @@ export const apiFetch = async <T = any>(
   }
 
   try {
-  
     console.log('[API] Making request:', {
       url,
       method: fetchOptions.method || 'GET',
@@ -196,10 +294,13 @@ export const apiFetch = async <T = any>(
       },
     };
   }
-};
+}
 
+// ========================================
+// CONVENIENCE METHODS
+// ========================================
 export const apiGet = <T = any>(url: string, options: ApiFetchOptions = {}): Promise<ApiResponse<T>> => {
-  return apiFetch<T>(url, { ...options, method: 'GET', skipIdempotency: true }); // GET doesn't need idempotency
+  return apiFetch<T>(url, { ...options, method: 'GET', skipIdempotency: true }); 
 };
 
 export const apiPost = <T = any>(
@@ -240,4 +341,12 @@ export const apiPatch = <T = any>(
 
 export const apiDelete = <T = any>(url: string, options: ApiFetchOptions = {}): Promise<ApiResponse<T>> => {
   return apiFetch<T>(url, { ...options, method: 'DELETE' });
+};
+
+// ========================================
+// UTILITY: CLEAR CACHE (for testing/debugging)
+// ========================================
+export const clearApiCache = () => {
+  requestCache.clear();
+  console.log('[API Cache] Cache cleared');
 };

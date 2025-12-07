@@ -1,3 +1,7 @@
+// components/feedback-form.ts
+
+import { submitFeedback } from '../services/feedback.service';
+
 export function createFeedbackForm(): HTMLElement {
   if (!document.getElementById('feedback-form-styles')) {
     const style = document.createElement('style');
@@ -7,6 +11,7 @@ export function createFeedbackForm(): HTMLElement {
         --primary: #636b2f;
         --text-main: #1a1a1a;
         --text-muted: #666;
+        --error-color: #dc2626;
       }
 
       .feedback-container {
@@ -16,7 +21,7 @@ export function createFeedbackForm(): HTMLElement {
         border-radius: 12px;
         padding: 30px;
         max-width: 100%;
-        margin: 10 auto;
+        margin: 10px auto;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
       }
 
@@ -59,8 +64,27 @@ export function createFeedbackForm(): HTMLElement {
         box-shadow: 0 0 0 3px rgba(99, 107, 47, 0.1);
       }
       
+      .modern-textarea.error {
+        border-color: var(--error-color);
+      }
+      
       .modern-textarea::placeholder {
         color: #9ca3af;
+      }
+
+      .char-count {
+        text-align: right;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-top: 6px;
+      }
+
+      .char-count.warning {
+        color: #f59e0b;
+      }
+
+      .char-count.error {
+        color: var(--error-color);
       }
 
       .form-actions {
@@ -88,7 +112,7 @@ export function createFeedbackForm(): HTMLElement {
         white-space: nowrap;
       }
 
-      .btn-send:hover {
+      .btn-send:hover:not(:disabled) {
         background: #4f5625;
         transform: translateY(-1px);
         box-shadow: 0 6px 16px rgba(99, 107, 47, 0.4);
@@ -100,8 +124,7 @@ export function createFeedbackForm(): HTMLElement {
         transform: none;
       }
 
-      .success-msg {
-        color: #059669;
+      .feedback-msg {
         font-weight: 600;
         font-size: 0.9rem;
         display: flex;
@@ -111,8 +134,16 @@ export function createFeedbackForm(): HTMLElement {
         transition: opacity 0.3s ease;
       }
 
-      .success-visible {
+      .feedback-msg.visible {
         opacity: 1;
+      }
+
+      .feedback-msg.success {
+        color: #059669;
+      }
+
+      .feedback-msg.error {
+        color: var(--error-color);
       }
 
       @media (max-width: 768px) {
@@ -134,7 +165,7 @@ export function createFeedbackForm(): HTMLElement {
           justify-content: center;
         }
 
-        .success-msg {
+        .feedback-msg {
           text-align: center;
         }
       }
@@ -167,20 +198,35 @@ export function createFeedbackForm(): HTMLElement {
   textarea.className = 'modern-textarea';
   textarea.placeholder = 'Share your thoughts, suggestions, or report issues...';
   textarea.required = true;
+  textarea.maxLength = 5000;
   form.appendChild(textarea);
+
+  // Character count
+  const charCount = document.createElement('div');
+  charCount.className = 'char-count';
+  charCount.textContent = '0 / 5000';
+  form.appendChild(charCount);
+
+  // Update character count on input
+  textarea.addEventListener('input', () => {
+    const length = textarea.value.length;
+    charCount.textContent = `${length} / 5000`;
+    
+    if (length > 4500) {
+      charCount.className = 'char-count warning';
+    } else if (length >= 5000) {
+      charCount.className = 'char-count error';
+    } else {
+      charCount.className = 'char-count';
+    }
+  });
   
   const actions = document.createElement('div');
   actions.className = 'form-actions';
   
-  const successMsg = document.createElement('span');
-  successMsg.className = 'success-msg';
-  successMsg.innerHTML = `
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <polyline points="20 6 9 17 4 12"></polyline>
-    </svg>
-    <span>Sent successfully!</span>
-  `;
-  actions.appendChild(successMsg);
+  const feedbackMsg = document.createElement('span');
+  feedbackMsg.className = 'feedback-msg';
+  actions.appendChild(feedbackMsg);
 
   const submitBtn = document.createElement('button');
   submitBtn.type = 'submit';
@@ -196,24 +242,79 @@ export function createFeedbackForm(): HTMLElement {
   
   form.appendChild(actions);
   
+  // Handle form submission
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const feedbackText = textarea.value.trim();
     
-    if (!feedbackText) return;
+    if (!feedbackText) {
+      showMessage('Please enter your feedback', 'error');
+      return;
+    }
+
+    if (feedbackText.length < 10) {
+      showMessage('Feedback must be at least 10 characters', 'error');
+      textarea.classList.add('error');
+      return;
+    }
     
+    // Disable button and show loading
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<span>Sending...</span>';
+    textarea.classList.remove('error');
     
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    console.log('Feedback sent:', feedbackText);
-    
-    submitBtn.innerHTML = '<span>Sent!</span>';
-    successMsg.classList.add('success-visible');
-    textarea.value = '';
-    
-    setTimeout(() => {
+    try {
+      console.log('[FeedbackForm] Submitting feedback...');
+      const response = await submitFeedback(feedbackText);
+      
+      if (response.success) {
+        console.log('[FeedbackForm] Feedback submitted successfully');
+        
+        // Show success state
+        submitBtn.innerHTML = '<span>Sent!</span>';
+        showMessage('Sent successfully!', 'success');
+        textarea.value = '';
+        charCount.textContent = '0 / 5000';
+        charCount.className = 'char-count';
+        
+        // Reset after 3 seconds
+        setTimeout(() => {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = `
+            <span>Send Feedback</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          `;
+          hideMessage();
+        }, 3000);
+      } else {
+        console.error('[FeedbackForm] Failed to submit feedback:', response.error);
+        
+        // Show error message
+        const errorMessage = response.error?.message || 'Failed to send feedback. Please try again.';
+        showMessage(errorMessage, 'error');
+        
+        // Re-enable button
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `
+          <span>Send Feedback</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        `;
+        
+        // Hide error after 5 seconds
+        setTimeout(hideMessage, 5000);
+      }
+    } catch (error) {
+      console.error('[FeedbackForm] Error submitting feedback:', error);
+      
+      showMessage('An unexpected error occurred. Please try again.', 'error');
+      
+      // Re-enable button
       submitBtn.disabled = false;
       submitBtn.innerHTML = `
         <span>Send Feedback</span>
@@ -222,9 +323,30 @@ export function createFeedbackForm(): HTMLElement {
           <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
         </svg>
       `;
-      successMsg.classList.remove('success-visible');
-    }, 3000);
+      
+      setTimeout(hideMessage, 5000);
+    }
   });
+  
+  // Helper functions for showing/hiding messages
+  function showMessage(message: string, type: 'success' | 'error') {
+    const icon = type === 'success' 
+      ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+           <polyline points="20 6 9 17 4 12"></polyline>
+         </svg>`
+      : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+           <circle cx="12" cy="12" r="10"></circle>
+           <line x1="15" y1="9" x2="9" y2="15"></line>
+           <line x1="9" y1="9" x2="15" y2="15"></line>
+         </svg>`;
+    
+    feedbackMsg.className = `feedback-msg ${type} visible`;
+    feedbackMsg.innerHTML = `${icon}<span>${message}</span>`;
+  }
+  
+  function hideMessage() {
+    feedbackMsg.classList.remove('visible');
+  }
   
   container.appendChild(form);
   return container;

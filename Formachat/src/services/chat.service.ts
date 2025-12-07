@@ -272,6 +272,31 @@ export const getAnalyticsSummary = async (
   }
 };
 
+/**
+ * Get complete dashboard summary in ONE request
+ * More efficient than separate calls
+ */
+export const getDashboardSummary = async (
+  businessId: string
+): Promise<{
+  sessions: ChatSession[];
+  leads: ContactLead[];
+  analytics: AnalyticsSummary;
+}> => {
+  console.log('[ChatService] Fetching dashboard summary for:', businessId);
+
+  const response = await apiGet(
+    CHAT_ENDPOINTS.BUSINESS_DASHBOARD_SUMMARY(businessId)
+  );
+
+  if (!response.success) {
+    throw new Error(response.error.message || 'Failed to fetch dashboard summary');
+  }
+
+  console.log('[ChatService] ✓ Dashboard summary retrieved');
+  return response.data;
+};
+
 
 export default {
   getBusinessSessions,
