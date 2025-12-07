@@ -4,7 +4,7 @@ export interface DeleteConfirmationConfig {
   onCancel: () => void;
 }
 
-// --- INJECT STYLES (The High-End UI) ---
+// --- INJECT STYLES (Matched to your theme) ---
 function injectDeleteStyles() {
   if (document.getElementById('delete-modal-styles')) return;
 
@@ -14,7 +14,9 @@ function injectDeleteStyles() {
     :root {
       --danger-red: #dc2626;
       --danger-bg: #fef2f2;
+      --primary: #636b2f;
       --text-main: #1a1a1a;
+      --text-muted: #666;
     }
 
     /* 1. The Reality Blur Overlay */
@@ -24,8 +26,8 @@ function injectDeleteStyles() {
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(25, 25, 25, 0.4); /* Darker dim */
-      backdrop-filter: blur(12px); /* heavy blur */
+      background: rgba(25, 25, 25, 0.4);
+      backdrop-filter: blur(12px);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -34,36 +36,27 @@ function injectDeleteStyles() {
       animation: fadeIn 0.3s forwards;
     }
 
-    /* 2. The Modal Card */
+    /* 2. The Modal Card - Matching your card style */
     .delete-confirmation-modal {
       background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
       width: 90%;
       max-width: 400px;
       padding: 30px;
-      border-radius: 24px; /* Super rounded modern look */
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: 12px; /* ✅ Matches your cards */
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); /* ✅ Matches your components */
       text-align: center;
       transform: scale(0.9);
       opacity: 0;
-      animation: springPopup 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards 0.1s;
+      animation: springPopup 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards 0.1s;
       position: relative;
-      overflow: hidden;
     }
 
-    /* Top Red Line */
-    .delete-confirmation-modal::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 6px;
-      background: linear-gradient(90deg, #ef4444, #b91c1c);
-    }
-
-    /* 3. The Pulsing Warning Beacon */
+    /* 3. The Warning Icon */
     .icon-wrapper {
-      width: 70px;
-      height: 70px;
+      width: 60px;
+      height: 60px;
       background: var(--danger-bg);
       border-radius: 50%;
       display: flex;
@@ -72,9 +65,10 @@ function injectDeleteStyles() {
       margin: 0 auto 20px auto;
       color: var(--danger-red);
       position: relative;
+      box-shadow: 0 2px 8px rgba(220, 38, 38, 0.1);
     }
 
-    /* The Pulse Ring Animation */
+    /* Subtle Pulse Ring */
     .icon-wrapper::after {
       content: '';
       position: absolute;
@@ -87,80 +81,109 @@ function injectDeleteStyles() {
     }
 
     .warning-icon {
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
     }
 
-    /* 4. Typography */
+    /* 4. Typography - Matching your style */
     .modal-title {
-      font-size: 1.5rem;
-      font-weight: 800;
+      font-size: 1.4rem;
+      font-weight: 700; 
       color: var(--text-main);
       margin: 0 0 10px 0;
       letter-spacing: -0.5px;
     }
 
     .modal-message {
-      color: #666;
-      font-size: 1rem;
+      color: var(--text-muted);
+      font-size: 0.95rem;
       line-height: 1.6;
       margin-bottom: 30px;
     }
     
     .highlight-item {
       color: var(--text-main);
-      font-weight: 700;
-      background: #f3f4f6;
+      font-weight: 600;
+      background: rgba(99, 107, 47, 0.08); /* ✅ Subtle primary tint */
       padding: 2px 6px;
       border-radius: 4px;
     }
 
-    /* 5. Buttons */
+    /* 5. Buttons - Matching your button style */
     .modal-buttons {
       display: flex;
-      gap: 15px;
+      gap: 12px;
       justify-content: center;
     }
 
     .btn-modal {
       padding: 12px 24px;
-      border-radius: 12px;
-      font-size: 1rem;
+      border-radius: 10px; /* ✅ Matches your buttons */
+      font-size: 0.95rem;
       font-weight: 600;
       cursor: pointer;
       border: none;
-      transition: all 0.2s ease;
+      transition: all 0.25s ease; /* ✅ Matches your transitions */
       flex: 1;
     }
 
+    /* Cancel Button - Matching your secondary style */
     .btn-cancel {
-      background: white;
-      border: 1px solid #e5e7eb;
-      color: #374151;
+      background: #636b2f;
+      
+      color: white;
     }
     .btn-cancel:hover {
-      background: #f9fafb;
+      background: #4a5122;
       transform: translateY(-1px);
+      border: #4a5122 !important;
     }
 
+    /* Delete Button - Solid danger style like your primary buttons */
     .btn-danger {
-      background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+      background: var(--danger-red);
       color: white;
-      box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3); /* ✅ Matches your button shadows */
     }
     .btn-danger:hover {
-      transform: translateY(-2px) scale(1.02);
-      box-shadow: 0 8px 20px rgba(220, 38, 38, 0.5);
+      background: #b91c1c;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4); /* ✅ Matches your hover shadows */
+    }
+    .btn-danger:active {
+      transform: translateY(0);
     }
 
     /* Animations */
-    @keyframes fadeIn { to { opacity: 1; } }
+    @keyframes fadeIn { 
+      to { opacity: 1; } 
+    }
     @keyframes springPopup { 
       to { opacity: 1; transform: scale(1); } 
     }
     @keyframes pulse-ring {
-      0% { transform: scale(0.8); opacity: 0.8; }
-      100% { transform: scale(2); opacity: 0; }
+      0% { transform: scale(0.8); opacity: 0.6; }
+      100% { transform: scale(1.8); opacity: 0; }
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .delete-confirmation-modal {
+        padding: 24px 20px;
+      }
+      
+      .modal-title {
+        font-size: 1.2rem;
+      }
+      
+      .modal-buttons {
+        flex-direction: column-reverse;
+        gap: 10px;
+      }
+      
+      .btn-modal {
+        width: 100%;
+      }
     }
   `;
   document.head.appendChild(style);
@@ -183,10 +206,9 @@ export function createDeleteConfirmation(config: DeleteConfirmationConfig): HTML
   const modal = document.createElement('div');
   modal.className = 'delete-confirmation-modal';
   
-  // --- 1. The Pulsing Icon ---
+  // --- 1. The Warning Icon ---
   const iconWrapper = document.createElement('div');
   iconWrapper.className = 'icon-wrapper';
-  // SVG Exclamation Mark
   iconWrapper.innerHTML = `
     <svg class="warning-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -202,7 +224,7 @@ export function createDeleteConfirmation(config: DeleteConfirmationConfig): HTML
 
   const message = document.createElement('p');
   message.className = 'modal-message';
-  message.innerHTML = `This action cannot be undone. <br/>You are about to delete <span class="highlight-item">${config.itemName}</span> permanently.`;
+  message.innerHTML = `This action cannot be undone. You are about to permanently delete <span class="highlight-item">${config.itemName}</span>.`;
   modal.appendChild(message);
 
   // --- 3. Actions ---
@@ -211,7 +233,7 @@ export function createDeleteConfirmation(config: DeleteConfirmationConfig): HTML
 
   // Cancel Button (Auto-focus for safety)
   const cancelBtn = document.createElement('button');
-  cancelBtn.textContent = 'Keep it';
+  cancelBtn.textContent = 'Cancel';
   cancelBtn.className = 'btn-modal btn-cancel';
   cancelBtn.onclick = () => {
     config.onCancel();
@@ -221,11 +243,12 @@ export function createDeleteConfirmation(config: DeleteConfirmationConfig): HTML
 
   // Delete Button
   const confirmBtn = document.createElement('button');
-  confirmBtn.innerHTML = 'Yes, Delete it'; // Stronger language
+  confirmBtn.textContent = 'Delete';
   confirmBtn.className = 'btn-modal btn-danger';
   confirmBtn.onclick = () => {
-    confirmBtn.innerHTML = 'Deleting...'; // Instant feedback
+    confirmBtn.textContent = 'Deleting...';
     confirmBtn.style.opacity = '0.7';
+    confirmBtn.disabled = true;
     config.onConfirm();
     removeModal(overlay);
   };
@@ -234,7 +257,7 @@ export function createDeleteConfirmation(config: DeleteConfirmationConfig): HTML
   modal.appendChild(buttons);
   overlay.appendChild(modal);
 
-  // Accessibility: Trap focus or focus cancel by default
+  // Accessibility: Focus cancel by default for safety
   setTimeout(() => cancelBtn.focus(), 100);
 
   return overlay;

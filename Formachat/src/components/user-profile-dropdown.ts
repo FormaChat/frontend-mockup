@@ -45,6 +45,14 @@ function injectProfileStyles() {
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
 
+    .profile-trigger svg {
+      flex-shrink: 0;
+    }
+
+    .profile-username {
+      white-space: nowrap;
+    }
+
     /* Dropdown Menu */
     .profile-menu {
       position: absolute;
@@ -89,10 +97,34 @@ function injectProfileStyles() {
       border-color: var(--primary);
     }
 
-    /* Mobile Optimization */
+    /* Mobile Optimization - Hide username, show only icon */
     @media (max-width: 768px) {
+      .profile-trigger {
+        padding: 10px;
+        min-width: 40px;
+        justify-content: center;
+      }
+
+      .profile-username {
+        display: none;
+      }
+
       .profile-menu {
         min-width: 200px;
+        right: -10px; /* Adjust alignment for smaller button */
+      }
+    }
+
+    /* Tablet - Show abbreviated username */
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .profile-trigger {
+        padding: 8px 12px;
+      }
+
+      .profile-username {
+        max-width: 80px;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
     }
   `;
@@ -116,7 +148,7 @@ export function createUserProfileDropdown(user: UserProfileData): HTMLElement {
       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
       <circle cx="12" cy="7" r="4"></circle>
     </svg>
-    <span>${user.username}</span>
+    <span class="profile-username">${user.username}</span>
   `;
   
   // Dropdown menu

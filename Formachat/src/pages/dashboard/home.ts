@@ -26,16 +26,17 @@ function injectHomeStyles() {
     .dashboard-home-container {
       max-width: 1200px;
       margin: 0 auto;
+      background: var(--bg-ash);
     }
 
     .hero-section {
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.5);
-      border-radius: 16px;
+      border-radius: 12px;
       padding: 50px 30px;
       text-align: center;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
       margin-bottom: 60px;
     }
 
@@ -99,7 +100,7 @@ function injectHomeStyles() {
       }
 
       .hero-section h1 {
-        font-size: 1.8rem;
+        font-size: 1.75rem;
       }
 
       .hero-section p {

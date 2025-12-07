@@ -144,14 +144,34 @@ function injectBusinessCardStyles() {
 
 export function createBusinessCard(
   business: BusinessCardData,
-  onClickPath: string
+  onClickPath?: string 
 ): HTMLElement {
   injectBusinessCardStyles();
 
   const card = document.createElement('div');
   card.className = 'business-card';
-  card.setAttribute('role', 'button');
-  card.setAttribute('tabindex', '0');
+  
+  // ✅ ONLY make it clickable if onClickPath is provided
+  if (onClickPath) {
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    card.style.cursor = 'pointer'; // Show pointer cursor
+    
+    const navigate = () => {
+      window.location.hash = onClickPath;
+    };
+
+    card.addEventListener('click', navigate);
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        navigate();
+      }
+    });
+  } else {
+    // ✅ Not clickable - remove cursor pointer
+    card.style.cursor = 'default';
+  }
 
   // --- Header (Avatar + Status) ---
   const header = document.createElement('div');
@@ -201,19 +221,6 @@ export function createBusinessCard(
   footer.appendChild(dateText);
   
   card.appendChild(footer);
-
-  // --- Interaction ---
-  const navigate = () => {
-    window.location.hash = onClickPath;
-  };
-
-  card.addEventListener('click', navigate);
-  card.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      navigate();
-    }
-  });
 
   return card;
 }

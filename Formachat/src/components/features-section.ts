@@ -18,6 +18,7 @@ function injectFeatureStyles() {
 
     .features-section {
       width: 100%;
+      box-sizing: border-box; 
     }
 
     .features-header {
@@ -43,20 +44,20 @@ function injectFeatureStyles() {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 20px;
-      width: 100%;
+      
     }
 
     .feature-card {
       background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.5);
+      backdrop-filter: none;
+      border: 1px solid rgba(99, 107, 47, 0.3);
       border-radius: 12px;
       padding: 24px;
       transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       display: flex;
       flex-direction: column;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-      height: 100%;
+      
     }
 
     .feature-card:hover {
@@ -78,6 +79,7 @@ function injectFeatureStyles() {
       justify-content: center;
       margin-bottom: 16px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+     
     }
 
     .card-available .feature-icon-box {

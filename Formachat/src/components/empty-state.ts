@@ -81,29 +81,20 @@ function injectEmptyStateStyles() {
       font-weight: 500;
     }
 
-    /* 4. Action Button */
     .btn-empty-action {
-      padding: 12px 30px;
       background: var(--primary);
-      color: white;
+      color: var(--bg-light);
       border: none;
-      border-radius: 50px; /* Pill shape */
-      font-size: 1rem;
+      padding: 10px 20px;
+      border-radius: 8px;
       font-weight: 600;
       cursor: pointer;
-      
-      /* Button Glow */
-      box-shadow: 0 4px 15px rgba(99, 107, 47, 0.3);
-      transition: all 0.2s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
+      transition: background 0.2s, transform 0.1s;
+      box-shadow: var(--shadow-subtle);
     }
-
     .btn-empty-action:hover {
-      background: #4f5625;
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(99, 107, 47, 0.4);
+      background: #4a5122;
+      transform: translateY(-1px);
     }
 
     /* Plus icon in button */

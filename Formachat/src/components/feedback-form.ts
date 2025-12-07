@@ -11,12 +11,12 @@ export function createFeedbackForm(): HTMLElement {
 
       .feedback-container {
         background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(12px);
+        backdrop-filter: none;
         border: 1px solid rgba(255, 255, 255, 0.5);
         border-radius: 12px;
         padding: 30px;
         max-width: 100%;
-        margin: 0 auto;
+        margin: 10 auto;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
       }
 

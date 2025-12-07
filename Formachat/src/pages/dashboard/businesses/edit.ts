@@ -4,856 +4,866 @@ import { createLoadingSpinner, hideLoadingSpinner } from '../../../components/lo
 import { getBusinessById, updateBusiness } from '../../../services/business.service';
 import type { UpdateBusinessRequest, Business } from '../../../types/business.types';
 
+// ========================================
+// 1. STYLES (Identical to Create Page)
+// ========================================
+function injectEditWizardStyles() {
+  if (document.getElementById('business-wizard-styles')) return;
+
+  const style = document.createElement('style');
+  style.id = 'business-wizard-styles';
+  style.textContent = `
+    :root {
+      --primary: #636b2f;
+      --primary-dim: rgba(99, 107, 47, 0.1);
+      --secondary: #bac095;
+      --text-main: #1a1a1a;
+      --text-muted: #666;
+      --error-red: #dc2626;
+      --success-green: #059669;
+      --bg-glass: rgba(255, 255, 255, 0.7);
+      --border-glass: rgba(255, 255, 255, 0.6);
+      --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+    }
+
+    .business-edit-wizard {
+      max-width: 900px;
+      margin: 0 auto;
+      padding-bottom: 80px;
+    }
+
+    /* Glass Container */
+    .wizard-container {
+      background: var(--bg-glass);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-glass);
+      border-radius: 24px;
+      box-shadow: var(--shadow-glass);
+      padding: 50px;
+      margin-top: 30px;
+      animation: floatUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    @keyframes floatUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Header & Progress */
+    .page-header { text-align: center; margin-bottom: 40px; }
+    
+    .wizard-progress-bar {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 30px 0;
+    }
+    
+    .progress-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #e5e7eb;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    .progress-dot.active { background: var(--primary); transform: scale(1.4); }
+    .progress-dot.completed { background: var(--success-green); }
+
+    .step-counter {
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 30px;
+    }
+
+    /* Form Sections */
+    .form-section { display: none; }
+    .form-section.active { 
+      display: block; 
+      animation: slideInRight 0.4s ease-out; 
+    }
+
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(15px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    h2 {
+      font-size: 1.8rem;
+      color: var(--text-main);
+      margin-bottom: 25px;
+      font-weight: 800;
+      border-bottom: 2px solid var(--primary-dim);
+      padding-bottom: 10px;
+    }
+    
+    h3 { font-size: 1.2rem; color: var(--text-main); margin-top: 20px; }
+
+    /* Inputs */
+    .form-field { margin-bottom: 24px; }
+    
+    label { display: block; margin-bottom: 8px; font-weight: 600; color: #374151; }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.8);
+      font-size: 1rem;
+      font-family: inherit;
+      box-sizing: border-box;
+      transition: all 0.2s ease;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: #fff;
+      box-shadow: 0 0 0 4px var(--primary-dim);
+    }
+
+    /* Checkbox Tiles */
+    .checkbox-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+    }
+    .checkbox-item input { position: absolute; opacity: 0; }
+    .checkbox-item label {
+      display: flex; align-items: center; justify-content: center;
+      background: #fff; border: 1px solid #e5e7eb; border-radius: 10px;
+      padding: 15px; cursor: pointer; font-weight: 500; text-align: center;
+      transition: all 0.2s;
+    }
+    .checkbox-item input:checked + label {
+      background: var(--primary-dim); border-color: var(--primary); color: var(--primary); font-weight: 700;
+    }
+
+    /* Dynamic Arrays */
+    .dynamic-array-section {
+      background: rgba(255,255,255,0.5);
+      border: 1px dashed var(--secondary);
+      border-radius: 16px;
+      padding: 25px;
+      margin-bottom: 30px;
+    }
+    .dynamic-array-item {
+      background: #fff; border-radius: 12px; padding: 20px;
+      margin-bottom: 15px; border: 1px solid #f0f0f0;
+      position: relative;
+    }
+
+    /* Buttons */
+    .wizard-navigation {
+      display: flex; justify-content: space-between; margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(0,0,0,0.05);
+    }
+    .btn-nav {
+      padding: 14px 35px; border-radius: 12px; font-weight: 600; font-size: 1rem; cursor: pointer; border: none;
+    }
+    .btn-prev { background: #fff; border: 1px solid #e5e7eb; color: var(--text-main); }
+    .btn-next { background: var(--primary); color: #fff; }
+    .btn-secondary { background: #fff; color: var(--primary); border: 1px solid var(--primary); padding: 8px 16px; border-radius: 8px; cursor: pointer; }
+    .btn-remove { 
+      color: var(--error-red); background: #fff0f0; border: 1px solid #ffcccc; 
+      padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem;
+      position: absolute; top: 15px; right: 15px;
+    }
+    .error-message {
+      background: #fef2f2; border: 1px solid #fee2e2; color: var(--error-red);
+      padding: 15px; border-radius: 12px; margin-bottom: 20px; display: none;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+// ========================================
+// 2. MAIN RENDER FUNCTION
+// ========================================
+
+const WIZARD_STEPS = [
+  'Basic Information',
+  'Products & Services',
+  'Customer Support',
+  'Contact & Escalation'
+];
+
 export async function renderBusinessEdit(businessId: string): Promise<HTMLElement> {
+  injectEditWizardStyles();
+
   const container = document.createElement('div');
-  container.className = 'business-edit';
+  container.className = 'business-edit-wizard';
   
-  const spinner = createLoadingSpinner('Loading business...');
+  const spinner = createLoadingSpinner('Loading business data...');
   container.appendChild(spinner);
   
   try {
+    // 1. Fetch Data
     const business = await getBusinessById(businessId);
     hideLoadingSpinner(spinner);
     
+    // 2. Breadcrumb
     const breadcrumb = createBreadcrumb([
       { label: 'Businesses', path: '#/dashboard/businesses' },
-      { label: business.basicInfo.businessName }
+      { label: business.basicInfo.businessName }, 
+      { label: 'Edit' }
     ]);
     container.appendChild(breadcrumb);
     
-    const heading = document.createElement('h1');
-    heading.textContent = `Edit: ${business.basicInfo.businessName}`;
-    container.appendChild(heading);
+    // 3. Wizard Container
+    const wizardContainer = document.createElement('div');
+    wizardContainer.className = 'wizard-container';
     
+    // Header
+    const heading = document.createElement('h1');
+    heading.style.textAlign = 'center';
+    heading.textContent = `Edit: ${business.basicInfo.businessName}`;
+    wizardContainer.appendChild(heading);
+
+    // Progress Dots
+    const progressContainer = document.createElement('div');
+    progressContainer.className = 'wizard-progress-bar';
+    WIZARD_STEPS.forEach(() => {
+        const dot = document.createElement('div');
+        dot.className = 'progress-dot';
+        progressContainer.appendChild(dot);
+    });
+    wizardContainer.appendChild(progressContainer);
+
+    // Step Counter
+    const stepCounter = document.createElement('div');
+    stepCounter.className = 'step-counter';
+    wizardContainer.appendChild(stepCounter);
+
+    // 4. Create Form (Pre-populated)
     const form = createEditForm(business);
-    container.appendChild(form);
+    wizardContainer.appendChild(form);
+    
+    // 5. Initialize Wizard Logic
+    initializeWizardLogic(form, progressContainer, stepCounter, business._id);
+
+    container.appendChild(wizardContainer);
     
   } catch (error: any) {
     hideLoadingSpinner(spinner);
-    
     const errorMessage = document.createElement('p');
     errorMessage.textContent = 'Failed to load business. Please try again.';
     errorMessage.className = 'error-message';
+    errorMessage.style.display = 'block';
     container.appendChild(errorMessage);
-    
     console.error('Failed to fetch business:', error);
   }
   
   return container;
 }
 
-function createEditForm(business: Business): HTMLElement {
-  const form = document.createElement('form');
-  form.className = 'business-form';
-  
-  // ========================================
-  // SECTION 1: BASIC INFORMATION
-  // ========================================
-  
-  const section1 = createSection('1. Basic Information');
-  
-  const nameField = createFormField({
-    type: 'text',
-    name: 'businessName',
-    label: 'Business Name',
-    required: true,
-    maxLength: 100,
-    value: business.basicInfo.businessName,
-    helpText: 'The official name of your business'
-  });
-  section1.appendChild(nameField);
-  
-  const descField = createFormField({
-    type: 'textarea',
-    name: 'businessDescription',
-    label: 'Business Description',
-    required: true,
-    maxLength: 500,
-    value: business.basicInfo.businessDescription,
-    helpText: 'A brief overview of what your business does'
-  });
-  section1.appendChild(descField);
-  
-  // Business Type with conditional "Other" input
-  const typeWrapper = document.createElement('div');
-  typeWrapper.className = 'form-field-group';
-  
-  const knownTypes = ['E-commerce', 'Real Estate', 'Restaurant', 'Hotel', 'Service-based', 'Tech/SaaS', 'Healthcare', 'Education'];
-  const isOtherType = !knownTypes.includes(business.basicInfo.businessType);
-  
-  const typeField = createSelectField({
-    name: 'businessType',
-    label: 'Business Type',
-    options: [...knownTypes, 'Other'],
-    required: true,
-    selectedValue: isOtherType ? 'Other' : business.basicInfo.businessType
-  });
-  typeWrapper.appendChild(typeField);
-  
-  const otherTypeField = createFormField({
-    type: 'text',
-    name: 'businessTypeOther',
-    label: 'Please specify',
-    placeholder: 'Enter your business type',
-    value: isOtherType ? business.basicInfo.businessType : ''
-  });
-  otherTypeField.style.display = isOtherType ? 'block' : 'none';
-  otherTypeField.dataset.conditional = 'true';
-  typeWrapper.appendChild(otherTypeField);
-  
-  const typeSelect = typeField.querySelector('select') as HTMLSelectElement;
-  typeSelect.addEventListener('change', () => {
-    if (typeSelect.value === 'Other') {
-      otherTypeField.style.display = 'block';
-      (otherTypeField.querySelector('input') as HTMLInputElement).required = true;
+// ========================================
+// 3. WIZARD LOGIC
+// ========================================
+
+function initializeWizardLogic(
+  form: HTMLFormElement, 
+  progressContainer: HTMLElement, 
+  stepCounter: HTMLElement,
+  businessId: string
+) {
+  const sections = Array.from(form.querySelectorAll('.form-section')) as HTMLElement[];
+  const dots = Array.from(progressContainer.querySelectorAll('.progress-dot')) as HTMLElement[];
+  const prevBtn = form.querySelector('.btn-prev') as HTMLButtonElement;
+  const nextBtn = form.querySelector('.btn-next') as HTMLButtonElement;
+  const errorContainer = form.querySelector('.error-box') as HTMLElement;
+
+  let currentStep = 0;
+
+  const updateUI = () => {
+    // Show/Hide Sections
+    sections.forEach((section, index) => {
+      section.classList.toggle('active', index === currentStep);
+    });
+
+    // Update Dots
+    dots.forEach((dot, index) => {
+      dot.classList.remove('active', 'completed');
+      if (index < currentStep) dot.classList.add('completed');
+      else if (index === currentStep) dot.classList.add('active');
+    });
+
+    // Update Counter
+    stepCounter.textContent = `Step ${currentStep + 1}: ${WIZARD_STEPS[currentStep]}`;
+
+    // Update Buttons
+    prevBtn.disabled = currentStep === 0;
+    if (currentStep === sections.length - 1) {
+      nextBtn.textContent = 'Save Changes';
+      nextBtn.type = 'submit'; // Make it a submit button only at the end
     } else {
-      otherTypeField.style.display = 'none';
-      (otherTypeField.querySelector('input') as HTMLInputElement).required = false;
+      nextBtn.textContent = 'Next';
+      nextBtn.type = 'button';
+    }
+
+    // Scroll top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Initial State
+  updateUI();
+
+  // Button Listeners
+  prevBtn.addEventListener('click', () => {
+    if (currentStep > 0) {
+      currentStep--;
+      updateUI();
     }
   });
-  
-  section1.appendChild(typeWrapper);
-  
-  const hoursField = createFormField({
-    type: 'text',
-    name: 'operatingHours',
-    label: 'Operating Hours',
-    required: true,
-    value: business.basicInfo.operatingHours,
-    helpText: 'When is your business available?'
+
+  nextBtn.addEventListener('click', (e) => {
+    // If it's a submit button (last step), let the form submit handler take over
+    if (nextBtn.type === 'submit') return;
+
+    e.preventDefault();
+    if (validateStep(sections[currentStep], errorContainer)) {
+        currentStep++;
+        updateUI();
+    }
   });
-  section1.appendChild(hoursField);
-  
-  const locationField = createFormField({
-    type: 'text',
-    name: 'location',
-    label: 'Location',
-    required: true,
-    value: business.basicInfo.location,
-    helpText: 'Primary business location'
-  });
-  section1.appendChild(locationField);
-  
-  const timezoneField = createSelectField({
-    name: 'timezone',
-    label: 'Timezone (Optional)',
-    options: ['America/New_York', 'America/Chicago', 'America/Denver', 'America/Los_Angeles', 'Europe/London', 'Europe/Paris', 'Asia/Tokyo', 'Australia/Sydney'],
-    required: false,
-    selectedValue: business.basicInfo.timezone || ''
-  });
-  section1.appendChild(timezoneField);
-  
-  form.appendChild(section1);
-  
-  // ========================================
-  // SECTION 2: PRODUCTS & SERVICES
-  // ========================================
-  
-  const section2 = createSection('2. Products & Services');
-  
-  const offeringsField = createFormField({
-    type: 'textarea',
-    name: 'offerings',
-    label: 'What do you offer?',
-    required: true,
-    maxLength: 1000,
-    value: business.productsServices.offerings,
-    helpText: 'Detailed description of your offerings'
-  });
-  section2.appendChild(offeringsField);
-  
-  const popularItemsSection = createDynamicArraySection({
-    title: 'Popular Items (Optional)',
-    name: 'popularItems',
-    fields: [
-      { type: 'text', name: 'name', label: 'Item Name', required: true },
-      { type: 'textarea', name: 'description', label: 'Description', required: false },
-      { type: 'number', name: 'price', label: 'Price', required: false, placeholder: '0.00' }
-    ],
-    helpText: 'Add your most popular products or services',
-    existingData: business.productsServices.popularItems
-  });
-  section2.appendChild(popularItemsSection);
-  
-  const deliveryField = createCheckboxGroup({
-    name: 'serviceDelivery',
-    label: 'Service Delivery Options',
-    options: ['Delivery', 'Pickup', 'In-person', 'Online/Virtual'],
-    checkedValues: business.productsServices.serviceDelivery,
-    helpText: 'How do customers receive your products/services?'
-  });
-  section2.appendChild(deliveryField);
-  
-  // Pricing Display
-  const pricingWrapper = document.createElement('div');
-  pricingWrapper.className = 'form-field-group';
-  
-  const canDiscussPricing = business.productsServices.pricingDisplay?.canDiscussPricing ?? true;
-  
-  const pricingToggle = createCheckboxField({
-    name: 'canDiscussPricing',
-    label: 'Allow chatbot to discuss pricing',
-    defaultChecked: canDiscussPricing,
-    helpText: 'Enable if you want the chatbot to share pricing information'
-  });
-  pricingWrapper.appendChild(pricingToggle);
-  
-  const pricingNoteField = createFormField({
-    type: 'textarea',
-    name: 'pricingNote',
-    label: 'Pricing Note (Optional)',
-    placeholder: 'e.g., Bulk discounts available, Custom quotes for enterprise...',
-    value: business.productsServices.pricingDisplay?.pricingNote || ''
-  });
-  pricingNoteField.style.display = canDiscussPricing ? 'block' : 'none';
-  
-  const pricingCheckbox = pricingToggle.querySelector('input') as HTMLInputElement;
-  pricingCheckbox.addEventListener('change', () => {
-    pricingNoteField.style.display = pricingCheckbox.checked ? 'block' : 'none';
-  });
-  
-  pricingWrapper.appendChild(pricingNoteField);
-  section2.appendChild(pricingWrapper);
-  
-  form.appendChild(section2);
-  
-  // ========================================
-  // SECTION 3: CUSTOMER SUPPORT
-  // ========================================
-  
-  const section3 = createSection('3. Customer Support');
-  
-  const faqsSection = createDynamicArraySection({
-    title: 'Frequently Asked Questions (Optional)',
-    name: 'faqs',
-    fields: [
-      { type: 'text', name: 'question', label: 'Question', required: true },
-      { type: 'textarea', name: 'answer', label: 'Answer', required: true }
-    ],
-    helpText: 'Add common questions your customers ask',
-    existingData: business.customerSupport.faqs
-  });
-  section3.appendChild(faqsSection);
-  
-  const refundField = createFormField({
-    type: 'textarea',
-    name: 'refundPolicy',
-    label: 'Refund Policy',
-    required: true,
-    value: business.customerSupport.policies.refundPolicy,
-    helpText: 'How do you handle refunds?'
-  });
-  section3.appendChild(refundField);
-  
-  const cancellationField = createFormField({
-    type: 'textarea',
-    name: 'cancellationPolicy',
-    label: 'Cancellation Policy (Optional)',
-    value: business.customerSupport.policies.cancellationPolicy || ''
-  });
-  section3.appendChild(cancellationField);
-  
-  const importantPoliciesField = createFormField({
-    type: 'textarea',
-    name: 'importantPolicies',
-    label: 'Other Important Policies (Optional)',
-    value: business.customerSupport.policies.importantPolicies || ''
-  });
-  section3.appendChild(importantPoliciesField);
-  
-  const toneField = createSelectField({
-    name: 'chatbotTone',
-    label: 'Chatbot Tone',
-    options: ['Friendly', 'Professional', 'Casual', 'Formal', 'Playful'],
-    required: true,
-    selectedValue: business.customerSupport.chatbotTone,
-    helpText: 'How should your chatbot communicate?'
-  });
-  section3.appendChild(toneField);
-  
-  const greetingField = createFormField({
-    type: 'textarea',
-    name: 'chatbotGreeting',
-    label: 'Custom Greeting (Optional)',
-    value: business.customerSupport.chatbotGreeting || '',
-    helpText: 'Customize the first message customers see'
-  });
-  section3.appendChild(greetingField);
-  
-  const restrictionsField = createFormField({
-    type: 'textarea',
-    name: 'chatbotRestrictions',
-    label: 'Chatbot Restrictions (Optional)',
-    value: business.customerSupport.chatbotRestrictions || '',
-    helpText: 'What should the chatbot NOT do or promise?'
-  });
-  section3.appendChild(restrictionsField);
-  
-  form.appendChild(section3);
-  
-  // ========================================
-  // SECTION 4: CONTACT & ESCALATION
-  // ========================================
-  
-  const section4 = createSection('4. Contact & Escalation');
-  
-  const contactMethodsSection = createDynamicArraySection({
-    title: 'Contact Methods',
-    name: 'contactMethods',
-    fields: [
-      { 
-        type: 'select', 
-        name: 'method', 
-        label: 'Method', 
-        required: true,
-        options: ['Email', 'Phone', 'WhatsApp', 'Live Chat', 'Social Media']
-      },
-      { type: 'text', name: 'value', label: 'Contact Details', required: true, placeholder: 'Enter email, phone, etc.' }
-    ],
-    helpText: 'How can customers reach you?',
-    minItems: 1,
-    existingData: business.contactEscalation.contactMethods
-  });
-  section4.appendChild(contactMethodsSection);
-  
-  const escalationTitle = document.createElement('h3');
-  escalationTitle.textContent = 'Escalation Contact';
-  escalationTitle.className = 'subsection-title';
-  section4.appendChild(escalationTitle);
-  
-  const escalationHelp = document.createElement('p');
-  escalationHelp.textContent = 'Who should be contacted for complex issues the chatbot cannot handle?';
-  escalationHelp.className = 'help-text';
-  section4.appendChild(escalationHelp);
-  
-  const escalationNameField = createFormField({
-    type: 'text',
-    name: 'escalationName',
-    label: 'Contact Name',
-    required: true,
-    value: business.contactEscalation.escalationContact.name
-  });
-  section4.appendChild(escalationNameField);
-  
-  const escalationEmailField = createFormField({
-    type: 'email',
-    name: 'escalationEmail',
-    label: 'Contact Email',
-    required: true,
-    value: business.contactEscalation.escalationContact.email
-  });
-  section4.appendChild(escalationEmailField);
-  
-  const escalationPhoneField = createFormField({
-    type: 'tel',
-    name: 'escalationPhone',
-    label: 'Contact Phone (Optional)',
-    value: business.contactEscalation.escalationContact.phone || ''
-  });
-  section4.appendChild(escalationPhoneField);
-  
-  const capabilitiesField = createCheckboxGroup({
-    name: 'chatbotCapabilities',
-    label: 'Chatbot Capabilities',
-    options: ['Answer FAQs', 'Book apointments', 'Generate leads', 'Handle Complaints', 'Provide product info', 'Process orders'],
-    checkedValues: business.contactEscalation.chatbotCapabilities,
-    helpText: 'What should your chatbot be able to do?'
-  });
-  section4.appendChild(capabilitiesField);
-  
-  form.appendChild(section4);
-  
-  // ========================================
-  // SUBMIT BUTTON
-  // ========================================
-  
-  const submitButton = document.createElement('button');
-  submitButton.type = 'submit';
-  submitButton.textContent = 'Save Changes';
-  submitButton.className = 'btn-primary';
-  form.appendChild(submitButton);
-  
-  const errorContainer = document.createElement('div');
-  errorContainer.className = 'error-message';
-  errorContainer.style.display = 'none';
-  form.appendChild(errorContainer);
-  
+
+  // Handle Form Submission
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    await handleUpdateBusiness(business._id, form, submitButton, errorContainer);
+    if (validateStep(sections[currentStep], errorContainer)) {
+        await handleUpdateBusiness(businessId, form, nextBtn, errorContainer);
+    }
+  });
+}
+
+function validateStep(section: HTMLElement, errorContainer: HTMLElement): boolean {
+    const requiredInputs = section.querySelectorAll('[required]') as NodeListOf<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>;
+    errorContainer.style.display = 'none';
+
+    for (const input of requiredInputs) {
+        // Skip hidden inputs (like conditional fields that are hidden)
+        if (input.offsetParent === null) continue;
+
+        if (!input.value.trim()) {
+            input.focus();
+            errorContainer.textContent = 'Please fill in all required fields.';
+            errorContainer.style.display = 'block';
+            return false;
+        }
+    }
+    return true;
+}
+
+// ========================================
+// 4. FORM CONSTRUCTION
+// ========================================
+
+function createEditForm(business: Business): HTMLFormElement {
+  const form = document.createElement('form');
+  form.className = 'business-form';
+
+  // --- SECTION 1: BASIC INFO ---
+  const s1 = createSection('1. Basic Information');
+  
+  s1.appendChild(createFormField({
+    type: 'text', name: 'businessName', label: 'Business Name', required: true,
+    value: business.basicInfo.businessName
+  }));
+
+  s1.appendChild(createFormField({
+    type: 'textarea', name: 'businessDescription', label: 'Business Description', required: true,
+    value: business.basicInfo.businessDescription
+  }));
+
+  // Business Type Logic
+  const knownTypes = ['E-commerce', 'Real Estate', 'Restaurant', 'Hotel', 'Service-based', 'Tech/SaaS', 'Healthcare', 'Education'];
+  const isOther = !knownTypes.includes(business.basicInfo.businessType);
+  
+  const typeWrapper = document.createElement('div');
+  const typeSelect = createSelectField({
+    name: 'businessType', label: 'Business Type', required: true,
+    options: [...knownTypes, 'Other'],
+    selectedValue: isOther ? 'Other' : business.basicInfo.businessType
   });
   
+  const otherTypeInput = createFormField({
+    type: 'text', name: 'businessTypeOther', label: 'Specify Type',
+    value: isOther ? business.basicInfo.businessType : ''
+  });
+  otherTypeInput.style.display = isOther ? 'block' : 'none';
+  const otherInputEl = otherTypeInput.querySelector('input') as HTMLInputElement;
+  if(isOther) otherInputEl.required = true;
+
+  typeSelect.querySelector('select')?.addEventListener('change', (e: Event) => {
+    const val = (e.target as HTMLSelectElement).value;
+    if (val === 'Other') {
+        otherTypeInput.style.display = 'block';
+        otherInputEl.required = true;
+    } else {
+        otherTypeInput.style.display = 'none';
+        otherInputEl.required = false;
+    }
+  });
+
+  typeWrapper.appendChild(typeSelect);
+  typeWrapper.appendChild(otherTypeInput);
+  s1.appendChild(typeWrapper);
+
+  s1.appendChild(createFormField({
+    type: 'text', name: 'operatingHours', label: 'Operating Hours', required: true,
+    value: business.basicInfo.operatingHours
+  }));
+
+  s1.appendChild(createFormField({
+    type: 'text', name: 'location', label: 'Location', required: true,
+    value: business.basicInfo.location
+  }));
+
+  s1.appendChild(createFormField({
+    type: 'text', name: 'timezone', label: 'Timezone (Optional)', 
+    value: business.basicInfo.timezone || ''
+  }));
+
+  form.appendChild(s1);
+
+  // --- SECTION 2: PRODUCTS ---
+  const s2 = createSection('2. Products & Services');
+  
+  s2.appendChild(createFormField({
+    type: 'textarea', name: 'offerings', label: 'What do you offer?', required: true,
+    value: business.productsServices.offerings
+  }));
+
+  s2.appendChild(createDynamicArraySection({
+    title: 'Popular Items', name: 'popularItems',
+    fields: [
+        { type: 'text', name: 'name', label: 'Name', required: true },
+        { type: 'textarea', name: 'description', label: 'Description' },
+        { type: 'number', name: 'price', label: 'Price' }
+    ],
+    existingData: business.productsServices.popularItems
+  }));
+
+  s2.appendChild(createCheckboxGroup({
+    name: 'serviceDelivery', label: 'Delivery Options',
+    options: ['Delivery', 'Pickup', 'In-person', 'Online/Virtual'],
+    checkedValues: business.productsServices.serviceDelivery
+  }));
+
+  // Pricing Logic
+  const pricingDiv = document.createElement('div');
+  const canDiscuss = business.productsServices.pricingDisplay?.canDiscussPricing ?? true;
+  
+  const pricingToggle = createCheckboxField({
+    name: 'canDiscussPricing', label: 'Allow chatbot to discuss pricing',
+    defaultChecked: canDiscuss
+  });
+  
+  const pricingNote = createFormField({
+    type: 'textarea', name: 'pricingNote', label: 'Pricing Note',
+    value: business.productsServices.pricingDisplay?.pricingNote || ''
+  });
+  pricingNote.style.display = canDiscuss ? 'block' : 'none';
+
+  pricingToggle.querySelector('input')?.addEventListener('change', (e) => {
+    pricingNote.style.display = (e.target as HTMLInputElement).checked ? 'block' : 'none';
+  });
+
+  pricingDiv.appendChild(pricingToggle);
+  pricingDiv.appendChild(pricingNote);
+  s2.appendChild(pricingDiv);
+
+  form.appendChild(s2);
+
+  // --- SECTION 3: SUPPORT ---
+  const s3 = createSection('3. Customer Support');
+
+  s3.appendChild(createDynamicArraySection({
+    title: 'FAQs', name: 'faqs',
+    fields: [
+        { type: 'text', name: 'question', label: 'Question', required: true },
+        { type: 'textarea', name: 'answer', label: 'Answer', required: true }
+    ],
+    existingData: business.customerSupport.faqs
+  }));
+
+  s3.appendChild(createFormField({
+    type: 'textarea', name: 'refundPolicy', label: 'Refund Policy', required: true,
+    value: business.customerSupport.policies.refundPolicy
+  }));
+
+  s3.appendChild(createFormField({
+    type: 'textarea', name: 'cancellationPolicy', label: 'Cancellation Policy',
+    value: business.customerSupport.policies.cancellationPolicy || ''
+  }));
+
+  s3.appendChild(createSelectField({
+    name: 'chatbotTone', label: 'Chatbot Tone', required: true,
+    options: ['Friendly', 'Professional', 'Casual', 'Formal', 'Playful'],
+    selectedValue: business.customerSupport.chatbotTone
+  }));
+
+  s3.appendChild(createFormField({
+    type: 'textarea', name: 'chatbotGreeting', label: 'Custom Greeting',
+    value: business.customerSupport.chatbotGreeting || ''
+  }));
+
+  form.appendChild(s3);
+
+  // --- SECTION 4: CONTACT ---
+  const s4 = createSection('4. Contact & Escalation');
+
+  s4.appendChild(createDynamicArraySection({
+    title: 'Contact Methods', name: 'contactMethods', minItems: 1,
+    fields: [
+        { type: 'select', name: 'method', label: 'Method', required: true, options: ['Email', 'Phone', 'WhatsApp'] },
+        { type: 'text', name: 'value', label: 'Details', required: true }
+    ],
+    existingData: business.contactEscalation.contactMethods
+  }));
+
+  s4.appendChild(document.createElement('h3')).textContent = 'Escalation Contact';
+
+  s4.appendChild(createFormField({
+    type: 'text', name: 'escalationName', label: 'Contact Name', required: true,
+    value: business.contactEscalation.escalationContact.name
+  }));
+
+  s4.appendChild(createFormField({
+    type: 'email', name: 'escalationEmail', label: 'Contact Email', required: true,
+    value: business.contactEscalation.escalationContact.email
+  }));
+
+  s4.appendChild(createCheckboxGroup({
+    name: 'chatbotCapabilities', label: 'Capabilities',
+    options: ['Answer FAQs', 'Book appointments', 'Generate leads'],
+    checkedValues: business.contactEscalation.chatbotCapabilities
+  }));
+
+  form.appendChild(s4);
+
+  // --- NAVIGATION AREA ---
+  const errorBox = document.createElement('div');
+  errorBox.className = 'error-message error-box';
+  form.appendChild(errorBox);
+
+  const navDiv = document.createElement('div');
+  navDiv.className = 'wizard-navigation';
+  
+  const btnPrev = document.createElement('button');
+  btnPrev.type = 'button';
+  btnPrev.className = 'btn-nav btn-prev';
+  btnPrev.textContent = 'Previous';
+  navDiv.appendChild(btnPrev);
+
+  const btnNext = document.createElement('button');
+  btnNext.type = 'button'; // logic handles change to submit
+  btnNext.className = 'btn-nav btn-next';
+  btnNext.textContent = 'Next';
+  navDiv.appendChild(btnNext);
+
+  form.appendChild(navDiv);
+
   return form;
 }
 
-async function handleUpdateBusiness(
-  businessId: string,
-  form: HTMLFormElement,
-  submitButton: HTMLButtonElement,
-  errorContainer: HTMLElement
-): Promise<void> {
-  try {
-    submitButton.disabled = true;
-    submitButton.textContent = 'Saving...';
-    errorContainer.style.display = 'none';
+// ========================================
+// 5. HELPER COMPONENTS (Styling & Logic)
+// ========================================
+
+function createSection(title: string): HTMLElement {
+  const s = document.createElement('section');
+  s.className = 'form-section';
+  const h = document.createElement('h2');
+  h.textContent = title;
+  s.appendChild(h);
+  return s;
+}
+
+function createFormField(opts: { type: string, name: string, label: string, required?: boolean, value?: string }): HTMLElement {
+  const div = document.createElement('div');
+  div.className = 'form-field';
+  
+  const label = document.createElement('label');
+  label.textContent = opts.label + (opts.required ? ' *' : '');
+  div.appendChild(label);
+
+  let input: HTMLElement;
+  if (opts.type === 'textarea') {
+    input = document.createElement('textarea');
+    (input as HTMLTextAreaElement).rows = 4;
+    (input as HTMLTextAreaElement).value = opts.value || '';
+  } else {
+    input = document.createElement('input');
+    (input as HTMLInputElement).type = opts.type;
+    (input as HTMLInputElement).value = opts.value || '';
+  }
+  
+  (input as any).name = opts.name;
+  if (opts.required) (input as any).required = true;
+  
+  div.appendChild(input);
+  return div;
+}
+
+function createSelectField(opts: { name: string, label: string, options: string[], selectedValue?: string, required?: boolean }): HTMLElement {
+  const div = document.createElement('div');
+  div.className = 'form-field';
+  
+  const label = document.createElement('label');
+  label.textContent = opts.label + (opts.required ? ' *' : '');
+  div.appendChild(label);
+
+  const select = document.createElement('select');
+  select.name = opts.name;
+  if (opts.required) select.required = true;
+
+  opts.options.forEach(opt => {
+    const option = document.createElement('option');
+    option.value = opt;
+    option.textContent = opt;
+    if (opt === opts.selectedValue) option.selected = true;
+    select.appendChild(option);
+  });
+
+  div.appendChild(select);
+  return div;
+}
+
+function createCheckboxGroup(opts: { name: string, label: string, options: string[], checkedValues?: string[] }): HTMLElement {
+  const div = document.createElement('div');
+  div.className = 'form-field';
+  
+  const label = document.createElement('label');
+  label.textContent = opts.label;
+  div.appendChild(label);
+
+  const group = document.createElement('div');
+  group.className = 'checkbox-group';
+
+  opts.options.forEach(opt => {
+    const wrap = document.createElement('div');
+    wrap.className = 'checkbox-item';
     
+    const input = document.createElement('input');
+    input.type = 'checkbox';
+    input.name = opts.name;
+    input.value = opt;
+    input.id = `${opts.name}_${opt.replace(/\s/g, '')}`;
+    if (opts.checkedValues?.includes(opt)) input.checked = true;
+
+    const lbl = document.createElement('label');
+    lbl.htmlFor = input.id;
+    lbl.textContent = opt;
+
+    wrap.appendChild(input);
+    wrap.appendChild(lbl);
+    group.appendChild(wrap);
+  });
+
+  div.appendChild(group);
+  return div;
+}
+
+function createCheckboxField(opts: { name: string, label: string, defaultChecked?: boolean }): HTMLElement {
+  const div = document.createElement('div');
+  div.className = 'form-field checkbox-field';
+  
+  const wrap = document.createElement('div');
+  wrap.className = 'checkbox-item';
+
+  const input = document.createElement('input');
+  input.type = 'checkbox';
+  input.name = opts.name;
+  input.id = opts.name;
+  if (opts.defaultChecked) input.checked = true;
+
+  const lbl = document.createElement('label');
+  lbl.htmlFor = opts.name;
+  lbl.textContent = opts.label;
+
+  wrap.appendChild(input);
+  wrap.appendChild(lbl);
+  div.appendChild(wrap);
+  return div;
+}
+
+function createDynamicArraySection(opts: { title: string, name: string, fields: any[], existingData?: any[], minItems?: number }): HTMLElement {
+  const section = document.createElement('div');
+  section.className = 'dynamic-array-section';
+  section.dataset.arrayName = opts.name; // Used for data collection helpers if needed
+
+  const h3 = document.createElement('h3');
+  h3.textContent = opts.title;
+  section.appendChild(h3);
+
+  const container = document.createElement('div');
+  container.className = 'dynamic-array-items';
+  section.appendChild(container);
+
+  // Pre-populate
+  if (opts.existingData && opts.existingData.length > 0) {
+    opts.existingData.forEach(data => {
+        container.appendChild(createDynamicItem(opts.name, opts.fields, container, data));
+    });
+  } else if (opts.minItems) {
+    for(let i=0; i<opts.minItems; i++) {
+        container.appendChild(createDynamicItem(opts.name, opts.fields, container));
+    }
+  }
+
+  const btnAdd = document.createElement('button');
+  btnAdd.type = 'button';
+  btnAdd.className = 'btn-secondary';
+  btnAdd.textContent = '+ Add Item';
+  btnAdd.addEventListener('click', () => {
+    container.appendChild(createDynamicItem(opts.name, opts.fields, container));
+  });
+  section.appendChild(btnAdd);
+
+  return section;
+}
+
+function createDynamicItem(arrayName: string, fields: any[], container: HTMLElement, data?: any): HTMLElement {
+  const item = document.createElement('div');
+  item.className = 'dynamic-array-item';
+  
+  const index = container.children.length; // Simple index for rendering
+
+  fields.forEach(f => {
+    // Generate correct name: arrayName[index][fieldName]
+    const fieldName = `${arrayName}[${index}][${f.name}]`;
+    const val = data ? data[f.name] : '';
+
+    if (f.type === 'select') {
+      item.appendChild(createSelectField({ name: fieldName, label: f.label, options: f.options, required: f.required, selectedValue: val }));
+    } else {
+      item.appendChild(createFormField({ type: f.type, name: fieldName, label: f.label, required: f.required, value: val }));
+    }
+  });
+
+  const btnRemove = document.createElement('button');
+  btnRemove.type = 'button';
+  btnRemove.className = 'btn-remove';
+  btnRemove.textContent = 'Remove';
+  btnRemove.addEventListener('click', () => {
+    item.remove();
+    // In a real robust app, we'd re-index the names here 
+    // or use a smarter data collector that doesn't rely on strict indices
+  });
+  item.appendChild(btnRemove);
+
+  return item;
+}
+
+// ========================================
+// 6. DATA COLLECTION & SUBMIT
+// ========================================
+
+// Helper to extract array data from form inputs based on naming convention
+function collectArrayData(form: HTMLFormElement, arrayName: string): any[] {
+    const results: any[] = [];
     const formData = new FormData(form);
     
-    let businessType = formData.get('businessType') as string;
-    if (businessType === 'Other') {
-      businessType = formData.get('businessTypeOther') as string;
-    }
+    // Naive regex parsing for names like popularItems[0][name]
+    // A more robust way is to query the DOM
+    const itemDivs = form.querySelectorAll(`.dynamic-array-section[data-array-name="${arrayName}"] .dynamic-array-item`);
     
+    itemDivs.forEach((div) => {
+        const itemObj: any = {};
+        const inputs = div.querySelectorAll('input, select, textarea');
+        let hasData = false;
+
+        inputs.forEach((input) => {
+            const name = (input as any).name; // e.g. popularItems[0][price]
+            // Extract the last part [price]
+            const keyMatch = name.match(/\[([^\]]+)\]$/); 
+            if (keyMatch) {
+                const key = keyMatch[1];
+                let val = (input as any).value;
+                if ((input as any).type === 'number') val = parseFloat(val);
+                itemObj[key] = val;
+                if(val) hasData = true;
+            }
+        });
+
+        if (hasData) results.push(itemObj);
+    });
+
+    return results;
+}
+
+async function handleUpdateBusiness(
+  businessId: string, 
+  form: HTMLFormElement, 
+  btn: HTMLButtonElement, 
+  errorBox: HTMLElement
+) {
+  try {
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+    errorBox.style.display = 'none';
+
+    const formData = new FormData(form);
+    
+    // Construct Object
+    let bType = formData.get('businessType') as string;
+    if (bType === 'Other') bType = formData.get('businessTypeOther') as string;
+
     const updateData: UpdateBusinessRequest = {
-      basicInfo: {
-        businessName: formData.get('businessName') as string,
-        businessDescription: formData.get('businessDescription') as string,
-        businessType: businessType as any,
-        operatingHours: formData.get('operatingHours') as string,
-        location: formData.get('location') as string,
-        timezone: (formData.get('timezone') as string) || undefined
-      },
-      productsServices: {
-        offerings: formData.get('offerings') as string,
-        popularItems: collectArrayData(form, 'popularItems'),
-        serviceDelivery: formData.getAll('serviceDelivery') as any[],
-        pricingDisplay: {
-          canDiscussPricing: formData.get('canDiscussPricing') === 'on',
-          pricingNote: (formData.get('pricingNote') as string) || undefined
+        basicInfo: {
+            businessName: formData.get('businessName') as string,
+            businessDescription: formData.get('businessDescription') as string,
+            businessType: bType as any,
+            operatingHours: formData.get('operatingHours') as string,
+            location: formData.get('location') as string,
+            timezone: formData.get('timezone') as string
+        },
+        productsServices: {
+            offerings: formData.get('offerings') as string,
+            popularItems: collectArrayData(form, 'popularItems'),
+            serviceDelivery: formData.getAll('serviceDelivery') as any[],
+            pricingDisplay: {
+                canDiscussPricing: !!formData.get('canDiscussPricing'),
+                pricingNote: formData.get('pricingNote') as string
+            }
+        },
+        customerSupport: {
+            faqs: collectArrayData(form, 'faqs'),
+            policies: {
+                refundPolicy: formData.get('refundPolicy') as string,
+                cancellationPolicy: formData.get('cancellationPolicy') as string,
+                importantPolicies: formData.get('importantPolicies') as string
+            },
+            chatbotTone: formData.get('chatbotTone') as any,
+            chatbotGreeting: formData.get('chatbotGreeting') as string,
+            chatbotRestrictions: formData.get('chatbotRestrictions') as string
+        },
+        contactEscalation: {
+            contactMethods: collectArrayData(form, 'contactMethods'),
+            escalationContact: {
+                name: formData.get('escalationName') as string,
+                email: formData.get('escalationEmail') as string,
+                phone: formData.get('escalationPhone') as string
+            },
+            chatbotCapabilities: formData.getAll('chatbotCapabilities') as any[]
         }
-      },
-      customerSupport: {
-        faqs: collectArrayData(form, 'faqs'),
-        policies: {
-          refundPolicy: formData.get('refundPolicy') as string,
-          cancellationPolicy: (formData.get('cancellationPolicy') as string) || undefined,
-          importantPolicies: (formData.get('importantPolicies') as string) || undefined
-        },
-        chatbotTone: formData.get('chatbotTone') as any,
-        chatbotGreeting: (formData.get('chatbotGreeting') as string) || undefined,
-        chatbotRestrictions: (formData.get('chatbotRestrictions') as string) || undefined
-      },
-      contactEscalation: {
-        contactMethods: collectArrayData(form, 'contactMethods'),
-        escalationContact: {
-          name: formData.get('escalationName') as string,
-          email: formData.get('escalationEmail') as string,
-          phone: (formData.get('escalationPhone') as string) || undefined
-        },
-        chatbotCapabilities: formData.getAll('chatbotCapabilities') as any[]
-      }
     };
-    
+
     await updateBusiness(businessId, updateData);
     
     alert('Business updated successfully!');
     window.location.hash = '#/dashboard/businesses';
-    
+
   } catch (error: any) {
-    errorContainer.textContent = error.message || 'Failed to update business';
-    errorContainer.style.display = 'block';
-    submitButton.disabled = false;
-    submitButton.textContent = 'Save Changes';
-    console.error('Update business error:', error);
+    btn.disabled = false;
+    btn.textContent = 'Save Changes';
+    errorBox.textContent = error.message || 'Failed to update business';
+    errorBox.style.display = 'block';
   }
-}
-
-// ========================================
-// HELPER FUNCTIONS (Same as create.ts)
-// ========================================
-
-function createSection(title: string): HTMLElement {
-  const section = document.createElement('section');
-  section.className = 'form-section';
-  
-  const titleElement = document.createElement('h2');
-  titleElement.textContent = title;
-  section.appendChild(titleElement);
-  
-  return section;
-}
-
-interface FormFieldOptions {
-  type: string;
-  name: string;
-  label: string;
-  required?: boolean;
-  maxLength?: number;
-  placeholder?: string;
-  helpText?: string;
-  value?: string;
-}
-
-function createFormField(options: FormFieldOptions): HTMLElement {
-  const { type, name, label, required = false, maxLength, placeholder = '', helpText, value = '' } = options;
-  
-  const fieldWrapper = document.createElement('div');
-  fieldWrapper.className = 'form-field';
-  
-  const labelElement = document.createElement('label');
-  labelElement.textContent = label + (required ? ' *' : '');
-  labelElement.htmlFor = name;
-  fieldWrapper.appendChild(labelElement);
-  
-  if (helpText) {
-    const helpElement = document.createElement('span');
-    helpElement.className = 'help-text';
-    helpElement.textContent = helpText;
-    fieldWrapper.appendChild(helpElement);
-  }
-  
-  let inputElement: HTMLInputElement | HTMLTextAreaElement;
-  
-  if (type === 'textarea') {
-    inputElement = document.createElement('textarea');
-    inputElement.rows = 4;
-  } else {
-    inputElement = document.createElement('input');
-    inputElement.type = type;
-  }
-  
-  inputElement.name = name;
-  inputElement.id = name;
-  inputElement.placeholder = placeholder;
-  inputElement.required = required;
-  inputElement.value = value;
-  
-  if (maxLength) {
-    inputElement.maxLength = maxLength;
-    
-    const counter = document.createElement('span');
-    counter.className = 'char-counter';
-    counter.textContent = `${value.length}/${maxLength}`;
-    
-    inputElement.addEventListener('input', () => {
-      counter.textContent = `${inputElement.value.length}/${maxLength}`;
-    });
-    
-    fieldWrapper.appendChild(inputElement);
-    fieldWrapper.appendChild(counter);
-  } else {
-    fieldWrapper.appendChild(inputElement);
-  }
-  
-  return fieldWrapper;
-}
-
-interface SelectFieldOptions {
-  name: string;
-  label: string;
-  options: string[];
-  required?: boolean;
-  helpText?: string;
-  selectedValue?: string;
-}
-
-function createSelectField(options: SelectFieldOptions): HTMLElement {
-  const { name, label, options: selectOptions, required = false, helpText, selectedValue = '' } = options;
-  
-  const fieldWrapper = document.createElement('div');
-  fieldWrapper.className = 'form-field';
-  
-  const labelElement = document.createElement('label');
-  labelElement.textContent = label + (required ? ' *' : '');
-  labelElement.htmlFor = name;
-  fieldWrapper.appendChild(labelElement);
-  
-  if (helpText) {
-    const helpElement = document.createElement('span');
-    helpElement.className = 'help-text';
-    helpElement.textContent = helpText;
-    fieldWrapper.appendChild(helpElement);
-  }
-  
-  const select = document.createElement('select');
-  select.name = name;
-  select.id = name;
-  select.required = required;
-  
-  const defaultOption = document.createElement('option');
-  defaultOption.value = '';
-  defaultOption.textContent = '-- Select --';
-  select.appendChild(defaultOption);
-  
-  selectOptions.forEach(option => {
-    const optionElement = document.createElement('option');
-    optionElement.value = option;
-    optionElement.textContent = option;
-    optionElement.selected = option === selectedValue;
-    select.appendChild(optionElement);
-  });
-  
-  fieldWrapper.appendChild(select);
-  
-  return fieldWrapper;
-}
-
-interface CheckboxGroupOptions {
-  name: string;
-  label: string;
-  options: string[];
-  helpText?: string;
-  checkedValues?: string[];
-}
-
-function createCheckboxGroup(options: CheckboxGroupOptions): HTMLElement {
-  const { name, label, options: checkboxOptions, helpText, checkedValues = [] } = options;
-  
-  const fieldWrapper = document.createElement('div');
-  fieldWrapper.className = 'form-field';
-  
-  const labelElement = document.createElement('label');
-  labelElement.textContent = label;
-  fieldWrapper.appendChild(labelElement);
-  
-  if (helpText) {
-    const helpElement = document.createElement('span');
-    helpElement.className = 'help-text';
-    helpElement.textContent = helpText;
-    fieldWrapper.appendChild(helpElement);
-  }
-  
-  const checkboxContainer = document.createElement('div');
-  checkboxContainer.className = 'checkbox-group';
-  
-  checkboxOptions.forEach(option => {
-    const checkboxWrapper = document.createElement('div');
-    checkboxWrapper.className = 'checkbox-item';
-    
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.name = name;
-    checkbox.value = option;
-    checkbox.id = `${name}_${option}`;
-    checkbox.checked = checkedValues.includes(option);
-    
-    const checkboxLabel = document.createElement('label');
-    checkboxLabel.textContent = option;
-    checkboxLabel.htmlFor = `${name}_${option}`;
-    
-    checkboxWrapper.appendChild(checkbox);
-    checkboxWrapper.appendChild(checkboxLabel);
-    checkboxContainer.appendChild(checkboxWrapper);
-  });
-  
-  fieldWrapper.appendChild(checkboxContainer);
-  
-  return fieldWrapper;
-}
-
-function createCheckboxField(options: { name: string; label: string; defaultChecked?: boolean; helpText?: string }): HTMLElement {
-  const { name, label, defaultChecked = false, helpText } = options;
-  
-  const fieldWrapper = document.createElement('div');
-  fieldWrapper.className = 'form-field checkbox-field';
-  
-  const checkboxWrapper = document.createElement('div');
-  checkboxWrapper.className = 'checkbox-item';
-  
-  const checkbox = document.createElement('input');
-  checkbox.type = 'checkbox';
-  checkbox.name = name;
-  checkbox.id = name;
-  checkbox.checked = defaultChecked;
-  
-  const checkboxLabel = document.createElement('label');
-  checkboxLabel.textContent = label;
-  checkboxLabel.htmlFor = name;
-  
-  checkboxWrapper.appendChild(checkbox);
-  checkboxWrapper.appendChild(checkboxLabel);
-  fieldWrapper.appendChild(checkboxWrapper);
-  
-  if (helpText) {
-    const helpElement = document.createElement('span');
-    helpElement.className = 'help-text';
-    helpElement.textContent = helpText;
-    fieldWrapper.appendChild(helpElement);
-  }
-  
-  return fieldWrapper;
-}
-
-interface DynamicArrayField {
-  type: string;
-  name: string;
-  label: string;
-  required?: boolean;
-  placeholder?: string;
-  options?: string[];
-}
-
-interface DynamicArrayOptions {
-  title: string;
-  name: string;
-  fields: DynamicArrayField[];
-  helpText?: string;
-  minItems?: number;
-  existingData?: any[];
-}
-
-function createDynamicArraySection(options: DynamicArrayOptions): HTMLElement {
-  const { title, name, fields, helpText, minItems = 0, existingData = [] } = options;
-  
-  const section = document.createElement('div');
-  section.className = 'dynamic-array-section';
-  section.dataset.arrayName = name;
-  
-  const header = document.createElement('div');
-  header.className = 'dynamic-array-header';
-  
-  const titleElement = document.createElement('h3');
-  titleElement.textContent = title;
-  header.appendChild(titleElement);
-  
-  if (helpText) {
-    const helpElement = document.createElement('p');
-    helpElement.className = 'help-text';
-    helpElement.textContent = helpText;
-    header.appendChild(helpElement);
-  }
-  
-  section.appendChild(header);
-  
-  const itemsContainer = document.createElement('div');
-  itemsContainer.className = 'dynamic-array-items';
-  section.appendChild(itemsContainer);
-  
-  const addButton = document.createElement('button');
-  addButton.type = 'button';
-  addButton.className = 'btn-secondary';
-  addButton.textContent = `+ Add ${title.replace(/\s*\(Optional\)/, '')}`;
-  
-  addButton.addEventListener('click', () => {
-    const item = createDynamicArrayItem(name, fields, itemsContainer, minItems);
-    itemsContainer.appendChild(item);
-  });
-  
-  section.appendChild(addButton);
-  
-  // Pre-populate with existing data
-  if (existingData.length > 0) {
-    existingData.forEach((data) => {
-      const item = createDynamicArrayItem(name, fields, itemsContainer, minItems, data);
-      itemsContainer.appendChild(item);
-    });
-  } else if (minItems > 0) {
-    for (let i = 0; i < minItems; i++) {
-      const item = createDynamicArrayItem(name, fields, itemsContainer, minItems);
-      itemsContainer.appendChild(item);
-    }
-  }
-  
-  return section;
-}
-
-function createDynamicArrayItem(
-  arrayName: string,
-  fields: DynamicArrayField[],
-  container: HTMLElement,
-  minItems: number,
-  existingData?: any
-): HTMLElement {
-  const item = document.createElement('div');
-  item.className = 'dynamic-array-item';
-  
-  const index = container.children.length;
-  
-  fields.forEach(field => {
-    const fieldName = `${arrayName}[${index}][${field.name}]`;
-    const fieldValue = existingData ? (existingData[field.name] || '') : '';
-    
-    if (field.type === 'select' && field.options) {
-      const selectField = createSelectField({
-        name: fieldName,
-        label: field.label,
-        options: field.options,
-        required: field.required,
-        selectedValue: fieldValue
-      });
-      item.appendChild(selectField);
-    } else {
-      const formField = createFormField({
-        type: field.type,
-        name: fieldName,
-        label: field.label,
-        required: field.required,
-        placeholder: field.placeholder,
-        value: String(fieldValue)
-      });
-      item.appendChild(formField);
-    }
-  });
-  
-  const removeButton = document.createElement('button');
-  removeButton.type = 'button';
-  removeButton.className = 'btn-remove';
-  removeButton.textContent = 'Remove';
-  
-  removeButton.addEventListener('click', () => {
-    if (container.children.length > minItems) {
-      item.remove();
-      reindexArrayItems(container, arrayName);
-    }
-  });
-  
-  if (minItems === 0 || container.children.length >= minItems) {
-    item.appendChild(removeButton);
-  }
-  
-  return item;
-}
-
-function reindexArrayItems(container: HTMLElement, arrayName: string): void {
-  Array.from(container.children).forEach((item, newIndex) => {
-    const inputs = item.querySelectorAll('input, textarea, select');
-    inputs.forEach(input => {
-      const nameAttr = (input as HTMLInputElement).name;
-      const fieldName = nameAttr.match(/\[([^\]]+)\]$/)?.[1];
-      if (fieldName) {
-        (input as HTMLInputElement).name = `${arrayName}[${newIndex}][${fieldName}]`;
-      }
-    });
-  });
-}
-
-function collectArrayData(form: HTMLFormElement, arrayName: string): any[] {
-  const items: any[] = [];
-  const formData = new FormData(form);
-  
-  let maxIndex = -1;
-  for (const key of formData.keys()) {
-    if (key.startsWith(`${arrayName}[`)) {
-      const match = key.match(/\[(\d+)\]/);
-      if (match) {
-        const index = parseInt(match[1]);
-        if (index > maxIndex) maxIndex = index;
-      }
-    }
-  }
-  
-  for (let i = 0; i <= maxIndex; i++) {
-    const item: any = {};
-    let hasData = false;
-    
-    for (const key of formData.keys()) {
-      if (key.startsWith(`${arrayName}[${i}]`)) {
-        const fieldMatch = key.match(/\[([^\]]+)\]$/);
-        if (fieldMatch) {
-          const fieldName = fieldMatch[1];
-          const value = formData.get(key);
-          if (value) {
-            item[fieldName] = fieldName === 'price' ? parseFloat(value as string) : value;
-            hasData = true;
-          }
-        }
-      }
-    }
-    
-    if (hasData) {
-      items.push(item);
-    }
-  }
-  
-  return items;
 }
