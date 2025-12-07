@@ -2,132 +2,297 @@
  * ========================================
  * LOGIN PAGE
  * ========================================
- * 
- * User login form with email verification check.
+ * * User login form with email verification check.
+ * Styled with Glassmorphism and Modern UI.
  */
 
 import { login } from '../../services/auth.service';
 import { saveTokens, saveUser } from '../../utils/auth.utils';
 
-export function renderLogin(): HTMLElement {
-  const container = document.createElement('div');
-  container.style.cssText = 'max-width: 400px; margin: 50px auto; padding: 20px; border: 1px solid #ccc;';
+// --- INJECTED CSS FOR MODERN STYLING ---
+function injectLoginStyles() {
+    // Check if styles already exist to avoid duplicates
+    if (document.getElementById('login-page-styles')) return;
 
-  // Title
-  const title = document.createElement('h1');
-  title.textContent = 'Login';
-  container.appendChild(title);
-
-  // Form
-  const form = document.createElement('form');
-
-  // Email field
-  const emailDiv = document.createElement('div');
-  emailDiv.style.marginBottom = '15px';
-
-  const emailLabel = document.createElement('label');
-  emailLabel.textContent = 'Email';
-  emailLabel.style.cssText = 'display: block; margin-bottom: 5px;';
-  emailDiv.appendChild(emailLabel);
-
-  const emailInput = document.createElement('input');
-  emailInput.type = 'email';
-  emailInput.name = 'email';
-  emailInput.required = true;
-  emailInput.style.cssText = 'width: 100%; padding: 8px; box-sizing: border-box;';
-  emailDiv.appendChild(emailInput);
-
-  form.appendChild(emailDiv);
-
-  // Password field
-  const passwordDiv = document.createElement('div');
-  passwordDiv.style.marginBottom = '15px';
-
-  const passwordLabel = document.createElement('label');
-  passwordLabel.textContent = 'Password';
-  passwordLabel.style.cssText = 'display: block; margin-bottom: 5px;';
-  passwordDiv.appendChild(passwordLabel);
-
-  const passwordInput = document.createElement('input');
-  passwordInput.type = 'password';
-  passwordInput.name = 'password';
-  passwordInput.required = true;
-  passwordInput.style.cssText = 'width: 100%; padding: 8px; box-sizing: border-box;';
-  passwordDiv.appendChild(passwordInput);
-
-  form.appendChild(passwordDiv);
-
-  // Error message
-  const errorDiv = document.createElement('div');
-  errorDiv.style.cssText = 'display: none; color: red; margin-bottom: 15px;';
-  form.appendChild(errorDiv);
-
-  // Submit button
-  const submitBtn = document.createElement('button');
-  submitBtn.type = 'submit';
-  submitBtn.textContent = 'Login';
-  submitBtn.style.cssText = 'width: 100%; padding: 10px; background: #007bff; color: white; border: none; cursor: pointer;';
-  form.appendChild(submitBtn);
-
-  // Form submission handler
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const email = emailInput.value;
-    const password = passwordInput.value;
-
-    // Hide previous errors
-    errorDiv.style.display = 'none';
-
-    // Disable form
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Logging in...';
-
-    try {
-      const response = await login({ email, password });
-
-      if (!response.success) {
-        // Check for email not verified
-        if (response.error.code === 'EMAIL_NOT_VERIFIED') {
-          errorDiv.textContent = 'Email not verified. Redirecting to verification page...';
-          errorDiv.style.display = 'block';
-
-          sessionStorage.setItem('pendingVerificationEmail', email);
-
-          setTimeout(() => {
-            window.location.hash = '#/verify-email';
-          }, 1500);
-          return;
+    const style = document.createElement('style');
+    style.id = 'login-page-styles';
+    style.textContent = `
+        :root {
+            --primary: #636b2f; /* Dark Green/Olive */
+            --secondary: #bac095; /* Light Olive */
+            --text-main: #1a1a1a;
+            --text-muted: #666;
+            --error-red: #dc3545;
+            --bg-light: #f7f9fb;
         }
 
-        errorDiv.textContent = response.error.message || 'Login failed';
-        errorDiv.style.display = 'block';
-        return;
-      }
+        /* 1. Main Container (Glassmorphism Card) */
+        .login-container {
+            max-width: 400px;
+            margin: 60px auto; /* Slightly more top margin for breathing room */
+            padding: 40px 30px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            animation: floatUp 0.6s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
 
-      // Success
-      saveTokens(response.data.tokens);
-      saveUser(response.data.user);
+        @keyframes floatUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-      window.location.hash = '#/dashboard';
+        /* 2. Typography */
+        .login-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 0 0 10px 0;
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+        
+        .login-subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+        }
 
-    } catch (error: any) {
-      errorDiv.textContent = 'An unexpected error occurred';
-      errorDiv.style.display = 'block';
-      console.error('Login error:', error);
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Login';
-    }
-  });
+        /* 3. Form Fields */
+        .form-group {
+            margin-bottom: 20px;
+        }
 
-  container.appendChild(form);
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 0.9rem;
+        }
 
-  // Register link
-  const registerLink = document.createElement('p');
-  registerLink.style.cssText = 'margin-top: 20px; text-align: center;';
-  registerLink.innerHTML = `Don't have an account? <a href="#/register" style="color: #007bff;">Register</a>`;
-  container.appendChild(registerLink);
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            box-sizing: border-box;
+            border: 1px solid #e1e1e1;
+            border-radius: 8px;
+            background: var(--bg-light);
+            transition: all 0.2s ease;
+            font-size: 1rem;
+            color: var(--text-main);
+        }
 
-  return container;
+        .form-input:focus {
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(99, 107, 47, 0.1);
+            outline: none;
+        }
+
+        /* 4. Buttons */
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 10px;
+            box-shadow: 0 4px 6px rgba(99, 107, 47, 0.2);
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            background: #4f5625;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 12px rgba(99, 107, 47, 0.3);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.7;
+            cursor: wait;
+        }
+
+        /* 5. Messages & Links */
+        .error-message {
+            background: rgba(220, 53, 69, 0.1);
+            color: var(--error-red);
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            border-left: 3px solid var(--error-red);
+            line-height: 1.4;
+        }
+
+        .register-link {
+            margin-top: 25px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .register-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .register-link a:hover {
+            color: #4f5625;
+            text-decoration: underline;
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+export function renderLogin(): HTMLElement {
+    injectLoginStyles();
+
+    const container = document.createElement('div');
+    container.className = 'login-container';
+
+    // Title Section
+    const title = document.createElement('h1');
+    title.textContent = 'Welcome Back'; // Slightly friendlier title
+    title.className = 'login-title';
+    container.appendChild(title);
+
+    const subtitle = document.createElement('p');
+    subtitle.textContent = 'Please enter your details to sign in.';
+    subtitle.className = 'login-subtitle';
+    container.appendChild(subtitle);
+
+    // Form
+    const form = document.createElement('form');
+
+    // Email field
+    const emailDiv = document.createElement('div');
+    emailDiv.className = 'form-group';
+
+    const emailLabel = document.createElement('label');
+    emailLabel.textContent = 'Email';
+    emailLabel.className = 'form-label';
+    emailDiv.appendChild(emailLabel);
+
+    const emailInput = document.createElement('input');
+    emailInput.type = 'email';
+    emailInput.name = 'email';
+    emailInput.required = true;
+    emailInput.className = 'form-input';
+    emailInput.placeholder = 'name@company.com'; // Added helpful placeholder
+    emailDiv.appendChild(emailInput);
+
+    form.appendChild(emailDiv);
+
+    // Password field
+    const passwordDiv = document.createElement('div');
+    passwordDiv.className = 'form-group';
+
+    const passwordLabel = document.createElement('label');
+    passwordLabel.textContent = 'Password';
+    passwordLabel.className = 'form-label';
+    passwordDiv.appendChild(passwordLabel);
+
+    const passwordInput = document.createElement('input');
+    passwordInput.type = 'password';
+    passwordInput.name = 'password';
+    passwordInput.required = true;
+    passwordInput.className = 'form-input';
+    passwordInput.placeholder = '••••••••'; // Added helpful placeholder
+    passwordDiv.appendChild(passwordInput);
+
+    form.appendChild(passwordDiv);
+
+    // Error message container
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message';
+    errorDiv.style.display = 'none';
+    form.appendChild(errorDiv);
+
+    // Submit button
+    const submitBtn = document.createElement('button');
+    submitBtn.type = 'submit';
+    submitBtn.textContent = 'Sign In'; // More professional text
+    submitBtn.className = 'btn-submit';
+    form.appendChild(submitBtn);
+
+    // Form submission handler
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const email = emailInput.value;
+        const password = passwordInput.value;
+
+        // Reset UI state
+        errorDiv.style.display = 'none';
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Verifying...';
+
+        try {
+            const response = await login({ email, password });
+
+            if (!response.success) {
+                // Check for email not verified
+                if (response.error.code === 'EMAIL_NOT_VERIFIED') {
+                    errorDiv.innerHTML = '<strong>Account not verified.</strong><br/>Redirecting to verification...';
+                    errorDiv.style.display = 'block';
+
+                    sessionStorage.setItem('pendingVerificationEmail', email);
+
+                    setTimeout(() => {
+                        window.location.hash = '#/verify-email';
+                    }, 1500);
+                    return;
+                }
+
+                errorDiv.textContent = response.error.message || 'Invalid email or password.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            // Success animation
+            submitBtn.textContent = 'Success!';
+            submitBtn.style.background = '#28a745'; // Quick flash of green
+            
+            saveTokens(response.data.tokens);
+            saveUser(response.data.user);
+
+            // Small delay to let user see success state
+            setTimeout(() => {
+                window.location.hash = '#/dashboard';
+            }, 500);
+
+        } catch (error: any) {
+            errorDiv.textContent = 'An unexpected error occurred. Please try again.';
+            errorDiv.style.display = 'block';
+            console.error('Login error:', error);
+        } finally {
+            // Only reset if we didn't succeed (success handles its own transition)
+            if (submitBtn.textContent !== 'Success!') {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Sign In';
+            }
+        }
+    });
+
+    container.appendChild(form);
+
+    // Register link
+    const registerLink = document.createElement('p');
+    registerLink.className = 'register-link';
+    registerLink.innerHTML = `Don't have an account? <a href="#/register">Create one now</a>`;
+    container.appendChild(registerLink);
+
+    return container;
 }

@@ -1,284 +1,440 @@
-/**
- * ========================================
- * REGISTER PAGE
- * ========================================
- * 
- * Two-step registration with OTP verification
- */
-
 import { register, verifyEmail, resendOTP } from '../../services/auth.service';
 import { OTPType } from '../../types/auth.types';
 
 let registeredEmail = '';
 
+// --- INJECTED CSS FOR MODERN STYLING ---
+function injectRegisterStyles() {
+    const style = document.createElement('style');
+    style.textContent = `
+        :root {
+            --primary: #636b2f; /* Dark Green/Olive */
+            --secondary: #bac095; /* Light Olive */
+            --text-main: #1a1a1a;
+            --text-muted: #666;
+            --error-red: #dc3545;
+            --success-green: #28a745;
+            --bg-light: #f7f9fb;
+        }
+        
+        /* 1. Main Container (Glassmorphism Card) */
+        .register-container {
+            max-width: 440px;
+            margin: 50px auto;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(8px);
+            border-radius: 16px;
+            border: 1px solid rgba(220, 220, 220, 0.5);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.5s ease-out;
+            color: var(--text-main);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 2. Typography */
+        .register-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        /* 3. Form Fields & Inputs */
+        .form-field {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: var(--bg-light);
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 107, 47, 0.15); /* Primary color glow */
+            outline: none;
+            background: white;
+        }
+
+        /* 4. Buttons */
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 10px;
+        }
+        
+        /* Register Button */
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #4f5625; /* Darker shade of primary */
+            box-shadow: 0 6px 10px rgba(99, 107, 47, 0.3);
+        }
+        
+        /* Resend Button (Secondary/Ghost) */
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            box-shadow: none;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: var(--bg-light);
+            color: #4f5625;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* 5. Messages and Links */
+        .error-message {
+            color: var(--error-red);
+            margin-bottom: 15px;
+            padding: 10px;
+            border-left: 3px solid var(--error-red);
+            background: rgba(220, 53, 69, 0.05);
+            border-radius: 4px;
+        }
+        
+        .success-message {
+            color: var(--success-green);
+            margin-bottom: 15px;
+            padding: 10px;
+            border-left: 3px solid var(--success-green);
+            background: rgba(40, 167, 69, 0.05);
+            border-radius: 4px;
+        }
+        
+        .login-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* OTP Specific Styling */
+        .otp-input {
+            text-align: center;
+            letter-spacing: 15px !important;
+            font-weight: bold;
+            font-size: 1.5rem !important;
+            padding: 15px !important;
+        }
+    `;
+    document.head.appendChild(style);
+}
+// --- END CSS INJECTION ---
+
 export function renderRegister(): HTMLElement {
-  const container = document.createElement('div');
-  container.style.cssText = 'max-width: 400px; margin: 50px auto; padding: 20px; border: 1px solid #ccc;';
+    // Inject styles once
+    if (!document.head.querySelector('style[data-register-styles]')) {
+        injectRegisterStyles();
+    }
 
-  // Title
-  const title = document.createElement('h1');
-  title.textContent = 'Register';
-  container.appendChild(title);
+    const container = document.createElement('div');
+    container.className = 'register-container'; // Apply glass card class
 
-  // Registration form
-  const registerForm = createRegisterForm(container);
-  container.appendChild(registerForm);
+    // Title
+    const title = document.createElement('h1');
+    title.className = 'register-title'; // Apply modern title class
+    title.textContent = 'Create Your Account';
+    container.appendChild(title);
 
-  // OTP section (hidden initially)
-  const otpSection = createOTPSection();
-  otpSection.style.display = 'none';
-  container.appendChild(otpSection);
+    // Registration form
+    const registerForm = createRegisterForm(container);
+    container.appendChild(registerForm);
 
-  // Login link
-  const loginLink = document.createElement('p');
-  loginLink.style.cssText = 'margin-top: 20px; text-align: center;';
-  loginLink.innerHTML = `Already have an account? <a href="#/login" style="color: #007bff;">Login</a>`;
-  container.appendChild(loginLink);
+    // OTP section (hidden initially)
+    const otpSection = createOTPSection();
+    otpSection.style.display = 'none';
+    container.appendChild(otpSection);
 
-  return container;
+    // Login link
+    const loginLink = document.createElement('p');
+    loginLink.className = 'login-link'; // Apply link class
+    loginLink.style.cssText = 'margin-top: 20px; text-align: center;';
+    loginLink.innerHTML = `Already have an account? <a href="#/login">Login</a>`;
+    container.appendChild(loginLink);
+
+    return container;
 }
 
 function createRegisterForm(container: HTMLElement): HTMLElement {
-  const form = document.createElement('form');
+    const form = document.createElement('form');
 
-  // First Name
-  const firstNameDiv = createFormField('text', 'firstName', 'First Name', true);
-  form.appendChild(firstNameDiv);
+    // First Name
+    const firstNameDiv = createFormField('text', 'firstName', 'First Name', true);
+    form.appendChild(firstNameDiv);
 
-  // Last Name
-  const lastNameDiv = createFormField('text', 'lastName', 'Last Name', true);
-  form.appendChild(lastNameDiv);
+    // Last Name
+    const lastNameDiv = createFormField('text', 'lastName', 'Last Name', true);
+    form.appendChild(lastNameDiv);
 
-  // Email
-  const emailDiv = createFormField('email', 'email', 'Email', true);
-  form.appendChild(emailDiv);
+    // Email
+    const emailDiv = createFormField('email', 'email', 'Email', true);
+    form.appendChild(emailDiv);
 
-  // Password
-  const passwordDiv = createFormField('password', 'password', 'Password', true);
-  const passwordInput = passwordDiv.querySelector('input') as HTMLInputElement;
-  passwordInput.minLength = 8;
-  
-  const passwordHint = document.createElement('small');
-  passwordHint.textContent = 'Minimum 8 characters';
-  passwordHint.style.color = '#666';
-  passwordDiv.appendChild(passwordHint);
-  
-  form.appendChild(passwordDiv);
+    // Password
+    const passwordDiv = createFormField('password', 'password', 'Password', true);
+    const passwordInput = passwordDiv.querySelector('input') as HTMLInputElement;
+    passwordInput.minLength = 8;
+    
+    const passwordHint = document.createElement('small');
+    passwordHint.textContent = 'Minimum 8 characters';
+    passwordHint.style.cssText = 'color: var(--text-muted); display: block; margin-top: 5px;';
+    passwordDiv.appendChild(passwordHint);
+    
+    form.appendChild(passwordDiv);
 
-  // Error message
-  const errorDiv = document.createElement('div');
-  errorDiv.style.cssText = 'display: none; color: red; margin-bottom: 15px;';
-  form.appendChild(errorDiv);
-
-  // Submit button
-  const submitBtn = document.createElement('button');
-  submitBtn.type = 'submit';
-  submitBtn.textContent = 'Register';
-  submitBtn.style.cssText = 'width: 100%; padding: 10px; background: #28a745; color: white; border: none; cursor: pointer;';
-  form.appendChild(submitBtn);
-
-  // Form submission
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const formData = new FormData(form);
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
-    const firstName = formData.get('firstName') as string;
-    const lastName = formData.get('lastName') as string;
-
+    // Error message
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message'; // Apply error style
     errorDiv.style.display = 'none';
+    form.appendChild(errorDiv);
 
-    if (password.length < 8) {
-      errorDiv.textContent = 'Password must be at least 8 characters';
-      errorDiv.style.display = 'block';
-      return;
-    }
+    // Submit button
+    const submitBtn = document.createElement('button');
+    submitBtn.type = 'submit';
+    submitBtn.textContent = 'Start Free Beta Access'; // Better CTA
+    submitBtn.className = 'btn btn-primary'; // Apply button styles
+    form.appendChild(submitBtn);
 
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Registering...';
+    // Form submission logic remains the same...
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        const email = formData.get('email') as string;
+        const password = formData.get('password') as string;
+        const firstName = formData.get('firstName') as string;
+        const lastName = formData.get('lastName') as string;
 
-    try {
-      const response = await register({ email, password, firstName, lastName });
+        errorDiv.style.display = 'none';
 
-      if (!response.success) {
-        errorDiv.textContent = response.error.message || 'Registration failed';
-        errorDiv.style.display = 'block';
-        return;
-      }
+        if (password.length < 8) {
+            errorDiv.textContent = 'Password must be at least 8 characters';
+            errorDiv.style.display = 'block';
+            return;
+        }
 
-      // Store email and show OTP section
-      registeredEmail = email;
-      form.style.display = 'none';
-      
-      const otpSection = container.querySelector('#otpSection') as HTMLElement;
-      if (otpSection) {
-        otpSection.style.display = 'block';
-      }
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Registering...';
 
-    } catch (error) {
-      errorDiv.textContent = 'An unexpected error occurred';
-      errorDiv.style.display = 'block';
-      console.error('Register error:', error);
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Register';
-    }
-  });
+        try {
+            const response = await register({ email, password, firstName, lastName });
 
-  return form;
+            if (!response.success) {
+                errorDiv.textContent = response.error.message || 'Registration failed';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            registeredEmail = email;
+            form.style.display = 'none';
+            
+            const otpSection = container.querySelector('#otpSection') as HTMLElement;
+            if (otpSection) {
+                otpSection.style.display = 'block';
+            }
+
+        } catch (error) {
+            errorDiv.textContent = 'An unexpected error occurred';
+            errorDiv.style.display = 'block';
+            console.error('Register error:', error);
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Start Free Beta Access';
+        }
+    });
+
+    return form;
 }
 
 function createOTPSection(): HTMLElement {
-  const section = document.createElement('div');
-  section.id = 'otpSection';
+    const section = document.createElement('div');
+    section.id = 'otpSection';
 
-  const successMsg = document.createElement('p');
-  successMsg.style.cssText = 'margin-top: 20px; color: #28a745;';
-  successMsg.textContent = '✓ Registration successful! Check your email for verification code.';
-  section.appendChild(successMsg);
+    const successMsg = document.createElement('p');
+    successMsg.className = 'success-message'; // Apply success style
+    successMsg.textContent = '✓ Success! Check your email for a 6-digit verification code.';
+    section.appendChild(successMsg);
 
-  const form = document.createElement('form');
+    const form = document.createElement('form');
 
-  // OTP field
-  const otpDiv = document.createElement('div');
-  otpDiv.style.marginBottom = '15px';
+    // OTP field
+    const otpDiv = document.createElement('div');
+    otpDiv.className = 'form-field';
+    otpDiv.style.marginBottom = '25px';
 
-  const otpLabel = document.createElement('label');
-  otpLabel.textContent = 'Verification Code (OTP)';
-  otpLabel.style.cssText = 'display: block; margin-bottom: 5px;';
-  otpDiv.appendChild(otpLabel);
+    const otpLabel = document.createElement('label');
+    otpLabel.textContent = 'Verification Code (OTP)';
+    otpLabel.className = 'form-label';
+    otpDiv.appendChild(otpLabel);
 
-  const otpInput = document.createElement('input');
-  otpInput.type = 'text';
-  otpInput.name = 'otp';
-  otpInput.required = true;
-  otpInput.maxLength = 6;
-  otpInput.placeholder = 'Enter 6-digit code';
-  otpInput.style.cssText = 'width: 100%; padding: 8px; box-sizing: border-box; font-size: 18px; letter-spacing: 2px;';
-  otpDiv.appendChild(otpInput);
+    const otpInput = document.createElement('input');
+    otpInput.type = 'text';
+    otpInput.name = 'otp';
+    otpInput.required = true;
+    otpInput.maxLength = 6;
+    otpInput.placeholder = '••••••';
+    otpInput.className = 'form-input otp-input'; // Apply modern input and OTP specific styles
+    otpDiv.appendChild(otpInput);
 
-  form.appendChild(otpDiv);
+    form.appendChild(otpDiv);
 
-  // Messages
-  const errorDiv = document.createElement('div');
-  errorDiv.style.cssText = 'display: none; color: red; margin-bottom: 10px;';
-  form.appendChild(errorDiv);
-
-  const successDiv = document.createElement('div');
-  successDiv.style.cssText = 'display: none; color: green; margin-bottom: 10px;';
-  form.appendChild(successDiv);
-
-  // Verify button
-  const verifyBtn = document.createElement('button');
-  verifyBtn.type = 'submit';
-  verifyBtn.textContent = 'Verify Email';
-  verifyBtn.style.cssText = 'width: 100%; padding: 10px; background: #007bff; color: white; border: none; cursor: pointer; margin-bottom: 10px;';
-  form.appendChild(verifyBtn);
-
-  // Resend button
-  const resendBtn = document.createElement('button');
-  resendBtn.type = 'button';
-  resendBtn.textContent = 'Resend Code';
-  resendBtn.style.cssText = 'width: 100%; padding: 8px; background: white; color: #007bff; border: 1px solid #007bff; cursor: pointer;';
-  form.appendChild(resendBtn);
-
-  // Verify submission
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const otp = otpInput.value;
-
+    // Messages
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message';
     errorDiv.style.display = 'none';
+    form.appendChild(errorDiv);
+
+    const successDiv = document.createElement('div');
+    successDiv.className = 'success-message';
     successDiv.style.display = 'none';
+    form.appendChild(successDiv);
 
-    if (otp.length !== 6) {
-      errorDiv.textContent = 'Please enter a valid 6-digit code';
-      errorDiv.style.display = 'block';
-      return;
-    }
+    // Verify button
+    const verifyBtn = document.createElement('button');
+    verifyBtn.type = 'submit';
+    verifyBtn.textContent = 'Verify Email';
+    verifyBtn.className = 'btn btn-primary'; // Apply primary style
+    form.appendChild(verifyBtn);
 
-    verifyBtn.disabled = true;
-    verifyBtn.textContent = 'Verifying...';
+    // Resend button
+    const resendBtn = document.createElement('button');
+    resendBtn.type = 'button';
+    resendBtn.textContent = 'Resend Code';
+    resendBtn.className = 'btn btn-secondary'; // Apply secondary style
+    form.appendChild(resendBtn);
 
-    try {
-      const response = await verifyEmail({
-        email: registeredEmail,
-        otp,
-        type: OTPType.EMAIL_VERIFICATION
-      });
+    // Form submission logic remains the same...
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const otp = otpInput.value;
+        errorDiv.style.display = 'none';
+        successDiv.style.display = 'none';
 
-      if (!response.success) {
-        errorDiv.textContent = response.error.message || 'Invalid code';
-        errorDiv.style.display = 'block';
-        return;
-      }
+        if (otp.length !== 6) {
+            errorDiv.textContent = 'Please enter a valid 6-digit code';
+            errorDiv.style.display = 'block';
+            return;
+        }
 
-      successDiv.textContent = 'Email verified! Redirecting to login...';
-      successDiv.style.display = 'block';
+        verifyBtn.disabled = true;
+        verifyBtn.textContent = 'Verifying...';
 
-      setTimeout(() => {
-        window.location.hash = '#/login';
-      }, 2000);
+        try {
+            const response = await verifyEmail({
+                email: registeredEmail,
+                otp,
+                type: OTPType.EMAIL_VERIFICATION
+            });
 
-    } catch (error) {
-      errorDiv.textContent = 'Verification failed';
-      errorDiv.style.display = 'block';
-      console.error('OTP verification error:', error);
-    } finally {
-      verifyBtn.disabled = false;
-      verifyBtn.textContent = 'Verify Email';
-    }
-  });
+            if (!response.success) {
+                errorDiv.textContent = response.error.message || 'Invalid code';
+                errorDiv.style.display = 'block';
+                return;
+            }
 
-  // Resend handler
-  resendBtn.addEventListener('click', async () => {
-    errorDiv.style.display = 'none';
-    successDiv.style.display = 'none';
+            successDiv.textContent = 'Email verified! Redirecting to login...';
+            successDiv.style.display = 'block';
 
-    resendBtn.disabled = true;
-    resendBtn.textContent = 'Sending...';
+            setTimeout(() => {
+                window.location.hash = '#/login';
+            }, 2000);
 
-    try {
-      const response = await resendOTP(registeredEmail);
+        } catch (error) {
+            errorDiv.textContent = 'Verification failed';
+            errorDiv.style.display = 'block';
+            console.error('OTP verification error:', error);
+        } finally {
+            verifyBtn.disabled = false;
+            verifyBtn.textContent = 'Verify Email';
+        }
+    });
 
-      if (!response.success) {
-        errorDiv.textContent = 'Failed to resend code';
-        errorDiv.style.display = 'block';
-        return;
-      }
+    // Resend handler logic remains the same...
+    resendBtn.addEventListener('click', async () => {
+        errorDiv.style.display = 'none';
+        successDiv.style.display = 'none';
 
-      successDiv.textContent = 'Code resent! Check your email.';
-      successDiv.style.display = 'block';
+        resendBtn.disabled = true;
+        resendBtn.textContent = 'Sending...';
 
-    } catch (error) {
-      errorDiv.textContent = 'Failed to resend code';
-      errorDiv.style.display = 'block';
-    } finally {
-      resendBtn.disabled = false;
-      resendBtn.textContent = 'Resend Code';
-    }
-  });
+        try {
+            const response = await resendOTP(registeredEmail);
 
-  section.appendChild(form);
-  return section;
+            if (!response.success) {
+                errorDiv.textContent = 'Failed to resend code';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            successDiv.textContent = 'Code resent! Check your email.';
+            successDiv.style.display = 'block';
+
+        } catch (error) {
+            errorDiv.textContent = 'Failed to resend code';
+            errorDiv.style.display = 'block';
+        } finally {
+            resendBtn.disabled = false;
+            resendBtn.textContent = 'Resend Code';
+        }
+    });
+
+    section.appendChild(form);
+    return section;
 }
 
 function createFormField(type: string, name: string, label: string, required: boolean): HTMLElement {
-  const div = document.createElement('div');
-  div.style.marginBottom = '15px';
+    const div = document.createElement('div');
+    div.className = 'form-field'; // Apply field container class
 
-  const labelEl = document.createElement('label');
-  labelEl.textContent = label;
-  labelEl.style.cssText = 'display: block; margin-bottom: 5px;';
-  div.appendChild(labelEl);
+    const labelEl = document.createElement('label');
+    labelEl.textContent = label;
+    labelEl.className = 'form-label'; // Apply modern label class
+    div.appendChild(labelEl);
 
-  const input = document.createElement('input');
-  input.type = type;
-  input.name = name;
-  input.required = required;
-  input.style.cssText = 'width: 100%; padding: 8px; box-sizing: border-box;';
-  div.appendChild(input);
+    const input = document.createElement('input');
+    input.type = type;
+    input.name = name;
+    input.required = required;
+    input.className = 'form-input'; // Apply modern input class
+    div.appendChild(input);
 
-  return div;
+    return div;
 }
