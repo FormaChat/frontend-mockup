@@ -545,10 +545,6 @@ function createStatCard(label: string, value: string, change: string): HTMLEleme
     return card;
 }
 
-
-/**
- * Show all sessions modal
- */
 async function showAllSessionsModal(businessId: string): Promise<void> {
     const { showModal } = await import('../../../components/modal');
     const { getBusinessSessions } = await import('../../../services/chat.service');
@@ -629,9 +625,6 @@ async function showAllSessionsModal(businessId: string): Promise<void> {
     }
 }
 
-/**
- * Show all leads modal (UPDATED)
- */
 async function showAllLeadsModal(businessId: string): Promise<void> {
     const { showModal } = await import('../../../components/modal');
     const { getBusinessLeads } = await import('../../../services/chat.service');
@@ -709,9 +702,6 @@ async function showAllLeadsModal(businessId: string): Promise<void> {
     }
 }
 
-/**
- * Export all leads to CSV (UPDATED)
- */
 function exportLeadsToCSV(leads: any[]): void {
     const headers = ['Session ID', 'Name', 'Email', 'Phone', 'Captured At'];
     

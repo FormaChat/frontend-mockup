@@ -624,9 +624,6 @@ export async function renderChannelsDetail(businessId: string): Promise<HTMLElem
   return container;
 }
 
-/**
- * Helper: Create Input Group with Label
- */
 function createInputGroup(label: string, value: string): HTMLElement {
   const wrapper = document.createElement('div');
   wrapper.className = 'input-group-wrapper';

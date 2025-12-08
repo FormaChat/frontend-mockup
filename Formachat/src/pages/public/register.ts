@@ -3,7 +3,6 @@ import { OTPType } from '../../types/auth.types';
 
 let registeredEmail = '';
 
-// --- INJECTED CSS FOR MODERN STYLING ---
 function injectRegisterStyles() {
     const style = document.createElement('style');
     style.textContent = `
@@ -158,35 +157,30 @@ function injectRegisterStyles() {
     `;
     document.head.appendChild(style);
 }
-// --- END CSS INJECTION ---
 
 export function renderRegister(): HTMLElement {
-    // Inject styles once
+
     if (!document.head.querySelector('style[data-register-styles]')) {
         injectRegisterStyles();
     }
 
     const container = document.createElement('div');
-    container.className = 'register-container'; // Apply glass card class
+    container.className = 'register-container'; 
 
-    // Title
     const title = document.createElement('h1');
-    title.className = 'register-title'; // Apply modern title class
+    title.className = 'register-title'; 
     title.textContent = 'Create Your Account';
     container.appendChild(title);
 
-    // Registration form
     const registerForm = createRegisterForm(container);
     container.appendChild(registerForm);
 
-    // OTP section (hidden initially)
     const otpSection = createOTPSection();
     otpSection.style.display = 'none';
     container.appendChild(otpSection);
 
-    // Login link
     const loginLink = document.createElement('p');
-    loginLink.className = 'login-link'; // Apply link class
+    loginLink.className = 'login-link'; 
     loginLink.style.cssText = 'margin-top: 20px; text-align: center;';
     loginLink.innerHTML = `Already have an account? <a href="#/login">Login</a>`;
     container.appendChild(loginLink);
@@ -197,19 +191,16 @@ export function renderRegister(): HTMLElement {
 function createRegisterForm(container: HTMLElement): HTMLElement {
     const form = document.createElement('form');
 
-    // First Name
     const firstNameDiv = createFormField('text', 'firstName', 'First Name', true);
     form.appendChild(firstNameDiv);
 
-    // Last Name
     const lastNameDiv = createFormField('text', 'lastName', 'Last Name', true);
     form.appendChild(lastNameDiv);
 
-    // Email
+ 
     const emailDiv = createFormField('email', 'email', 'Email', true);
     form.appendChild(emailDiv);
 
-    // Password
     const passwordDiv = createFormField('password', 'password', 'Password', true);
     const passwordInput = passwordDiv.querySelector('input') as HTMLInputElement;
     passwordInput.minLength = 8;
@@ -221,20 +212,17 @@ function createRegisterForm(container: HTMLElement): HTMLElement {
     
     form.appendChild(passwordDiv);
 
-    // Error message
     const errorDiv = document.createElement('div');
-    errorDiv.className = 'error-message'; // Apply error style
+    errorDiv.className = 'error-message'; 
     errorDiv.style.display = 'none';
     form.appendChild(errorDiv);
 
-    // Submit button
     const submitBtn = document.createElement('button');
     submitBtn.type = 'submit';
-    submitBtn.textContent = 'Start Free Beta Access'; // Better CTA
-    submitBtn.className = 'btn btn-primary'; // Apply button styles
+    submitBtn.textContent = 'Start Free Beta Access'; 
+    submitBtn.className = 'btn btn-primary'; 
     form.appendChild(submitBtn);
 
-    // Form submission logic remains the same...
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const formData = new FormData(form);
@@ -289,13 +277,12 @@ function createOTPSection(): HTMLElement {
     section.id = 'otpSection';
 
     const successMsg = document.createElement('p');
-    successMsg.className = 'success-message'; // Apply success style
+    successMsg.className = 'success-message'; 
     successMsg.textContent = '✓ Success! Check your email for a 6-digit verification code.';
     section.appendChild(successMsg);
 
     const form = document.createElement('form');
 
-    // OTP field
     const otpDiv = document.createElement('div');
     otpDiv.className = 'form-field';
     otpDiv.style.marginBottom = '25px';
@@ -311,12 +298,11 @@ function createOTPSection(): HTMLElement {
     otpInput.required = true;
     otpInput.maxLength = 6;
     otpInput.placeholder = '••••••';
-    otpInput.className = 'form-input otp-input'; // Apply modern input and OTP specific styles
+    otpInput.className = 'form-input otp-input'; 
     otpDiv.appendChild(otpInput);
 
     form.appendChild(otpDiv);
 
-    // Messages
     const errorDiv = document.createElement('div');
     errorDiv.className = 'error-message';
     errorDiv.style.display = 'none';
@@ -327,21 +313,18 @@ function createOTPSection(): HTMLElement {
     successDiv.style.display = 'none';
     form.appendChild(successDiv);
 
-    // Verify button
     const verifyBtn = document.createElement('button');
     verifyBtn.type = 'submit';
     verifyBtn.textContent = 'Verify Email';
-    verifyBtn.className = 'btn btn-primary'; // Apply primary style
+    verifyBtn.className = 'btn btn-primary';
     form.appendChild(verifyBtn);
 
-    // Resend button
     const resendBtn = document.createElement('button');
     resendBtn.type = 'button';
     resendBtn.textContent = 'Resend Code';
-    resendBtn.className = 'btn btn-secondary'; // Apply secondary style
+    resendBtn.className = 'btn btn-secondary'; 
     form.appendChild(resendBtn);
 
-    // Form submission logic remains the same...
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const otp = otpInput.value;
@@ -387,7 +370,7 @@ function createOTPSection(): HTMLElement {
         }
     });
 
-    // Resend handler logic remains the same...
+
     resendBtn.addEventListener('click', async () => {
         errorDiv.style.display = 'none';
         successDiv.style.display = 'none';
@@ -422,18 +405,18 @@ function createOTPSection(): HTMLElement {
 
 function createFormField(type: string, name: string, label: string, required: boolean): HTMLElement {
     const div = document.createElement('div');
-    div.className = 'form-field'; // Apply field container class
+    div.className = 'form-field'; 
 
     const labelEl = document.createElement('label');
     labelEl.textContent = label;
-    labelEl.className = 'form-label'; // Apply modern label class
+    labelEl.className = 'form-label'; 
     div.appendChild(labelEl);
 
     const input = document.createElement('input');
     input.type = type;
     input.name = name;
     input.required = required;
-    input.className = 'form-input'; // Apply modern input class
+    input.className = 'form-input'; 
     div.appendChild(input);
 
     return div;

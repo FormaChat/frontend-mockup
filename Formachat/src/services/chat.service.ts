@@ -272,10 +272,6 @@ export const getAnalyticsSummary = async (
   }
 };
 
-/**
- * Get complete dashboard summary in ONE request
- * More efficient than separate calls
- */
 export const getDashboardSummary = async (
   businessId: string
 ): Promise<{

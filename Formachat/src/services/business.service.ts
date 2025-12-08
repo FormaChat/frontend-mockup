@@ -46,17 +46,14 @@ export const getBusinesses = async (
   return response.data.businesses;
 };
 
-
-// ✅ UPDATED: Now uses proper config endpoints
 export const getBusinessById = async (
   businessId: string, 
   isPublic: boolean = false
 ): Promise<Business> => {
   console.log('[BusinessService] Fetching business:', businessId, '(public:', isPublic + ')');
 
-  // Use the correct endpoint from config
   const endpoint = isPublic 
-    ? BUSINESS_ENDPOINTS.PUBLIC_DETAILS(businessId)  // ✅ Full URL with base
+    ? BUSINESS_ENDPOINTS.PUBLIC_DETAILS(businessId) 
     : BUSINESS_ENDPOINTS.DETAILS(businessId);
   
   console.log('[BusinessService] Using endpoint:', endpoint);

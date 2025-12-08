@@ -316,9 +316,6 @@ function buildSessionDetailsContent(sessionDetails: any): HTMLElement {
   return container;
 }
 
-/**
- * Helper to create grid items
- */
 function createInfoItem(label: string, valueHtml: string): HTMLElement {
   const div = document.createElement('div');
   div.className = 'info-item';

@@ -155,7 +155,7 @@ export function renderLogin(): HTMLElement {
 
 
     const title = document.createElement('h1');
-    title.textContent = 'Welcome Back'; // Slightly friendlier title
+    title.textContent = 'Welcome Back'; 
     title.className = 'login-title';
     container.appendChild(title);
 
@@ -164,10 +164,8 @@ export function renderLogin(): HTMLElement {
     subtitle.className = 'login-subtitle';
     container.appendChild(subtitle);
 
-    // Form
     const form = document.createElement('form');
 
-    // Email field
     const emailDiv = document.createElement('div');
     emailDiv.className = 'form-group';
 
@@ -181,12 +179,11 @@ export function renderLogin(): HTMLElement {
     emailInput.name = 'email';
     emailInput.required = true;
     emailInput.className = 'form-input';
-    emailInput.placeholder = 'name@company.com'; // Added helpful placeholder
+    emailInput.placeholder = 'name@company.com'; 
     emailDiv.appendChild(emailInput);
 
     form.appendChild(emailDiv);
 
-    // Password field
     const passwordDiv = document.createElement('div');
     passwordDiv.className = 'form-group';
 
@@ -200,32 +197,30 @@ export function renderLogin(): HTMLElement {
     passwordInput.name = 'password';
     passwordInput.required = true;
     passwordInput.className = 'form-input';
-    passwordInput.placeholder = '••••••••'; // Added helpful placeholder
+    passwordInput.placeholder = '••••••••'; 
     passwordDiv.appendChild(passwordInput);
 
     form.appendChild(passwordDiv);
 
-    // Error message container
+
     const errorDiv = document.createElement('div');
     errorDiv.className = 'error-message';
     errorDiv.style.display = 'none';
     form.appendChild(errorDiv);
 
-    // Submit button
+
     const submitBtn = document.createElement('button');
     submitBtn.type = 'submit';
-    submitBtn.textContent = 'Sign In'; // More professional text
+    submitBtn.textContent = 'Sign In'; 
     submitBtn.className = 'btn-submit';
     form.appendChild(submitBtn);
 
-    // Form submission handler
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         const email = emailInput.value;
         const password = passwordInput.value;
 
-        // Reset UI state
         errorDiv.style.display = 'none';
         submitBtn.disabled = true;
         submitBtn.textContent = 'Verifying...';
@@ -234,7 +229,7 @@ export function renderLogin(): HTMLElement {
             const response = await login({ email, password });
 
             if (!response.success) {
-                // Check for email not verified
+             
                 if (response.error.code === 'EMAIL_NOT_VERIFIED') {
                     errorDiv.innerHTML = '<strong>Account not verified.</strong><br/>Redirecting to verification...';
                     errorDiv.style.display = 'block';
@@ -252,14 +247,12 @@ export function renderLogin(): HTMLElement {
                 return;
             }
 
-            // Success animation
             submitBtn.textContent = 'Success!';
-            submitBtn.style.background = '#28a745'; // Quick flash of green
+            submitBtn.style.background = '#28a745';
             
             saveTokens(response.data.tokens);
             saveUser(response.data.user);
 
-            // Small delay to let user see success state
             setTimeout(() => {
                 window.location.hash = '#/dashboard';
             }, 500);
@@ -269,7 +262,7 @@ export function renderLogin(): HTMLElement {
             errorDiv.style.display = 'block';
             console.error('Login error:', error);
         } finally {
-            // Only reset if we didn't succeed (success handles its own transition)
+         
             if (submitBtn.textContent !== 'Success!') {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Sign In';
@@ -279,7 +272,6 @@ export function renderLogin(): HTMLElement {
 
     container.appendChild(form);
 
-    // Register link
     const registerLink = document.createElement('p');
     registerLink.className = 'register-link';
     registerLink.innerHTML = `Don't have an account? <a href="#/register">Create one now</a>`;

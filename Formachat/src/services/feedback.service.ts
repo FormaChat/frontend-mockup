@@ -1,5 +1,3 @@
-// services/feedback.service.ts
-
 import { apiPost } from '../utils/api.utils';
 import { AUTH_ENDPOINTS } from '../config/api.config';
 import type { ApiResponse } from '../config/api.config';
@@ -12,10 +10,6 @@ export interface SubmitFeedbackResponse {
   message: string;
 }
 
-/**
- * Submit user feedback to support team
- * Sends feedback via Auth service which publishes event to Email service
- */
 export const submitFeedback = async (
   message: string
 ): Promise<ApiResponse<SubmitFeedbackResponse>> => {

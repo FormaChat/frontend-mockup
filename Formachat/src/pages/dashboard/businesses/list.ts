@@ -254,9 +254,6 @@ function createBusinessCardWithActions(business: any): HTMLElement {
   return cardWrapper;
 }
 
-/**
- * Handle business deletion with confirmation
- */
 async function handleDeleteBusiness(
   businessId: string,
   businessName: string,

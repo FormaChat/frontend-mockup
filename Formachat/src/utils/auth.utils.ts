@@ -1,31 +1,8 @@
-/**
- * ========================================
- * AUTH UTILITIES
- * ========================================
- * 
- * Handles JWT token storage, retrieval, and validation.
- * 
- * Storage Strategy:
- * - Uses localStorage for persistence
- * - Stores both access and refresh tokens
- * - Provides helpers to check authentication status
- * 
- * Token Structure:
- * {
- *   accessToken: "eyJhbGc...",
- *   refreshToken: "eyJhbGc..."
- * }
- */
-
 import type { AuthTokens, User } from '../types/auth.types';
 
-// LocalStorage keys
 const TOKEN_KEY = 'formachat_tokens';
 const USER_KEY = 'formachat_user';
 
-/**
- * Save auth tokens to localStorage
- */
 export const saveTokens = (tokens: { accessToken: string; refreshToken: string }): void => {
   try {
     const authTokens: AuthTokens = {
@@ -34,7 +11,6 @@ export const saveTokens = (tokens: { accessToken: string; refreshToken: string }
     };
     localStorage.setItem(TOKEN_KEY, JSON.stringify(authTokens));
     
-    // Decode and log expiry for debugging
     try {
       const payload = JSON.parse(atob(tokens.accessToken.split('.')[1]));
       const expiryDate = new Date(payload.exp * 1000);
@@ -47,9 +23,6 @@ export const saveTokens = (tokens: { accessToken: string; refreshToken: string }
   }
 };
 
-/**
- * Get auth tokens from localStorage
- */
 export const getTokens = (): AuthTokens | null => {
   try {
     const tokensJson = localStorage.getItem(TOKEN_KEY);
@@ -62,17 +35,12 @@ export const getTokens = (): AuthTokens | null => {
   }
 };
 
-/**
- * Get access token only
- */
 export const getAccessToken = (): string | null => {
   const tokens = getTokens();
   return tokens?.accessToken || null;
 };
 
-/**
- * Get refresh token only
- */
+
 export const getRefreshToken = (): string | null => {
   const tokens = getTokens();
   return tokens?.refreshToken || null;
@@ -163,7 +131,7 @@ export const isTokenExpired = (token: string): boolean => {
 export const isTokenExpiredSoon = (token: string): boolean => {
   try {
     const payload = JSON.parse(atob(token.split('.')[1]));
-    const expiryTime = payload.exp * 1000; // Convert to milliseconds
+    const expiryTime = payload.exp * 1000;
     const currentTime = Date.now();
     
     const isExpiring = expiryTime - currentTime < 30000;

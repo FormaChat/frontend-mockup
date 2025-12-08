@@ -1,16 +1,8 @@
-/**
- * ========================================
- * EMAIL VERIFICATION PAGE
- * ========================================
- * * Standalone page for email verification, styled with Glassmorphism.
- */
-
 import { verifyEmail, resendOTP } from '../../services/auth.service';
 import { OTPType } from '../../types/auth.types';
 
-// --- INJECTED CSS FOR MODERN STYLING ---
 function injectVerifyEmailStyles() {
-    // Check if styles already exist to avoid duplicates
+
     if (document.getElementById('verify-email-page-styles')) return;
 
     const style = document.createElement('style');
@@ -181,21 +173,16 @@ function injectVerifyEmailStyles() {
     document.head.appendChild(style);
 }
 
-// ========================================
-// RENDER FUNCTION
-// ========================================
-
 export function renderVerifyEmail(): HTMLElement {
     injectVerifyEmailStyles();
 
     const container = document.createElement('div');
-    container.className = 'verify-container'; // Glassmorphism container
+    container.className = 'verify-container'; 
 
-    // Get email from session storage
     const email = sessionStorage.getItem('pendingVerificationEmail');
 
     if (!email) {
-        // No pending verification - Apply Error State Styling
+       
         container.className = 'verify-container error-state';
         
         const errorTitle = document.createElement('h2');
@@ -211,28 +198,24 @@ export function renderVerifyEmail(): HTMLElement {
         const loginLink = document.createElement('a');
         loginLink.href = '#/login';
         loginLink.textContent = 'Go to Login';
-        loginLink.className = 'btn btn-secondary'; // Styled button
+        loginLink.className = 'btn btn-secondary';
         container.appendChild(loginLink);
 
         return container;
     }
 
-    // Title
     const title = document.createElement('h1');
     title.textContent = 'Verify Your Email';
     title.className = 'verify-title';
     container.appendChild(title);
 
-    // Email display
     const emailInfo = document.createElement('p');
     emailInfo.className = 'email-info';
     emailInfo.innerHTML = `We sent a 6-digit code to:<br><strong>${email}</strong>`;
     container.appendChild(emailInfo);
 
-    // Form
     const form = document.createElement('form');
 
-    // OTP field
     const otpDiv = document.createElement('div');
     otpDiv.className = 'otp-group';
 
@@ -247,12 +230,11 @@ export function renderVerifyEmail(): HTMLElement {
     otpInput.required = true;
     otpInput.maxLength = 6;
     otpInput.placeholder = '••••••';
-    otpInput.className = 'otp-input'; // Apply unique OTP styling
+    otpInput.className = 'otp-input';
     otpDiv.appendChild(otpInput);
 
     form.appendChild(otpDiv);
 
-    // Messages
     const errorDiv = document.createElement('div');
     errorDiv.className = 'error-message';
     errorDiv.style.display = 'none';
@@ -263,21 +245,18 @@ export function renderVerifyEmail(): HTMLElement {
     successDiv.style.display = 'none';
     form.appendChild(successDiv);
 
-    // Verify button
     const verifyBtn = document.createElement('button');
     verifyBtn.type = 'submit';
     verifyBtn.textContent = 'Verify Email';
-    verifyBtn.className = 'btn btn-primary'; // Apply primary button style
+    verifyBtn.className = 'btn btn-primary'; 
     form.appendChild(verifyBtn);
 
-    // Resend button
     const resendBtn = document.createElement('button');
     resendBtn.type = 'button';
     resendBtn.textContent = 'Resend Code';
-    resendBtn.className = 'btn btn-secondary'; // Apply secondary button style
+    resendBtn.className = 'btn btn-secondary'; 
     form.appendChild(resendBtn);
 
-    // Form submission logic remains the same...
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -326,7 +305,6 @@ export function renderVerifyEmail(): HTMLElement {
         }
     });
 
-    // Resend handler logic remains the same...
     resendBtn.addEventListener('click', async () => {
         errorDiv.style.display = 'none';
         successDiv.style.display = 'none';
@@ -357,13 +335,11 @@ export function renderVerifyEmail(): HTMLElement {
 
     container.appendChild(form);
 
-    // Helper text
     const helperText = document.createElement('p');
     helperText.style.cssText = 'margin-top: 25px; text-align: center; font-size: 0.85rem; color: var(--text-muted);';
     helperText.textContent = 'Check your spam or junk folder if you don\'t see the email within 2 minutes.';
     container.appendChild(helperText);
 
-    // Back to login link
     const loginLink = document.createElement('p');
     loginLink.className = 'link-text';
     loginLink.style.cssText = 'margin-top: 20px; text-align: center;';
