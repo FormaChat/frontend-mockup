@@ -47,12 +47,21 @@ export const getBusinesses = async (
 };
 
 
-export const getBusinessById = async (businessId: string): Promise<Business> => {
-  console.log('[BusinessService] Fetching business:', businessId);
+// ✅ UPDATED: Now uses proper config endpoints
+export const getBusinessById = async (
+  businessId: string, 
+  isPublic: boolean = false
+): Promise<Business> => {
+  console.log('[BusinessService] Fetching business:', businessId, '(public:', isPublic + ')');
 
-  const response: ApiResponse<Business> = await apiGet(
-    BUSINESS_ENDPOINTS.DETAILS(businessId)
-  );
+  // Use the correct endpoint from config
+  const endpoint = isPublic 
+    ? BUSINESS_ENDPOINTS.PUBLIC_DETAILS(businessId)  // ✅ Full URL with base
+    : BUSINESS_ENDPOINTS.DETAILS(businessId);
+  
+  console.log('[BusinessService] Using endpoint:', endpoint);
+  
+  const response: ApiResponse<Business> = await apiGet(endpoint);
 
   if (!response.success) {
     throw new Error(response.error.message || 'Failed to fetch business details');

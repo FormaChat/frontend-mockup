@@ -1,17 +1,8 @@
-/**
- * ========================================
- * LOGIN PAGE
- * ========================================
- * * User login form with email verification check.
- * Styled with Glassmorphism and Modern UI.
- */
-
 import { login } from '../../services/auth.service';
 import { saveTokens, saveUser } from '../../utils/auth.utils';
 
-// --- INJECTED CSS FOR MODERN STYLING ---
 function injectLoginStyles() {
-    // Check if styles already exist to avoid duplicates
+   
     if (document.getElementById('login-page-styles')) return;
 
     const style = document.createElement('style');
@@ -162,7 +153,7 @@ export function renderLogin(): HTMLElement {
     const container = document.createElement('div');
     container.className = 'login-container';
 
-    // Title Section
+
     const title = document.createElement('h1');
     title.textContent = 'Welcome Back'; // Slightly friendlier title
     title.className = 'login-title';

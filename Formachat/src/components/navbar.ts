@@ -2,7 +2,7 @@ import { createUserProfileDropdown } from './user-profile-dropdown';
 import type { UserProfileData } from './user-profile-dropdown';
 import { createSidebarDropdown } from './sidebar';
 
-// --- 1. INJECT NAVBAR STYLES ---
+
 function injectNavbarStyles() {
   if (document.getElementById('navbar-styles')) return;
 
@@ -99,7 +99,6 @@ function injectNavbarStyles() {
   document.head.appendChild(style);
 }
 
-// --- 2. SMART SCROLL LOGIC ---
 function attachSmartScrollHide(navbarElement: HTMLElement): void {
   let lastScrollY = window.scrollY;
   let isScrolling: number | undefined; 
@@ -133,11 +132,6 @@ function attachSmartScrollHide(navbarElement: HTMLElement): void {
   window.addEventListener('scroll', handleScroll, { passive: true });
 }
 
-// --- 3. THE MAIN COMPONENT ---
-
-/**
- * Create navbar with centered logo, sidebar dropdown, and user profile dropdown.
- */
 export function createNavbar(
   userProfile: UserProfileData | null
 ): HTMLElement {
@@ -146,7 +140,6 @@ export function createNavbar(
   const nav = document.createElement('nav');
   nav.className = 'navbar';
   
-  // --- Left Section (Sidebar Toggle + Dropdown) ---
   const leftSection = document.createElement('div');
   leftSection.className = 'navbar-left';
   
@@ -161,10 +154,8 @@ export function createNavbar(
     </svg>
   `;
   
-  // Create sidebar dropdown
   const sidebarDropdown = createSidebarDropdown();
   
-  // Toggle sidebar dropdown on button click
   toggleBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     const menu = sidebarDropdown.querySelector('.sidebar-menu') as HTMLElement;
@@ -178,7 +169,6 @@ export function createNavbar(
   leftSection.appendChild(sidebarDropdown);
   nav.appendChild(leftSection);
 
-  // --- Center Section (Logo) ---
   const centerSection = document.createElement('div');
   centerSection.className = 'navbar-center';
   
@@ -189,7 +179,6 @@ export function createNavbar(
   centerSection.appendChild(logo);
   nav.appendChild(centerSection);
   
-  // --- Right Section (User Profile) ---
   const rightSection = document.createElement('div');
   rightSection.className = 'navbar-right';
   
@@ -205,7 +194,6 @@ export function createNavbar(
   
   nav.appendChild(rightSection);
 
-  // Close all dropdowns when clicking outside
   document.addEventListener('click', () => {
     const sidebarMenu = sidebarDropdown.querySelector('.sidebar-menu') as HTMLElement;
     if (sidebarMenu) {
@@ -213,7 +201,6 @@ export function createNavbar(
     }
   });
 
-  // Attach Scroll Logic
   window.requestAnimationFrame(() => attachSmartScrollHide(nav));
   
   return nav;

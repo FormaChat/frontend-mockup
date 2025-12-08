@@ -5,7 +5,6 @@ export interface UserProfileData {
   lastLogin?: string;
 }
 
-// --- INJECT PROFILE DROPDOWN STYLES ---
 function injectProfileStyles() {
   if (document.getElementById('profile-dropdown-styles')) return;
 
@@ -137,12 +136,10 @@ export function createUserProfileDropdown(user: UserProfileData): HTMLElement {
   const container = document.createElement('div');
   container.className = 'user-profile-dropdown';
   
-  // Trigger button
   const trigger = document.createElement('button');
   trigger.className = 'profile-trigger';
   trigger.setAttribute('aria-label', 'User menu');
   
-  // Add user icon + username
   trigger.innerHTML = `
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -151,19 +148,16 @@ export function createUserProfileDropdown(user: UserProfileData): HTMLElement {
     <span class="profile-username">${user.username}</span>
   `;
   
-  // Dropdown menu
   const menu = document.createElement('div');
   menu.className = 'profile-menu';
   menu.style.display = 'none';
   
-  // Last login info
   if (user.lastLogin) {
     const lastLogin = document.createElement('p');
     lastLogin.textContent = `Last login: ${new Date(user.lastLogin).toLocaleString()}`;
     menu.appendChild(lastLogin);
   }
   
-  // Logout button
   const logoutBtn = document.createElement('button');
   logoutBtn.textContent = 'Logout';
   logoutBtn.addEventListener('click', () => {
@@ -172,18 +166,17 @@ export function createUserProfileDropdown(user: UserProfileData): HTMLElement {
   });
   menu.appendChild(logoutBtn);
   
-  // Toggle dropdown
+ 
   trigger.addEventListener('click', (e) => {
     e.stopPropagation();
     menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
   });
   
-  // Stop propagation on menu clicks
+
   menu.addEventListener('click', (e) => {
     e.stopPropagation();
   });
   
-  // Close dropdown when clicking outside (handled by navbar)
   document.addEventListener('click', () => {
     menu.style.display = 'none';
   });

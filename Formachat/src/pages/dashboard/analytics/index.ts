@@ -1,4 +1,3 @@
-// pages/dashboard/analytics/index.ts
 import { createBusinessCard } from '../../../components/business-card';
 import type { BusinessCardData } from '../../../components/business-card';
 import { createEmptyState } from '../../../components/empty-state';
@@ -6,7 +5,6 @@ import { createLoadingSpinner, hideLoadingSpinner } from '../../../components/lo
 import { createBreadcrumb } from '../../../components/breadcrumb';
 import { getBusinesses } from '../../../services/business.service';
 
-// --- 1. INJECT STYLES ---
 function injectAnalyticsIndexStyles() {
   if (document.getElementById('analytics-index-styles')) return;
 
@@ -74,14 +72,12 @@ export async function renderAnalyticsIndex(): Promise<HTMLElement> {
   const container = document.createElement('div');
   container.className = 'analytics-index';
   
-  // 1. Breadcrumb
   const breadcrumb = createBreadcrumb([
     { label: 'Home', path: '#/dashboard' },
     { label: 'Analytics' }
   ]);
   container.appendChild(breadcrumb);
   
-  // 2. Page Header
   const header = document.createElement('div');
   header.className = 'page-header';
   
@@ -92,12 +88,10 @@ export async function renderAnalyticsIndex(): Promise<HTMLElement> {
 
   container.appendChild(header);
   
-  // 3. Grid Container
   const grid = document.createElement('div');
   grid.className = 'business-cards-grid';
   container.appendChild(grid);
   
-  // Show loading spinner
   const spinner = createLoadingSpinner('Loading businesses...');
   grid.appendChild(spinner);
   
@@ -122,7 +116,6 @@ export async function renderAnalyticsIndex(): Promise<HTMLElement> {
           status: business.isActive ? 'active' : 'inactive'
         };
         
-        // Links to the specific analytics dashboard for this business
         const card = createBusinessCard(
           cardData,
           `#/dashboard/analytics/${business._id}`

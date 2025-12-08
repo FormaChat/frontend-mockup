@@ -4,7 +4,6 @@ export interface SidebarItem {
   icon: string;
 }
 
-// --- 1. INJECT SIDEBAR DROPDOWN STYLES ---
 function injectSidebarDropdownStyles() {
   if (document.getElementById('sidebar-dropdown-styles')) return;
 
@@ -108,12 +107,10 @@ export function createSidebarDropdown(): HTMLElement {
   const container = document.createElement('div');
   container.className = 'sidebar-dropdown';
 
-  // Dropdown menu
   const menu = document.createElement('div');
   menu.className = 'sidebar-menu';
   menu.style.display = 'none';
 
-  // Define navigation items
   const navItems: SidebarItem[] = [
     { 
       label: 'Home', 
@@ -147,7 +144,6 @@ export function createSidebarDropdown(): HTMLElement {
     link.href = item.path;
     link.className = 'sidebar-link';
     
-    // Icon SVG wrapper
     const iconSpan = document.createElement('span');
     iconSpan.className = 'sidebar-icon';
     iconSpan.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${item.icon}</svg>`;
@@ -155,25 +151,20 @@ export function createSidebarDropdown(): HTMLElement {
     link.appendChild(iconSpan);
     link.appendChild(document.createTextNode(item.label));
     
-    // Initial Active Check
     const currentHash = window.location.hash || '#/dashboard';
     if (currentHash === item.path) {
       link.classList.add('active');
     }
     
-    // Click Handler
     link.addEventListener('click', (e) => {
       e.preventDefault();
       
-      // Update UI classes
       const allLinks = menu.querySelectorAll('.sidebar-link');
       allLinks.forEach(l => l.classList.remove('active'));
       link.classList.add('active');
       
-      // Navigate
       window.location.hash = item.path;
       
-      // Close dropdown after selection
       menu.style.display = 'none';
     });
     
@@ -185,7 +176,6 @@ export function createSidebarDropdown(): HTMLElement {
   menu.appendChild(nav);
   container.appendChild(menu);
   
-  // Listen for hash changes to keep sidebar in sync
   window.addEventListener('hashchange', () => {
     const links = menu.querySelectorAll('.sidebar-link');
     links.forEach(l => {
@@ -198,7 +188,6 @@ export function createSidebarDropdown(): HTMLElement {
     });
   });
   
-  // Stop propagation on menu clicks to prevent closing
   menu.addEventListener('click', (e) => {
     e.stopPropagation();
   });

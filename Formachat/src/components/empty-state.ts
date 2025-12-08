@@ -4,7 +4,6 @@ export interface EmptyStateConfig {
   buttonPath?: string;
 }
 
-// --- INJECT STYLES ---
 function injectEmptyStateStyles() {
   if (document.getElementById('empty-state-styles')) return;
 
@@ -118,11 +117,9 @@ export function createEmptyState(config: EmptyStateConfig): HTMLElement {
   const container = document.createElement('div');
   container.className = 'empty-state';
   
-  // --- 1. Visual Illustration (SVG) ---
   const visualContainer = document.createElement('div');
   visualContainer.className = 'empty-illustration';
   
-  // Abstract "Open Box" / Search SVG
   visualContainer.innerHTML = `
     <svg class="empty-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
       <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
@@ -132,18 +129,15 @@ export function createEmptyState(config: EmptyStateConfig): HTMLElement {
   `;
   container.appendChild(visualContainer);
 
-  // --- 2. Message ---
   const message = document.createElement('p');
   message.className = 'empty-message';
   message.textContent = config.message;
   container.appendChild(message);
   
-  // --- 3. Optional Button ---
   if (config.buttonText && config.buttonPath) {
     const button = document.createElement('button');
     button.className = 'btn-empty-action';
     
-    // Add a "+" symbol to make it feel constructive
     button.innerHTML = `<span class="btn-icon-plus">+</span> ${config.buttonText}`;
     
     button.addEventListener('click', () => {

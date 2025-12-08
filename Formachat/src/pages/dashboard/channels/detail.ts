@@ -1,10 +1,8 @@
-// pages/dashboard/channels/detail.ts
 import { createBreadcrumb } from '../../../components/breadcrumb';
 import { createLoadingSpinner, hideLoadingSpinner } from '../../../components/loading-spinner';
 import { getBusinessById } from '../../../services/business.service';
 import QRCode from 'qrcode';
 
-// --- 1. INJECT STYLES ---
 function injectChannelStyles() {
   if (document.getElementById('channels-detail-styles')) return;
 
@@ -377,7 +375,6 @@ export async function renderChannelsDetail(businessId: string): Promise<HTMLElem
   const container = document.createElement('div');
   container.className = 'channels-detail';
   
-  // Loading State
   const spinner = createLoadingSpinner('Loading business details...');
   container.appendChild(spinner);
   
@@ -385,14 +382,12 @@ export async function renderChannelsDetail(businessId: string): Promise<HTMLElem
     const business = await getBusinessById(businessId);
     hideLoadingSpinner(spinner);
     
-    // 1. Breadcrumb
     const breadcrumb = createBreadcrumb([
       { label: 'Channels', path: '#/dashboard/channels' },
       { label: business.basicInfo.businessName }
     ]);
     container.appendChild(breadcrumb);
     
-    // 2. Header
     const header = document.createElement('div');
     header.className = 'page-header';
     
@@ -407,17 +402,15 @@ export async function renderChannelsDetail(businessId: string): Promise<HTMLElem
     
     container.appendChild(header);
 
-    // --- MAIN GRID LAYOUT ---
     const grid = document.createElement('div');
     grid.className = 'channels-grid';
 
-    // URLs
+
     const currentDomain = window.location.origin;
     const productionDomain = 'https://formachat.com'; 
     const localChatUrl = `${currentDomain}/#/chat/${business._id}`;
     const prodChatUrl = `${productionDomain}/#/chat/${business._id}`;
 
-    // === CARD 1: Test Bot ===
     const testCard = document.createElement('section');
     testCard.className = 'glass-card';
     testCard.innerHTML = `
@@ -440,7 +433,6 @@ export async function renderChannelsDetail(businessId: string): Promise<HTMLElem
     testCard.appendChild(testBtn);
     grid.appendChild(testCard);
 
-    // === CARD 2: QR Code ===
     const qrCard = document.createElement('section');
     qrCard.className = 'glass-card';
     qrCard.innerHTML = `
@@ -468,7 +460,6 @@ export async function renderChannelsDetail(businessId: string): Promise<HTMLElem
     btnDownload.textContent = 'Download PNG';
     btnDownload.disabled = true;
 
-    // QR Logic
     btnGenerate.addEventListener('click', async () => {
       try {
         btnGenerate.textContent = 'Generating...';
@@ -511,7 +502,6 @@ export async function renderChannelsDetail(businessId: string): Promise<HTMLElem
     qrCard.appendChild(qrSection);
     grid.appendChild(qrCard);
 
-    // === CARD 3: Share & Embed (Full Width) ===
     const shareCard = document.createElement('section');
     shareCard.className = 'glass-card full-width';
     shareCard.innerHTML = `
@@ -519,10 +509,8 @@ export async function renderChannelsDetail(businessId: string): Promise<HTMLElem
       <p class="card-desc">Direct links and embed codes for your website or social media.</p>
     `;
     
-    // Chat Link
     shareCard.appendChild(createInputGroup('Chat Link', prodChatUrl));
     
-    // Embed Code with Selector
     const embedWrapper = document.createElement('div');
     embedWrapper.className = 'input-group-wrapper';
     
@@ -531,7 +519,6 @@ export async function renderChannelsDetail(businessId: string): Promise<HTMLElem
     embedLabel.textContent = 'Website Embed Code';
     embedWrapper.appendChild(embedLabel);
     
-    // Code type selector
     const codeSelector = document.createElement('div');
     codeSelector.className = 'code-type-selector';
     
@@ -555,7 +542,6 @@ export async function renderChannelsDetail(businessId: string): Promise<HTMLElem
     
     const iframeScript = `<iframe src="${prodChatUrl}" width="100%" height="600" frameborder="0"></iframe>`;
     
-    // Input group for embed code
     const embedGroup = document.createElement('div');
     embedGroup.className = 'input-group';
     
@@ -580,7 +566,6 @@ export async function renderChannelsDetail(businessId: string): Promise<HTMLElem
       }, 2000);
     });
     
-    // Toggle between widget and iframe
     const toggleCodeType = (type: string) => {
       widgetBtn.classList.toggle('active', type === 'widget');
       iframeBtn.classList.toggle('active', type === 'iframe');
@@ -597,7 +582,6 @@ export async function renderChannelsDetail(businessId: string): Promise<HTMLElem
     
     grid.appendChild(shareCard);
 
-    // === CARD 4: Tips ===
     const tipsCard = document.createElement('section');
     tipsCard.className = 'glass-card full-width';
     tipsCard.innerHTML = `

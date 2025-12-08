@@ -3,8 +3,6 @@ export interface BreadcrumbItem {
   path?: string; 
 }
 
-// --- INJECT STYLES ---
-// We inject this once to keep the component self-contained
 function injectBreadcrumbStyles() {
   if (document.getElementById('breadcrumb-styles')) return;
 
@@ -85,7 +83,7 @@ export function createBreadcrumb(items: BreadcrumbItem[]): HTMLElement {
     li.className = 'breadcrumb-li';
     
     if (item.path) {
-      // Clickable breadcrumb item
+
       const link = document.createElement('a');
       link.href = item.path;
       link.textContent = item.label;
@@ -97,7 +95,7 @@ export function createBreadcrumb(items: BreadcrumbItem[]): HTMLElement {
       });
       li.appendChild(link);
     } else {
-      // Current page (not clickable)
+      
       const span = document.createElement('span');
       span.textContent = item.label;
       span.className = 'breadcrumb-current';
@@ -105,11 +103,10 @@ export function createBreadcrumb(items: BreadcrumbItem[]): HTMLElement {
       li.appendChild(span);
     }
     
-    // Add separator except for last item
     if (index < items.length - 1) {
       const separator = document.createElement('span');
       separator.className = 'breadcrumb-separator';
-      // We use a thinner, more elegant chevron or slash
+     
       separator.innerHTML = '&rsaquo;'; 
       li.appendChild(separator);
     }

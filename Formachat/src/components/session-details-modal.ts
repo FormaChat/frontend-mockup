@@ -2,7 +2,6 @@ import { showModal } from './modal';
 import { getSessionDetails } from '../services/chat.service';
 import { createLoadingSpinner } from './loading-spinner';
 
-// --- 1. INJECT STYLES ---
 function injectSessionStyles() {
   if (document.getElementById('session-details-styles')) return;
 
@@ -178,12 +177,10 @@ export async function showSessionDetailsModal(
 ): Promise<void> {
   injectSessionStyles();
 
-  // 1. Loading State
   const loadingContent = document.createElement('div');
   loadingContent.style.padding = '60px 20px';
   loadingContent.style.textAlign = 'center';
   
-  // Use existing spinner component
   const spinner = createLoadingSpinner('Retrieving conversation history...');
   loadingContent.appendChild(spinner);
 
@@ -227,7 +224,6 @@ function buildSessionDetailsContent(sessionDetails: any): HTMLElement {
   const container = document.createElement('div');
   container.className = 'session-details-container';
 
-  // --- 1. Session Info (Metadata) ---
   const infoSection = document.createElement('div');
   infoSection.className = 'info-card';
 
@@ -239,14 +235,11 @@ function buildSessionDetailsContent(sessionDetails: any): HTMLElement {
   const infoGrid = document.createElement('div');
   infoGrid.className = 'session-info-grid';
 
-  // Session ID (Truncated visually if needed, but handled by CSS)
   infoGrid.appendChild(createInfoItem('Session ID', sessionDetails.session.sessionId));
 
-  // Status with Badge
   const statusHtml = `<span class="status-badge status-${sessionDetails.session.status.toLowerCase()}">${sessionDetails.session.status}</span>`;
   infoGrid.appendChild(createInfoItem('Status', statusHtml));
 
-  // Timestamps
   infoGrid.appendChild(createInfoItem('Started', new Date(sessionDetails.session.startedAt).toLocaleString()));
   
   if (sessionDetails.session.endedAt) {
@@ -258,7 +251,6 @@ function buildSessionDetailsContent(sessionDetails: any): HTMLElement {
   infoSection.appendChild(infoGrid);
   container.appendChild(infoSection);
 
-  // --- 2. Contact Info (Conditional) ---
   if (sessionDetails.session.contact?.captured) {
     const contactSection = document.createElement('div');
     contactSection.className = 'info-card contact-card';
@@ -266,7 +258,7 @@ function buildSessionDetailsContent(sessionDetails: any): HTMLElement {
     const contactTitle = document.createElement('h4');
     contactTitle.className = 'section-title';
     contactTitle.style.color = 'var(--primary)';
-    // User Icon
+   
     contactTitle.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> Captured Contact`;
     contactSection.appendChild(contactTitle);
 
@@ -288,7 +280,6 @@ function buildSessionDetailsContent(sessionDetails: any): HTMLElement {
     container.appendChild(contactSection);
   }
 
-  // --- 3. Chat Transcript ---
   const conversationSection = document.createElement('div');
   conversationSection.className = 'conversation-section';
 
@@ -305,7 +296,7 @@ function buildSessionDetailsContent(sessionDetails: any): HTMLElement {
       messagesContainer.appendChild(createMessageBubble(message));
     });
     
-    // Auto-scroll to bottom of chat
+
     setTimeout(() => {
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }, 100);
@@ -345,12 +336,10 @@ function createInfoItem(label: string, valueHtml: string): HTMLElement {
   return div;
 }
 
-/**
- * Helper to create chat bubbles 
- */
+
 function createMessageBubble(message: any): HTMLElement {
   const messageDiv = document.createElement('div');
-  // Dynamic class based on role: message-user, message-assistant, message-system
+  
   messageDiv.className = `message-bubble message-${message.role}`;
 
   const contentDiv = document.createElement('div');
@@ -358,7 +347,6 @@ function createMessageBubble(message: any): HTMLElement {
   contentDiv.textContent = message.content;
   messageDiv.appendChild(contentDiv);
 
-  // Skip timestamp for system messages to keep them clean
   if (message.role !== 'system') {
     const timestampDiv = document.createElement('div');
     timestampDiv.className = 'message-timestamp';

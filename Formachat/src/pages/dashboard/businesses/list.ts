@@ -1,4 +1,3 @@
-// pages/dashboard/businesses/list.ts
 import { createBreadcrumb } from '../../../components/breadcrumb';
 import { createBusinessCard } from '../../../components/business-card';
 import type { BusinessCardData } from '../../../components/business-card';
@@ -7,7 +6,6 @@ import { createLoadingSpinner, hideLoadingSpinner } from '../../../components/lo
 import { showDeleteConfirmation } from '../../../components/delete-confirmation';
 import { getBusinesses, deleteBusiness } from '../../../services/business.service';
 
-// --- 1. INJECT STYLES ---
 function injectListStyles() {
   if (document.getElementById('business-list-styles')) return;
 
@@ -140,15 +138,13 @@ export async function renderBusinessList(): Promise<HTMLElement> {
   
   const container = document.createElement('div');
   container.className = 'businesses-list';
-  
-  // Breadcrumb
+ 
   const breadcrumb = createBreadcrumb([
     { label: 'Home', path: '#/dashboard' },
     { label: 'Businesses' }
   ]);
   container.appendChild(breadcrumb);
   
-  // Header section
   const header = document.createElement('div');
   header.className = 'page-header';
   
@@ -158,7 +154,7 @@ export async function renderBusinessList(): Promise<HTMLElement> {
   createButton.addEventListener('click', () => {
     window.location.hash = '#/dashboard/businesses/create';
   });
-  // Don't append yet - we'll add it conditionally
+
   
   container.appendChild(header);
   
@@ -166,12 +162,12 @@ export async function renderBusinessList(): Promise<HTMLElement> {
   description.textContent = 'Manage your chatbot businesses. Create, edit, or delete your business profiles.';
   container.appendChild(description);
   
-  // Business cards grid
+
   const grid = document.createElement('div');
   grid.className = 'business-cards-grid';
   container.appendChild(grid);
   
-  // Show loading spinner
+
   const spinner = createLoadingSpinner('Loading businesses...');
   grid.appendChild(spinner);
   
@@ -181,7 +177,7 @@ export async function renderBusinessList(): Promise<HTMLElement> {
     hideLoadingSpinner(spinner);
     
     if (businesses.length === 0) {
-      // ✅ Empty state: Don't show the top button
+     
       const emptyState = createEmptyState({
         message: 'No businesses found. Create your first chatbot to get started!',
         buttonText: 'Add New Business',
@@ -189,7 +185,7 @@ export async function renderBusinessList(): Promise<HTMLElement> {
       });
       grid.appendChild(emptyState);
     } else {
-      // ✅ Has businesses: Show the top button
+      
       header.appendChild(createButton);
       
       businesses.forEach(business => {
@@ -210,14 +206,12 @@ export async function renderBusinessList(): Promise<HTMLElement> {
   
   return container;
 }
-/**
- * Create business card with edit/delete actions
- */
+
 function createBusinessCardWithActions(business: any): HTMLElement {
   const cardWrapper = document.createElement('div');
   cardWrapper.className = 'business-card-wrapper';
   
-  // Business card (clickable to view details)
+ 
   const cardData: BusinessCardData = {
     id: business._id,
     name: business.basicInfo.businessName,
@@ -225,34 +219,31 @@ function createBusinessCardWithActions(business: any): HTMLElement {
     status: business.isActive ? 'active' : 'inactive'
   };
   
-  // NOTE: Clicking the card now directs to a general details view, 
-  // not directly to edit, as is standard practice.
+ 
   const card = createBusinessCard(
     cardData,
   );
-  
-  // Actions container
+ 
   const actions = document.createElement('div');
   actions.className = 'card-actions';
   
-  // Edit button
+
   const editBtn = document.createElement('button');
   editBtn.textContent = 'Edit';
   editBtn.type = 'button'
   editBtn.className = 'btn-secondary';
   editBtn.addEventListener('click', (e) => {
-    e.stopPropagation(); // Prevent card click
+    e.stopPropagation(); 
     window.location.hash = `#/dashboard/businesses/${business._id}/edit`;
   });
   actions.appendChild(editBtn);
   
-  // Delete button
   const deleteBtn = document.createElement('button');
   deleteBtn.textContent = 'Delete';
   deleteBtn.type = 'button';
   deleteBtn.className = 'btn-danger';
   deleteBtn.addEventListener('click', (e) => {
-    e.stopPropagation(); // Prevent card click
+    e.stopPropagation();
     handleDeleteBusiness(business._id, business.basicInfo.businessName, cardWrapper);
   });
   actions.appendChild(deleteBtn);
@@ -275,19 +266,17 @@ async function handleDeleteBusiness(
     itemName: businessName,
     onConfirm: async () => {
       try {
-        // Show loading state
+        
         cardElement.style.opacity = '0.5';
         cardElement.style.pointerEvents = 'none';
         
-        // Delete business
         await deleteBusiness(businessId);
         
-        // Remove card from DOM
         cardElement.remove();
         
         alert(`Business "${businessName}" deleted successfully`);
       } catch (error) {
-        // Restore card state
+       
         cardElement.style.opacity = '1';
         cardElement.style.pointerEvents = 'auto';
         

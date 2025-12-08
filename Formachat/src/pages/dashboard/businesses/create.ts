@@ -1,9 +1,7 @@
-// pages/dashboard/businesses/create.ts
 import { createBreadcrumb } from '../../../components/breadcrumb';
 import { createBusiness } from '../../../services/business.service';
 import type { CreateBusinessRequest } from '../../../types/business.types';
 
-// --- INJECT WIZARD STYLES (THE ULTRAMODERN THEME) ---
 function injectWizardStyles() {
   if (document.getElementById('business-wizard-styles')) return;
 
@@ -348,26 +346,21 @@ function injectWizardStyles() {
   document.head.appendChild(style);
 }
 
-// 
-
 export async function renderBusinessCreate(): Promise<HTMLElement> {
   injectWizardStyles();
 
   const container = document.createElement('div');
   container.className = 'business-create';
   
-  // Breadcrumb
   const breadcrumb = createBreadcrumb([
     { label: 'Businesses', path: '#/dashboard/businesses' },
     { label: 'Create New Business' }
   ]);
   container.appendChild(breadcrumb);
   
-  // Wizard Container
   const wizardContainer = document.createElement('div');
   wizardContainer.className = 'wizard-container';
   
-  // Page Header
   const header = document.createElement('div');
   header.className = 'page-header';
   
@@ -378,21 +371,18 @@ export async function renderBusinessCreate(): Promise<HTMLElement> {
   
   wizardContainer.appendChild(header);
   
-  // Progress Dots
   const progressDots = createProgressDots(4);
   wizardContainer.appendChild(progressDots);
   
-  // Step Counter
   const stepCounter = document.createElement('div');
   stepCounter.className = 'step-counter';
   stepCounter.textContent = 'Step 1 of 4';
   wizardContainer.appendChild(stepCounter);
   
-  // Form
+ 
   const form = document.createElement('form');
   form.className = 'business-form';
   
-  // Create all 4 sections
   const section1 = createSection1();
   const section2 = createSection2();
   const section3 = createSection3();
@@ -403,20 +393,17 @@ export async function renderBusinessCreate(): Promise<HTMLElement> {
   form.appendChild(section3);
   form.appendChild(section4);
   
-  // Error container
   const errorContainer = document.createElement('div');
   errorContainer.className = 'error-message';
   errorContainer.style.display = 'none';
   form.appendChild(errorContainer);
   
-  // Navigation buttons
   const navigation = createNavigation();
   form.appendChild(navigation);
   
   wizardContainer.appendChild(form);
   container.appendChild(wizardContainer);
   
-  // Initialize wizard logic
   initializeWizard(form, progressDots, stepCounter, navigation, errorContainer);
   
   return container;
@@ -471,16 +458,14 @@ function initializeWizard(
   
   let currentStep = 0;
   
-  // Show first section
   sections[0].classList.add('active');
   
   const updateUI = () => {
-    // Update sections visibility
+  
     sections.forEach((section, index) => {
       section.classList.toggle('active', index === currentStep);
     });
     
-    // Update progress dots
     dots.forEach((dot, index) => {
       dot.classList.remove('active', 'completed');
       if (index < currentStep) {
@@ -490,10 +475,8 @@ function initializeWizard(
       }
     });
     
-    // Update step counter
     stepCounter.textContent = `Step ${currentStep + 1} of ${sections.length}`;
     
-    // Update buttons
     prevBtn.disabled = currentStep === 0;
     
     if (currentStep === sections.length - 1) {
@@ -504,7 +487,6 @@ function initializeWizard(
       nextBtn.className = 'btn-nav btn-next';
     }
     
-    // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
   
@@ -545,13 +527,12 @@ function initializeWizard(
       currentStep++;
       updateUI();
     } else {
-      // Final step - submit form
+      
       await handleCreateBusiness(form, nextBtn, errorContainer);
     }
   });
 }
 
-// SECTION 1: BASIC INFORMATION
 function createSection1(): HTMLElement {
   const section = document.createElement('section');
   section.className = 'form-section';
@@ -560,7 +541,6 @@ function createSection1(): HTMLElement {
   title.textContent = '1. Basic Information';
   section.appendChild(title);
   
-  // Business Name
   section.appendChild(createFormField({
     type: 'text',
     name: 'businessName',
@@ -570,7 +550,7 @@ function createSection1(): HTMLElement {
     helpText: 'The official name of your business'
   }));
   
-  // Business Description
+  
   section.appendChild(createFormField({
     type: 'textarea',
     name: 'businessDescription',
@@ -581,7 +561,6 @@ function createSection1(): HTMLElement {
     helpText: 'A brief overview of what your business does'
   }));
   
-  // Business Type with conditional "Other"
   const typeWrapper = document.createElement('div');
   typeWrapper.className = 'form-field-group';
   
@@ -615,7 +594,6 @@ function createSection1(): HTMLElement {
   typeWrapper.appendChild(otherTypeField);
   section.appendChild(typeWrapper);
   
-  // Operating Hours
   section.appendChild(createFormField({
     type: 'text',
     name: 'operatingHours',
@@ -625,7 +603,7 @@ function createSection1(): HTMLElement {
     helpText: 'When is your business available?'
   }));
   
-  // Location
+  
   section.appendChild(createFormField({
     type: 'text',
     name: 'location',
@@ -635,7 +613,6 @@ function createSection1(): HTMLElement {
     helpText: 'Primary business location'
   }));
   
-  // Timezone (TEXT INPUT)
   section.appendChild(createFormField({
     type: 'text',
     name: 'timezone',
@@ -647,7 +624,6 @@ function createSection1(): HTMLElement {
   return section;
 }
 
-// SECTION 2: PRODUCTS & SERVICES
 function createSection2(): HTMLElement {
   const section = document.createElement('section');
   section.className = 'form-section';
@@ -656,7 +632,6 @@ function createSection2(): HTMLElement {
   title.textContent = '2. Products & Services';
   section.appendChild(title);
   
-  // Offerings
   section.appendChild(createFormField({
     type: 'textarea',
     name: 'offerings',
@@ -667,7 +642,7 @@ function createSection2(): HTMLElement {
     helpText: 'Detailed description of your offerings'
   }));
   
-  // Popular Items
+
   section.appendChild(createDynamicArraySection({
     title: 'Popular Items (Optional)',
     name: 'popularItems',
@@ -679,7 +654,6 @@ function createSection2(): HTMLElement {
     helpText: 'Add your most popular products or services'
   }));
   
-  // Service Delivery
   section.appendChild(createCheckboxGroup({
     name: 'serviceDelivery',
     label: 'Service Delivery Options',
@@ -687,7 +661,7 @@ function createSection2(): HTMLElement {
     helpText: 'How do customers receive your products/services?'
   }));
   
-  // Pricing
+
   const pricingWrapper = document.createElement('div');
   pricingWrapper.className = 'form-field-group';
   
@@ -717,7 +691,6 @@ function createSection2(): HTMLElement {
   return section;
 }
 
-// SECTION 3: CUSTOMER SUPPORT
 function createSection3(): HTMLElement {
   const section = document.createElement('section');
   section.className = 'form-section';
@@ -726,7 +699,6 @@ function createSection3(): HTMLElement {
   title.textContent = '3. Customer Support';
   section.appendChild(title);
   
-  // FAQs
   section.appendChild(createDynamicArraySection({
     title: 'Frequently Asked Questions (Optional)',
     name: 'faqs',
@@ -737,7 +709,6 @@ function createSection3(): HTMLElement {
     helpText: 'Add common questions your customers ask'
   }));
   
-  // Policies
   section.appendChild(createFormField({
     type: 'textarea',
     name: 'refundPolicy',
@@ -761,7 +732,6 @@ function createSection3(): HTMLElement {
     placeholder: 'Any other policies customers should know...'
   }));
   
-  // Chatbot Settings
   section.appendChild(createSelectField({
     name: 'chatbotTone',
     label: 'Chatbot Tone',
@@ -789,7 +759,6 @@ function createSection3(): HTMLElement {
   return section;
 }
 
-// SECTION 4: CONTACT & ESCALATION
 function createSection4(): HTMLElement {
   const section = document.createElement('section');
   section.className = 'form-section';
@@ -798,7 +767,7 @@ function createSection4(): HTMLElement {
   title.textContent = '4. Contact & Escalation';
   section.appendChild(title);
   
-  // Contact Methods
+
   section.appendChild(createDynamicArraySection({
     title: 'Contact Methods',
     name: 'contactMethods',
@@ -816,7 +785,6 @@ function createSection4(): HTMLElement {
     minItems: 1
   }));
   
-  // Escalation Contact
   const escalationTitle = document.createElement('h3');
   escalationTitle.textContent = 'Escalation Contact';
   section.appendChild(escalationTitle);
@@ -849,7 +817,6 @@ function createSection4(): HTMLElement {
     placeholder: '+1-555-123-4567'
   }));
   
-  // Chatbot Capabilities
   section.appendChild(createCheckboxGroup({
     name: 'chatbotCapabilities',
     label: 'Chatbot Capabilities',
@@ -859,8 +826,6 @@ function createSection4(): HTMLElement {
   
   return section;
 }
-
-// --- HELPER FUNCTIONS (Preserving Logic) ---
 
 interface FormFieldOptions {
   type: string;

@@ -1,24 +1,23 @@
-// pages/dashboard/analytics/detail.ts
 import { createBreadcrumb } from '../../../components/breadcrumb';
 import { createLoadingSpinner, hideLoadingSpinner } from '../../../components/loading-spinner';
 import { showSessionDetailsModal } from '../../../components/session-details-modal'; 
 import { getBusinessById } from '../../../services/business.service';
+import { showLeadDetailsModal } from '../../../components/lead-details-modal';
+
 import { 
   
   getDashboardSummary
 } from '../../../services/chat.service';
 
-// --- 1. UTILITY: FORMAT DATE ---
 function formatDateTime(dateString: string | Date): string {
     const date = new Date(dateString);
-    // Example: "Dec 7, 2025 at 3:16 PM"
+
     return date.toLocaleString('en-US', {
         month: 'short', day: 'numeric', year: 'numeric', 
         hour: 'numeric', minute: '2-digit', hour12: true
     });
 }
 
-// --- 2. INJECT STYLES ---
 function injectAnalyticsDetailStyles() {
     if (document.getElementById('analytics-detail-styles')) return;
 
@@ -276,20 +275,18 @@ export async function renderAnalyticsDetail(businessId: string): Promise<HTMLEle
         
         hideLoadingSpinner(spinner);
         
-        // 1. Breadcrumb
+        
         const breadcrumb = createBreadcrumb([
             { label: 'Analytics', path: '#/dashboard/analytics' },
             { label: business.basicInfo.businessName }
         ]);
         container.appendChild(breadcrumb);
         
-        // 2. Page heading
         const heading = document.createElement('h1');
         heading.textContent = `${business.basicInfo.businessName} Dashboard`;
         heading.className = 'page-header';
         container.appendChild(heading);
         
-        // 3. Stats Overview
         const statsSection = document.createElement('section');
         statsSection.className = 'stats-section';
         
@@ -323,11 +320,9 @@ export async function renderAnalyticsDetail(businessId: string): Promise<HTMLEle
         statsSection.appendChild(statsGrid);
         container.appendChild(statsSection);
 
-        // 4. Main Content Grid
         const mainContentGrid = document.createElement('div');
         mainContentGrid.className = 'main-content-grid';
 
-        // 5. Recent Sessions Section
         if (recentSessions.length > 0) {
             const sessionsSection = document.createElement('section');
             sessionsSection.className = 'sessions-section';
@@ -339,7 +334,6 @@ export async function renderAnalyticsDetail(businessId: string): Promise<HTMLEle
             const sessionsTable = document.createElement('div');
             sessionsTable.className = 'sessions-table';
             
-            // Table header
             const tableHeader = document.createElement('div');
             tableHeader.className = 'table-row table-header';
             tableHeader.innerHTML = `
@@ -351,7 +345,6 @@ export async function renderAnalyticsDetail(businessId: string): Promise<HTMLEle
             `;
             sessionsTable.appendChild(tableHeader);
             
-            // Table rows
             recentSessions.forEach(session => {
                 const row = document.createElement('div');
                 row.className = 'table-row';
@@ -372,13 +365,11 @@ export async function renderAnalyticsDetail(businessId: string): Promise<HTMLEle
                 messagesCell.textContent = session.messageCount.toString();
                 row.appendChild(messagesCell);
                 
-                // UPDATED: Contact Column Logic
                 const contactCell = document.createElement('div');
                 contactCell.className = 'table-cell';
 
                 const contact = session.contact;
                 
-                // Priority: Email > Phone > None
                 if (contact?.email) {
                     contactCell.textContent = contact.email;
                     contactCell.className = 'table-cell contact-captured';
@@ -397,7 +388,6 @@ export async function renderAnalyticsDetail(businessId: string): Promise<HTMLEle
                 dateCell.textContent = formatDateTime(session.startedAt);
                 row.appendChild(dateCell);
                 
-                // Make row clickable to view session details
                 row.style.cursor = 'pointer';
                 row.addEventListener('click', async () => {
                     await showSessionDetailsModal(businessId, session.sessionId);
@@ -408,7 +398,6 @@ export async function renderAnalyticsDetail(businessId: string): Promise<HTMLEle
             
             sessionsSection.appendChild(sessionsTable);
             
-            // View all button
             const viewAllBtn = document.createElement('button');
             viewAllBtn.textContent = 'View All Sessions';
             viewAllBtn.className = 'btn-secondary';
@@ -420,7 +409,7 @@ export async function renderAnalyticsDetail(businessId: string): Promise<HTMLEle
             mainContentGrid.appendChild(sessionsSection);
         }
         
-        // 6. Recent Leads Section (UPDATED STRUCTURE)
+
         if (recentLeads.length > 0) {
             const leadsSection = document.createElement('section');
             leadsSection.className = 'leads-section';
@@ -432,7 +421,6 @@ export async function renderAnalyticsDetail(businessId: string): Promise<HTMLEle
             const leadsTable = document.createElement('div');
             leadsTable.className = 'leads-table';
             
-            // UPDATED: New table header structure
             const tableHeader = document.createElement('div');
             tableHeader.className = 'table-row table-header';
             tableHeader.innerHTML = `
@@ -444,46 +432,43 @@ export async function renderAnalyticsDetail(businessId: string): Promise<HTMLEle
             `;
             leadsTable.appendChild(tableHeader);
             
-            // Table rows
             recentLeads.forEach(lead => {
                 const row = document.createElement('div');
                 row.className = 'table-row';
                 row.style.cursor = 'pointer';
                 
-                // Session ID (shortened)
                 const sessionIdCell = document.createElement('div');
                 sessionIdCell.className = 'table-cell';
                 sessionIdCell.textContent = lead.firstSessionId.substring(0, 8) + '...';
                 sessionIdCell.title = lead.firstSessionId;
                 row.appendChild(sessionIdCell);
                 
-                // Name
+             
                 const nameCell = document.createElement('div');
                 nameCell.className = 'table-cell';
                 nameCell.textContent = lead.name || '-';
                 row.appendChild(nameCell);
                 
-                // Email
+            
                 const emailCell = document.createElement('div');
                 emailCell.className = 'table-cell';
                 emailCell.textContent = lead.email || '-';
                 row.appendChild(emailCell);
                 
-                // Phone
+            
                 const phoneCell = document.createElement('div');
                 phoneCell.className = 'table-cell';
                 phoneCell.textContent = lead.phone || '-';
                 row.appendChild(phoneCell);
                 
-                // Captured At (with date AND time)
+        
                 const dateCell = document.createElement('div');
                 dateCell.className = 'table-cell';
                 dateCell.textContent = formatDateTime(lead.firstContactDate);
                 row.appendChild(dateCell);
                 
-                // Make row clickable to show lead details modal
                 row.addEventListener('click', () => {
-                    showLeadDetailsModal(lead);
+                    showLeadDetailsModal(lead, businessId);
                 });
                 
                 leadsTable.appendChild(row);
@@ -491,7 +476,6 @@ export async function renderAnalyticsDetail(businessId: string): Promise<HTMLEle
             
             leadsSection.appendChild(leadsTable);
             
-            // View all button
             const viewAllBtn = document.createElement('button');
             viewAllBtn.textContent = 'View All Leads';
             viewAllBtn.className = 'btn-secondary';
@@ -505,7 +489,6 @@ export async function renderAnalyticsDetail(businessId: string): Promise<HTMLEle
 
         container.appendChild(mainContentGrid);
         
-        // 7. Empty state
         if (recentSessions.length === 0 && recentLeads.length === 0) {
             const emptyState = document.createElement('div');
             emptyState.className = 'empty-state';
@@ -534,9 +517,6 @@ export async function renderAnalyticsDetail(businessId: string): Promise<HTMLEle
     return container;
 }
 
-// ========================================
-// HELPER FUNCTIONS
-// ========================================
 
 function createStatCard(label: string, value: string, change: string): HTMLElement {
     const card = document.createElement('div');
@@ -565,120 +545,6 @@ function createStatCard(label: string, value: string, change: string): HTMLEleme
     return card;
 }
 
-/**
- * NEW: Show lead details modal
- */
-function showLeadDetailsModal(lead: any): void {
-    const { showModal } = require('../../../components/modal');
-    
-    const content = document.createElement('div');
-    content.className = 'lead-details-content';
-    
-    // Full Session ID (copyable)
-    const sessionIdRow = document.createElement('div');
-    sessionIdRow.className = 'lead-detail-row';
-    sessionIdRow.innerHTML = `
-        <div class="lead-detail-label">Session ID:</div>
-        <div class="lead-detail-value session-id" title="Click to copy">${lead.sessionId}</div>
-    `;
-    const sessionIdValue = sessionIdRow.querySelector('.session-id');
-    sessionIdValue?.addEventListener('click', async () => {
-        await navigator.clipboard.writeText(lead.firstSessionId);
-        const original = sessionIdValue.textContent;
-        sessionIdValue.textContent = '✓ Copied!';
-        setTimeout(() => {
-            sessionIdValue.textContent = original;
-        }, 2000);
-    });
-    content.appendChild(sessionIdRow);
-    
-    // Name
-    const nameRow = document.createElement('div');
-    nameRow.className = 'lead-detail-row';
-    nameRow.innerHTML = `
-        <div class="lead-detail-label">Name:</div>
-        <div class="lead-detail-value">${lead.name || '-'}</div>
-    `;
-    content.appendChild(nameRow);
-    
-    // Email
-    const emailRow = document.createElement('div');
-    emailRow.className = 'lead-detail-row';
-    emailRow.innerHTML = `
-        <div class="lead-detail-label">Email:</div>
-        <div class="lead-detail-value">${lead.email || '-'}</div>
-    `;
-    content.appendChild(emailRow);
-    
-    // Phone
-    const phoneRow = document.createElement('div');
-    phoneRow.className = 'lead-detail-row';
-    phoneRow.innerHTML = `
-        <div class="lead-detail-label">Phone:</div>
-        <div class="lead-detail-value">${lead.phone || '-'}</div>
-    `;
-    content.appendChild(phoneRow);
-    
-    // Captured At
-    const capturedRow = document.createElement('div');
-    capturedRow.className = 'lead-detail-row';
-    capturedRow.innerHTML = `
-        <div class="lead-detail-label">Captured At:</div>
-        <div class="lead-detail-value">${formatDateTime(lead.firstContactDate)}</div>
-    `;
-    content.appendChild(capturedRow);
-    
-    // Actions
-    const actions = document.createElement('div');
-    actions.className = 'lead-modal-actions';
-    
-    const exportBtn = document.createElement('button');
-    exportBtn.textContent = 'Export to CSV';
-    exportBtn.className = 'btn-secondary';
-    exportBtn.addEventListener('click', () => {
-        exportSingleLeadToCSV(lead);
-    });
-    actions.appendChild(exportBtn);
-    
-    content.appendChild(actions);
-    
-    showModal({
-        title: 'Lead Details',
-        content,
-        showCloseButton: true
-    });
-}
-
-/**
- * Export single lead to CSV
- */
-function exportSingleLeadToCSV(lead: any): void {
-    const headers = ['Session ID', 'Name', 'Email', 'Phone', 'Captured At'];
-    const row = [
-        lead.sessionId,
-        lead.name || '',
-        lead.email || '',
-        lead.phone || '',
-        formatDateTime(lead.firstContactDate)
-    ];
-
-    const csvContent = [
-        headers.join(','),
-        row.map(cell => `"${cell}"`).join(',')
-    ].join('\n');
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    
-    link.setAttribute('href', url);
-    link.setAttribute('download', `lead-${lead.firstSessionId.substring(0, 8)}-${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = 'hidden';
-    
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
 
 /**
  * Show all sessions modal
@@ -789,7 +655,6 @@ async function showAllLeadsModal(businessId: string): Promise<void> {
         const tableContainer = document.createElement('div');
         tableContainer.className = 'leads-table';
 
-        // Export button
         const exportBtn = document.createElement('button');
         exportBtn.textContent = 'Export All to CSV 📥';
         exportBtn.className = 'btn-secondary';
@@ -799,7 +664,6 @@ async function showAllLeadsModal(businessId: string): Promise<void> {
         });
         tableContainer.appendChild(exportBtn);
 
-        // UPDATED: New table structure
         const tableHeader = document.createElement('div');
         tableHeader.className = 'table-row table-header';
         tableHeader.innerHTML = `
@@ -825,7 +689,7 @@ async function showAllLeadsModal(businessId: string): Promise<void> {
             `;
 
             row.addEventListener('click', () => {
-                showLeadDetailsModal(lead);
+                showLeadDetailsModal(lead, businessId);
             });
 
             tableContainer.appendChild(row);

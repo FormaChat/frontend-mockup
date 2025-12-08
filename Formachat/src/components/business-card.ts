@@ -5,7 +5,6 @@ export interface BusinessCardData {
   status?: 'active' | 'inactive';
 }
 
-// --- INJECT STYLES ---
 function injectBusinessCardStyles() {
   if (document.getElementById('business-card-styles')) return;
 
@@ -151,11 +150,10 @@ export function createBusinessCard(
   const card = document.createElement('div');
   card.className = 'business-card';
   
-  // ✅ ONLY make it clickable if onClickPath is provided
   if (onClickPath) {
     card.setAttribute('role', 'button');
     card.setAttribute('tabindex', '0');
-    card.style.cursor = 'pointer'; // Show pointer cursor
+    card.style.cursor = 'pointer'; 
     
     const navigate = () => {
       window.location.hash = onClickPath;
@@ -169,11 +167,10 @@ export function createBusinessCard(
       }
     });
   } else {
-    // ✅ Not clickable - remove cursor pointer
+  
     card.style.cursor = 'default';
   }
 
-  // --- Header (Avatar + Status) ---
   const header = document.createElement('div');
   header.className = 'card-header';
 
@@ -196,13 +193,11 @@ export function createBusinessCard(
 
   card.appendChild(header);
 
-  // --- Name ---
   const name = document.createElement('h3');
   name.className = 'business-name';
   name.textContent = business.name;
   card.appendChild(name);
 
-  // --- Footer (Date) ---
   const footer = document.createElement('div');
   footer.className = 'card-footer';
   

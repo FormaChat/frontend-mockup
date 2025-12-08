@@ -1,5 +1,3 @@
-// components/feedback-form.ts
-
 import { submitFeedback } from '../services/feedback.service';
 
 export function createFeedbackForm(): HTMLElement {
@@ -201,13 +199,11 @@ export function createFeedbackForm(): HTMLElement {
   textarea.maxLength = 5000;
   form.appendChild(textarea);
 
-  // Character count
   const charCount = document.createElement('div');
   charCount.className = 'char-count';
   charCount.textContent = '0 / 5000';
   form.appendChild(charCount);
 
-  // Update character count on input
   textarea.addEventListener('input', () => {
     const length = textarea.value.length;
     charCount.textContent = `${length} / 5000`;
@@ -242,7 +238,6 @@ export function createFeedbackForm(): HTMLElement {
   
   form.appendChild(actions);
   
-  // Handle form submission
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const feedbackText = textarea.value.trim();
@@ -258,7 +253,6 @@ export function createFeedbackForm(): HTMLElement {
       return;
     }
     
-    // Disable button and show loading
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<span>Sending...</span>';
     textarea.classList.remove('error');
@@ -270,14 +264,12 @@ export function createFeedbackForm(): HTMLElement {
       if (response.success) {
         console.log('[FeedbackForm] Feedback submitted successfully');
         
-        // Show success state
         submitBtn.innerHTML = '<span>Sent!</span>';
         showMessage('Sent successfully!', 'success');
         textarea.value = '';
         charCount.textContent = '0 / 5000';
         charCount.className = 'char-count';
         
-        // Reset after 3 seconds
         setTimeout(() => {
           submitBtn.disabled = false;
           submitBtn.innerHTML = `
@@ -292,11 +284,9 @@ export function createFeedbackForm(): HTMLElement {
       } else {
         console.error('[FeedbackForm] Failed to submit feedback:', response.error);
         
-        // Show error message
         const errorMessage = response.error?.message || 'Failed to send feedback. Please try again.';
         showMessage(errorMessage, 'error');
         
-        // Re-enable button
         submitBtn.disabled = false;
         submitBtn.innerHTML = `
           <span>Send Feedback</span>
@@ -306,7 +296,6 @@ export function createFeedbackForm(): HTMLElement {
           </svg>
         `;
         
-        // Hide error after 5 seconds
         setTimeout(hideMessage, 5000);
       }
     } catch (error) {
@@ -314,7 +303,6 @@ export function createFeedbackForm(): HTMLElement {
       
       showMessage('An unexpected error occurred. Please try again.', 'error');
       
-      // Re-enable button
       submitBtn.disabled = false;
       submitBtn.innerHTML = `
         <span>Send Feedback</span>
@@ -328,7 +316,6 @@ export function createFeedbackForm(): HTMLElement {
     }
   });
   
-  // Helper functions for showing/hiding messages
   function showMessage(message: string, type: 'success' | 'error') {
     const icon = type === 'success' 
       ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

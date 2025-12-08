@@ -1,12 +1,8 @@
-// pages/dashboard/businesses/edit.ts
 import { createBreadcrumb } from '../../../components/breadcrumb';
 import { createLoadingSpinner, hideLoadingSpinner } from '../../../components/loading-spinner';
 import { getBusinessById, updateBusiness } from '../../../services/business.service';
 import type { UpdateBusinessRequest, Business } from '../../../types/business.types';
 
-// ========================================
-// 1. STYLES (Identical to Create Page)
-// ========================================
 function injectEditWizardStyles() {
   if (document.getElementById('business-wizard-styles')) return;
 
@@ -182,10 +178,6 @@ function injectEditWizardStyles() {
   document.head.appendChild(style);
 }
 
-// ========================================
-// 2. MAIN RENDER FUNCTION
-// ========================================
-
 const WIZARD_STEPS = [
   'Basic Information',
   'Products & Services',
@@ -203,11 +195,10 @@ export async function renderBusinessEdit(businessId: string): Promise<HTMLElemen
   container.appendChild(spinner);
   
   try {
-    // 1. Fetch Data
+   
     const business = await getBusinessById(businessId);
     hideLoadingSpinner(spinner);
     
-    // 2. Breadcrumb
     const breadcrumb = createBreadcrumb([
       { label: 'Businesses', path: '#/dashboard/businesses' },
       { label: business.basicInfo.businessName }, 
@@ -215,17 +206,14 @@ export async function renderBusinessEdit(businessId: string): Promise<HTMLElemen
     ]);
     container.appendChild(breadcrumb);
     
-    // 3. Wizard Container
     const wizardContainer = document.createElement('div');
     wizardContainer.className = 'wizard-container';
     
-    // Header
     const heading = document.createElement('h1');
     heading.style.textAlign = 'center';
     heading.textContent = `Edit: ${business.basicInfo.businessName}`;
     wizardContainer.appendChild(heading);
 
-    // Progress Dots
     const progressContainer = document.createElement('div');
     progressContainer.className = 'wizard-progress-bar';
     WIZARD_STEPS.forEach(() => {
@@ -235,16 +223,13 @@ export async function renderBusinessEdit(businessId: string): Promise<HTMLElemen
     });
     wizardContainer.appendChild(progressContainer);
 
-    // Step Counter
     const stepCounter = document.createElement('div');
     stepCounter.className = 'step-counter';
     wizardContainer.appendChild(stepCounter);
 
-    // 4. Create Form (Pre-populated)
     const form = createEditForm(business);
     wizardContainer.appendChild(form);
     
-    // 5. Initialize Wizard Logic
     initializeWizardLogic(form, progressContainer, stepCounter, business._id);
 
     container.appendChild(wizardContainer);
@@ -262,9 +247,6 @@ export async function renderBusinessEdit(businessId: string): Promise<HTMLElemen
   return container;
 }
 
-// ========================================
-// 3. WIZARD LOGIC
-// ========================================
 
 function initializeWizardLogic(
   form: HTMLFormElement, 
@@ -281,39 +263,35 @@ function initializeWizardLogic(
   let currentStep = 0;
 
   const updateUI = () => {
-    // Show/Hide Sections
+  
     sections.forEach((section, index) => {
       section.classList.toggle('active', index === currentStep);
     });
 
-    // Update Dots
     dots.forEach((dot, index) => {
       dot.classList.remove('active', 'completed');
       if (index < currentStep) dot.classList.add('completed');
       else if (index === currentStep) dot.classList.add('active');
     });
 
-    // Update Counter
+  
     stepCounter.textContent = `Step ${currentStep + 1}: ${WIZARD_STEPS[currentStep]}`;
 
-    // Update Buttons
+  
     prevBtn.disabled = currentStep === 0;
     if (currentStep === sections.length - 1) {
       nextBtn.textContent = 'Save Changes';
-      nextBtn.type = 'submit'; // Make it a submit button only at the end
+      nextBtn.type = 'submit';
     } else {
       nextBtn.textContent = 'Next';
       nextBtn.type = 'button';
     }
 
-    // Scroll top
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Initial State
   updateUI();
 
-  // Button Listeners
   prevBtn.addEventListener('click', () => {
     if (currentStep > 0) {
       currentStep--;
@@ -322,7 +300,6 @@ function initializeWizardLogic(
   });
 
   nextBtn.addEventListener('click', (e) => {
-    // If it's a submit button (last step), let the form submit handler take over
     if (nextBtn.type === 'submit') return;
 
     e.preventDefault();
@@ -332,7 +309,7 @@ function initializeWizardLogic(
     }
   });
 
-  // Handle Form Submission
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (validateStep(sections[currentStep], errorContainer)) {
@@ -346,7 +323,7 @@ function validateStep(section: HTMLElement, errorContainer: HTMLElement): boolea
     errorContainer.style.display = 'none';
 
     for (const input of requiredInputs) {
-        // Skip hidden inputs (like conditional fields that are hidden)
+       
         if (input.offsetParent === null) continue;
 
         if (!input.value.trim()) {
@@ -359,15 +336,12 @@ function validateStep(section: HTMLElement, errorContainer: HTMLElement): boolea
     return true;
 }
 
-// ========================================
-// 4. FORM CONSTRUCTION
-// ========================================
+
 
 function createEditForm(business: Business): HTMLFormElement {
   const form = document.createElement('form');
   form.className = 'business-form';
 
-  // --- SECTION 1: BASIC INFO ---
   const s1 = createSection('1. Basic Information');
   
   s1.appendChild(createFormField({
@@ -380,7 +354,6 @@ function createEditForm(business: Business): HTMLFormElement {
     value: business.basicInfo.businessDescription
   }));
 
-  // Business Type Logic
   const knownTypes = ['E-commerce', 'Real Estate', 'Restaurant', 'Hotel', 'Service-based', 'Tech/SaaS', 'Healthcare', 'Education'];
   const isOther = !knownTypes.includes(business.basicInfo.businessType);
   
@@ -431,7 +404,6 @@ function createEditForm(business: Business): HTMLFormElement {
 
   form.appendChild(s1);
 
-  // --- SECTION 2: PRODUCTS ---
   const s2 = createSection('2. Products & Services');
   
   s2.appendChild(createFormField({
@@ -455,7 +427,6 @@ function createEditForm(business: Business): HTMLFormElement {
     checkedValues: business.productsServices.serviceDelivery
   }));
 
-  // Pricing Logic
   const pricingDiv = document.createElement('div');
   const canDiscuss = business.productsServices.pricingDisplay?.canDiscussPricing ?? true;
   
@@ -480,7 +451,6 @@ function createEditForm(business: Business): HTMLFormElement {
 
   form.appendChild(s2);
 
-  // --- SECTION 3: SUPPORT ---
   const s3 = createSection('3. Customer Support');
 
   s3.appendChild(createDynamicArraySection({
@@ -515,7 +485,6 @@ function createEditForm(business: Business): HTMLFormElement {
 
   form.appendChild(s3);
 
-  // --- SECTION 4: CONTACT ---
   const s4 = createSection('4. Contact & Escalation');
 
   s4.appendChild(createDynamicArraySection({
@@ -547,7 +516,7 @@ function createEditForm(business: Business): HTMLFormElement {
 
   form.appendChild(s4);
 
-  // --- NAVIGATION AREA ---
+
   const errorBox = document.createElement('div');
   errorBox.className = 'error-message error-box';
   form.appendChild(errorBox);
@@ -562,7 +531,7 @@ function createEditForm(business: Business): HTMLFormElement {
   navDiv.appendChild(btnPrev);
 
   const btnNext = document.createElement('button');
-  btnNext.type = 'button'; // logic handles change to submit
+  btnNext.type = 'button'; 
   btnNext.className = 'btn-nav btn-next';
   btnNext.textContent = 'Next';
   navDiv.appendChild(btnNext);
@@ -571,10 +540,6 @@ function createEditForm(business: Business): HTMLFormElement {
 
   return form;
 }
-
-// ========================================
-// 5. HELPER COMPONENTS (Styling & Logic)
-// ========================================
 
 function createSection(title: string): HTMLElement {
   const s = document.createElement('section');
@@ -696,7 +661,7 @@ function createCheckboxField(opts: { name: string, label: string, defaultChecked
 function createDynamicArraySection(opts: { title: string, name: string, fields: any[], existingData?: any[], minItems?: number }): HTMLElement {
   const section = document.createElement('div');
   section.className = 'dynamic-array-section';
-  section.dataset.arrayName = opts.name; // Used for data collection helpers if needed
+  section.dataset.arrayName = opts.name; 
 
   const h3 = document.createElement('h3');
   h3.textContent = opts.title;
@@ -706,7 +671,6 @@ function createDynamicArraySection(opts: { title: string, name: string, fields: 
   container.className = 'dynamic-array-items';
   section.appendChild(container);
 
-  // Pre-populate
   if (opts.existingData && opts.existingData.length > 0) {
     opts.existingData.forEach(data => {
         container.appendChild(createDynamicItem(opts.name, opts.fields, container, data));
@@ -733,10 +697,9 @@ function createDynamicItem(arrayName: string, fields: any[], container: HTMLElem
   const item = document.createElement('div');
   item.className = 'dynamic-array-item';
   
-  const index = container.children.length; // Simple index for rendering
+  const index = container.children.length; 
 
   fields.forEach(f => {
-    // Generate correct name: arrayName[index][fieldName]
     const fieldName = `${arrayName}[${index}][${f.name}]`;
     const val = data ? data[f.name] : '';
 
@@ -753,25 +716,16 @@ function createDynamicItem(arrayName: string, fields: any[], container: HTMLElem
   btnRemove.textContent = 'Remove';
   btnRemove.addEventListener('click', () => {
     item.remove();
-    // In a real robust app, we'd re-index the names here 
-    // or use a smarter data collector that doesn't rely on strict indices
+    
   });
   item.appendChild(btnRemove);
 
   return item;
 }
 
-// ========================================
-// 6. DATA COLLECTION & SUBMIT
-// ========================================
-
-// Helper to extract array data from form inputs based on naming convention
 function collectArrayData(form: HTMLFormElement, arrayName: string): any[] {
     const results: any[] = [];
     
-    
-    // Naive regex parsing for names like popularItems[0][name]
-    // A more robust way is to query the DOM
     const itemDivs = form.querySelectorAll(`.dynamic-array-section[data-array-name="${arrayName}"] .dynamic-array-item`);
     
     itemDivs.forEach((div) => {
@@ -780,8 +734,8 @@ function collectArrayData(form: HTMLFormElement, arrayName: string): any[] {
         let hasData = false;
 
         inputs.forEach((input) => {
-            const name = (input as any).name; // e.g. popularItems[0][price]
-            // Extract the last part [price]
+            const name = (input as any).name; 
+            
             const keyMatch = name.match(/\[([^\]]+)\]$/); 
             if (keyMatch) {
                 const key = keyMatch[1];
@@ -811,7 +765,7 @@ async function handleUpdateBusiness(
 
     const formData = new FormData(form);
     
-    // Construct Object
+
     let bType = formData.get('businessType') as string;
     if (bType === 'Other') bType = formData.get('businessTypeOther') as string;
 

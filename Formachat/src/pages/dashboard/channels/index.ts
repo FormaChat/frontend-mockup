@@ -1,4 +1,3 @@
-// pages/dashboard/channels/index.ts
 import { createBusinessCard} from '../../../components/business-card';
 import type { BusinessCardData } from '../../../components/business-card';
 import { createEmptyState } from '../../../components/empty-state';
@@ -6,7 +5,6 @@ import { createLoadingSpinner, hideLoadingSpinner } from '../../../components/lo
 import { createBreadcrumb } from '../../../components/breadcrumb';
 import { getBusinesses } from '../../../services/business.service';
 
-// --- 1. INJECT STYLES (Consistency with Business List) ---
 function injectChannelIndexStyles() {
   if (document.getElementById('channels-index-styles')) return;
 
@@ -76,15 +74,12 @@ export async function renderChannelsIndex(): Promise<HTMLElement> {
   const container = document.createElement('div');
   container.className = 'channels-index';
   
-  // 1. Breadcrumb
-  // We add 'Home' to match the breadcrumb flow of other pages
   const breadcrumb = createBreadcrumb([
     { label: 'Home', path: '#/dashboard' },
     { label: 'Channels' }
   ]);
   container.appendChild(breadcrumb);
-  
-  // 2. Page Heading Section
+
   const header = document.createElement('div');
   header.className = 'page-header';
 
@@ -96,12 +91,10 @@ export async function renderChannelsIndex(): Promise<HTMLElement> {
 
   container.appendChild(header);
   
-  // 3. Grid
   const grid = document.createElement('div');
   grid.className = 'business-cards-grid';
   container.appendChild(grid);
   
-  // Show loading spinner
   const spinner = createLoadingSpinner('Loading businesses...');
   grid.appendChild(spinner);
   
@@ -126,7 +119,6 @@ export async function renderChannelsIndex(): Promise<HTMLElement> {
           status: business.isActive? 'active' : 'inactive'
         };
         
-        // This card now links to the channels management page for this specific business
         const card = createBusinessCard(
           cardData,
           `#/dashboard/channels/${business._id}`

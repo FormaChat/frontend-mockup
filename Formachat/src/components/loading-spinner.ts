@@ -1,5 +1,5 @@
 export function createLoadingSpinner(message: string = 'Loading...'): HTMLElement {
-  // --- 1. INJECT STYLES ---
+
   if (!document.getElementById('spinner-styles')) {
     const style = document.createElement('style');
     style.id = 'spinner-styles';
@@ -99,11 +99,11 @@ export function createLoadingSpinner(message: string = 'Loading...'): HTMLElemen
     document.head.appendChild(style);
   }
 
-  // --- 2. BUILD COMPONENT ---
+ 
   const container = document.createElement('div');
   container.className = 'loading-spinner-container';
   
-  // Create the gyroscopic visual
+
   const wrapper = document.createElement('div');
   wrapper.className = 'spinner-wrapper';
   
@@ -116,7 +116,7 @@ export function createLoadingSpinner(message: string = 'Loading...'): HTMLElemen
   wrapper.appendChild(ring1);
   wrapper.appendChild(ring2);
   
-  // Text
+
   const text = document.createElement('p');
   text.className = 'loading-text';
   text.textContent = message;
@@ -131,7 +131,7 @@ export function showLoadingSpinner(
   parent: HTMLElement,
   message: string = 'Processing...'
 ): HTMLElement {
-  // Ensure parent is positioned so absolute overlay works
+ 
   const parentStyle = window.getComputedStyle(parent);
   if (parentStyle.position === 'static') {
       parent.style.position = 'relative';
@@ -143,10 +143,9 @@ export function showLoadingSpinner(
 }
 
 export function hideLoadingSpinner(spinner: HTMLElement): void {
-  // Add smooth exit animation
+  
   spinner.style.animation = 'fadeOut 0.3s forwards';
   
-  // Wait for animation to finish before removing from DOM
   spinner.addEventListener('animationend', () => {
     if (spinner.parentNode) {
       spinner.parentNode.removeChild(spinner);

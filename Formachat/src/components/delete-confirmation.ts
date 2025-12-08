@@ -4,7 +4,6 @@ export interface DeleteConfirmationConfig {
   onCancel: () => void;
 }
 
-// --- INJECT STYLES (Matched to your theme) ---
 function injectDeleteStyles() {
   if (document.getElementById('delete-modal-styles')) return;
 
@@ -195,7 +194,6 @@ export function createDeleteConfirmation(config: DeleteConfirmationConfig): HTML
   const overlay = document.createElement('div');
   overlay.className = 'modal-overlay';
   
-  // Close on backdrop click
   overlay.addEventListener('click', (e) => {
     if (e.target === overlay) {
       config.onCancel();
@@ -206,7 +204,6 @@ export function createDeleteConfirmation(config: DeleteConfirmationConfig): HTML
   const modal = document.createElement('div');
   modal.className = 'delete-confirmation-modal';
   
-  // --- 1. The Warning Icon ---
   const iconWrapper = document.createElement('div');
   iconWrapper.className = 'icon-wrapper';
   iconWrapper.innerHTML = `
@@ -216,7 +213,6 @@ export function createDeleteConfirmation(config: DeleteConfirmationConfig): HTML
   `;
   modal.appendChild(iconWrapper);
 
-  // --- 2. Content ---
   const heading = document.createElement('h3');
   heading.className = 'modal-title';
   heading.textContent = 'Delete this item?';
@@ -227,11 +223,9 @@ export function createDeleteConfirmation(config: DeleteConfirmationConfig): HTML
   message.innerHTML = `This action cannot be undone. You are about to permanently delete <span class="highlight-item">${config.itemName}</span>.`;
   modal.appendChild(message);
 
-  // --- 3. Actions ---
   const buttons = document.createElement('div');
   buttons.className = 'modal-buttons';
 
-  // Cancel Button (Auto-focus for safety)
   const cancelBtn = document.createElement('button');
   cancelBtn.textContent = 'Cancel';
   cancelBtn.className = 'btn-modal btn-cancel';
@@ -241,7 +235,6 @@ export function createDeleteConfirmation(config: DeleteConfirmationConfig): HTML
   };
   buttons.appendChild(cancelBtn);
 
-  // Delete Button
   const confirmBtn = document.createElement('button');
   confirmBtn.textContent = 'Delete';
   confirmBtn.className = 'btn-modal btn-danger';
@@ -257,13 +250,11 @@ export function createDeleteConfirmation(config: DeleteConfirmationConfig): HTML
   modal.appendChild(buttons);
   overlay.appendChild(modal);
 
-  // Accessibility: Focus cancel by default for safety
   setTimeout(() => cancelBtn.focus(), 100);
 
   return overlay;
 }
 
-// Helper to animate out before removing
 function removeModal(overlay: HTMLElement) {
   overlay.style.transition = 'opacity 0.2s';
   overlay.style.opacity = '0';

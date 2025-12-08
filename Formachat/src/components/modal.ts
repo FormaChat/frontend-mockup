@@ -5,7 +5,6 @@ export interface ModalConfig {
   onClose?: () => void;
 }
 
-// --- 1. INJECT STYLES ---
 function injectModalStyles() {
   if (document.getElementById('modal-styles')) return;
 
@@ -125,17 +124,15 @@ function injectModalStyles() {
 export function createModal(config: ModalConfig): HTMLElement {
   injectModalStyles();
 
-  // Overlay
   const overlay = document.createElement('div');
   overlay.className = 'modal-overlay';
   
-  // Modal container
   const modal = document.createElement('div');
   modal.className = 'modal';
-  // Stop click propagation so clicking inside modal doesn't close it
+ 
   modal.addEventListener('click', (e) => e.stopPropagation());
   
-  // --- Header ---
+  
   const header = document.createElement('div');
   header.className = 'modal-header';
   
@@ -143,13 +140,12 @@ export function createModal(config: ModalConfig): HTMLElement {
   title.textContent = config.title;
   header.appendChild(title);
   
-  // Close button (optional)
+  
   if (config.showCloseButton !== false) {
     const closeBtn = document.createElement('button');
     closeBtn.className = 'modal-close';
     closeBtn.setAttribute('aria-label', 'Close modal');
     
-    // SVG Icon for a cleaner look than "X"
     closeBtn.innerHTML = `
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -165,7 +161,6 @@ export function createModal(config: ModalConfig): HTMLElement {
   
   modal.appendChild(header);
   
-  // --- Content ---
   const contentDiv = document.createElement('div');
   contentDiv.className = 'modal-content';
   
@@ -178,7 +173,6 @@ export function createModal(config: ModalConfig): HTMLElement {
   modal.appendChild(contentDiv);
   overlay.appendChild(modal);
   
-  // Close on overlay click
   overlay.addEventListener('click', () => {
     closeModalWithAnimation(overlay, config.onClose);
   });
@@ -186,45 +180,32 @@ export function createModal(config: ModalConfig): HTMLElement {
   return overlay;
 }
 
-/**
- * Show modal (append to body)
- */
 export function showModal(config: ModalConfig): HTMLElement {
   const modal = createModal(config);
   document.body.appendChild(modal);
-  // Trap focus could go here for accessibility
+  
   return modal;
 }
 
-/**
- * Internal helper to handle the exit animation
- */
 function closeModalWithAnimation(overlay: HTMLElement, onCloseCallback?: () => void) {
-  // 1. Add closing class to trigger CSS animations
+ 
   overlay.classList.add('closing');
 
-  // 2. Wait for animation to finish
   overlay.addEventListener('animationend', () => {
     if (overlay.parentNode) {
       overlay.parentNode.removeChild(overlay);
     }
-    // 3. Trigger callback
+    
     if (onCloseCallback) onCloseCallback();
   }, { once: true });
 }
 
-/**
- * Public close function (wrapper)
- */
 export function closeModal(modal: HTMLElement): void {
-  // If it's already closing, ignore
+ 
   if (modal.classList.contains('closing')) return;
   closeModalWithAnimation(modal);
 }
 
-/**
- * Close all open modals
- */
 export function closeAllModals(): void {
   const modals = document.querySelectorAll('.modal-overlay');
   modals.forEach(modal => {

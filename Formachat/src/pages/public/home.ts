@@ -1,6 +1,5 @@
 export function renderHome(): HTMLElement {
-  // 1. Define Styles (CSS) to inject
-  // We do this to enable Media Queries and Keyframes which aren't possible with inline styles
+ 
   const style = document.createElement('style');
   style.textContent = `
     :root {
@@ -229,66 +228,52 @@ export function renderHome(): HTMLElement {
   `;
   document.head.appendChild(style);
 
-  // 2. Main Container
   const container = document.createElement('div');
   container.className = 'home-container';
 
-  // Hero Section
   const hero = document.createElement('div');
   hero.className = 'hero-section';
 
-  // Beta Badge
   const betaBadge = document.createElement('div');
   betaBadge.className = 'beta-badge animate-item delay-1';
   betaBadge.innerHTML = '🎉 FREE for Beta Users - Limited Spots!';
   hero.appendChild(betaBadge);
 
-  // Title
   const title = document.createElement('h1');
   title.className = 'hero-title animate-item delay-2';
   title.innerHTML = 'Never Miss a Customer<br/>Question Again';
   hero.appendChild(title);
 
-  // Subtitle
   const subtitle = document.createElement('p');
   subtitle.className = 'hero-subtitle animate-item delay-3';
   subtitle.textContent = 'AI-powered support that understands your business. Instant answers, 24/7 availability, zero missed opportunities.';
   hero.appendChild(subtitle);
 
-  // Buttons section
   const buttonSection = document.createElement('div');
   buttonSection.className = 'button-group animate-item delay-4';
 
-  // Register button
   const registerBtn = document.createElement('a');
   registerBtn.href = '#/register';
   registerBtn.textContent = 'Start Free Beta Access';
   registerBtn.className = 'btn btn-register';
   buttonSection.appendChild(registerBtn);
 
-  // Login button
   const loginBtn = document.createElement('a');
   loginBtn.href = '#/login';
   loginBtn.textContent = 'Login';
   loginBtn.className = 'btn btn-login';
   buttonSection.appendChild(loginBtn);
 
-  
-
   hero.appendChild(buttonSection);
 
-  // Trust Signal
   const trustSignal = document.createElement('p');
   trustSignal.className = 'trust-signal animate-item delay-5';
   trustSignal.innerHTML = '✓ No credit card required &nbsp;•&nbsp; ✓ Setup in 5 minutes &nbsp;•&nbsp; ✓ Cancel anytime';
   hero.appendChild(trustSignal);
 
-  // 3. The "Intrigue" Placeholder Visual
-  // This creates a CSS-only abstract representation of a dashboard
   const visual = document.createElement('div');
   visual.className = 'visual-placeholder';
   
-  // Abstract UI parts
   const sidebar = document.createElement('div');
   sidebar.className = 'abstract-sidebar';
   visual.appendChild(sidebar);
@@ -297,7 +282,6 @@ export function renderHome(): HTMLElement {
   header.className = 'abstract-header';
   visual.appendChild(header);
 
-  // The floating "Magic" element
   const floatingCard = document.createElement('div');
   floatingCard.className = 'floating-card';
   
