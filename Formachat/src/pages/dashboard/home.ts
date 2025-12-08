@@ -159,23 +159,37 @@ export function renderDashboardHome(): HTMLElement {
   
   const features: Feature[] = [
     {
-      title: 'AI-Powered Conversations',
-      description: 'Natural language understanding with 24/7 automated customer support responses.',
+      title: 'Beta Perks 🎁',
+      description: [
+      'Free access during entire beta period',
+      '40% off for first 6 months after launch',
+      'Direct input on feature roadmap',
+      'Priority support from founders',
+      'First access to new features before public release'
+    ],
       status: 'available'
     },
     {
-      title: 'Multi-Channel Deployment',
-      description: 'Deploy across web, WhatsApp, and social media from a single dashboard.',
+      title: 'What\'s Live Now ✅',
+      description: [
+        'AI chat that answers questions using your business info',
+        'Deploy via website embed, direct link, or QR code on flyers',
+        'Track every conversation and capture lead contact details',
+        'Update your business info anytime - AI adapts instantly',
+        'Automatic conversation management and lead organization'
+      ],
       status: 'available'
     },
     {
-      title: 'Real-Time Analytics',
-      description: 'Track conversations, leads, and performance metrics with detailed insights.',
-      status: 'available'
-    },
-    {
-      title: 'CRM Integration',
-      description: 'Seamlessly connect with your existing CRM and business tools.',
+      title: 'Coming Soon 🚀',
+      description: [
+        'WhatsApp and Telegram integration',
+        'Voice conversation support',
+        'OAuth login with Google and GitHub',
+        'Payment processing through chat',
+        'Developer API and API key access',
+        'AI agents for autonomous conversations'
+      ],
       status: 'coming-soon'
     }
   ];

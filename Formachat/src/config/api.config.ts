@@ -36,6 +36,7 @@ export const BUSINESS_ENDPOINTS = {
 export const CHAT_ENDPOINTS = {
   SESSION_CREATE: `${API_BASE_URLS.CHAT}/session/create`,
   SESSION_GET: (sessionId: string) => `${API_BASE_URLS.CHAT}/session/${sessionId}`,
+  // SESSION_MESSAGE: (sessionId: string) => `${API_BASE_URLS.CHAT}/session/${sessionId}/message/stream`,
   SESSION_MESSAGE: (sessionId: string) => `${API_BASE_URLS.CHAT}/session/${sessionId}/message`,
   SESSION_MESSAGES: (sessionId: string) => `${API_BASE_URLS.CHAT}/session/${sessionId}/messages`,
   SESSION_END: (sessionId: string) => `${API_BASE_URLS.CHAT}/session/${sessionId}/end`,

@@ -70,25 +70,63 @@ function injectNavbarStyles() {
       z-index: 42;
     }
 
-    /* Sidebar Toggle Button */
+    /* ========== MORPHING HAMBURGER BUTTON ========== */
     .sidebar-toggle {
       background: transparent;
       border: none;
       cursor: pointer;
-      color: var(--text-main);
-      padding: 8px;
+      padding: 12px;
       border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: background 0.2s ease;
+      width: 44px;
+      height: 44px;
+      position: relative;
     }
+    
     .sidebar-toggle:hover {
       background: rgba(99, 107, 47, 0.1);
     }
-    .sidebar-toggle svg {
-      width: 26px;
-      height: 26px;
+
+    /* Hamburger Icon Container */
+    .hamburger-icon {
+      width: 24px;
+      height: 18px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* Individual Lines */
+    .hamburger-line {
+      width: 100%;
+      height: 2.5px;
+      background-color: var(--text-main);
+      border-radius: 2px;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      transform-origin: center;
+    }
+
+    /* Active State (X Icon) */
+    .sidebar-toggle.active .hamburger-line:nth-child(1) {
+      transform: translateY(7.75px) rotate(45deg);
+    }
+
+    .sidebar-toggle.active .hamburger-line:nth-child(2) {
+      opacity: 0;
+      transform: scaleX(0);
+    }
+
+    .sidebar-toggle.active .hamburger-line:nth-child(3) {
+      transform: translateY(-7.75px) rotate(-45deg);
+    }
+
+    /* Hover effect on active state */
+    .sidebar-toggle.active:hover .hamburger-line {
+      background-color: var(--primary);
     }
     
     .user-loading {
@@ -143,25 +181,42 @@ export function createNavbar(
   const leftSection = document.createElement('div');
   leftSection.className = 'navbar-left';
   
+  // ✅ NEW: Create morphing hamburger button
   const toggleBtn = document.createElement('button');
   toggleBtn.className = 'sidebar-toggle';
   toggleBtn.setAttribute('aria-label', 'Toggle menu');
-  toggleBtn.innerHTML = `
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <line x1="3" y1="12" x2="21" y2="12"></line>
-      <line x1="3" y1="6" x2="21" y2="6"></line>
-      <line x1="3" y1="18" x2="21" y2="18"></line>
-    </svg>
-  `;
+  
+  // Create hamburger icon with three lines
+  const hamburgerIcon = document.createElement('div');
+  hamburgerIcon.className = 'hamburger-icon';
+  
+  // Create the three lines
+  for (let i = 0; i < 3; i++) {
+    const line = document.createElement('span');
+    line.className = 'hamburger-line';
+    hamburgerIcon.appendChild(line);
+  }
+  
+  toggleBtn.appendChild(hamburgerIcon);
   
   const sidebarDropdown = createSidebarDropdown();
   
+  // ✅ UPDATED: Toggle logic with animation sync
   toggleBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     const menu = sidebarDropdown.querySelector('.sidebar-menu') as HTMLElement;
     if (menu) {
       const isVisible = menu.style.display !== 'none';
-      menu.style.display = isVisible ? 'none' : 'block';
+      
+      if (isVisible) {
+        // Closing sidebar
+        menu.style.display = 'none';
+        toggleBtn.classList.remove('active');
+      } else {
+        // Opening sidebar
+        menu.style.display = 'block';
+        toggleBtn.classList.add('active');
+      }
     }
   });
   
@@ -194,10 +249,12 @@ export function createNavbar(
   
   nav.appendChild(rightSection);
 
+  // ✅ UPDATED: Close sidebar and reset icon when clicking outside
   document.addEventListener('click', () => {
     const sidebarMenu = sidebarDropdown.querySelector('.sidebar-menu') as HTMLElement;
     if (sidebarMenu) {
       sidebarMenu.style.display = 'none';
+      toggleBtn.classList.remove('active'); // Reset icon to hamburger
     }
   });
 
