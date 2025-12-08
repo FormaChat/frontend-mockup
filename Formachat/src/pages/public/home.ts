@@ -146,27 +146,55 @@ export function renderHome(): HTMLElement {
 
     /* The "Intrigue" Placeholder Graphic */
     .visual-placeholder {
-      margin-top: 60px;
-      position: relative;
-      height: 300px;
-      max-width: 800px;
-      margin-left: auto;
-      margin-right: auto;
-      background: linear-gradient(180deg, #ffffff 0%, #f3f4f6 100%);
-      border: 1px solid #e5e7eb;
-      border-radius: 12px 12px 0 0;
-      box-shadow: 0 -20px 60px -10px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-      animation: fadeInUp 1s ease forwards 0.6s; /* Delayed entrance */
-      opacity: 0;
-    }
+    margin-top: 60px;
+    position: relative;
+    height: 300px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px 12px 0 0;
+    box-shadow: 0 -20px 60px -10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    animation: fadeInUp 1s ease forwards 0.6s;
+    opacity: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .screenshot-box {
+    background-size: cover;
+    background-position: center;
+    border-radius: 8px;
+    animation: fadeBox 8s infinite;
+    opacity: 0.8;
+  }
+
+  /* Stagger animation delays for each box */
+  .screenshot-box:nth-child(1) { animation-delay: 0s; }
+  .screenshot-box:nth-child(2) { animation-delay: 1s; }
+  .screenshot-box:nth-child(3) { animation-delay: 2s; }
+  .screenshot-box:nth-child(4) { animation-delay: 3s; }
+  .screenshot-box:nth-child(5) { animation-delay: 4s; }
+  .screenshot-box:nth-child(6) { animation-delay: 5s; }
+  .screenshot-box:nth-child(7) { animation-delay: 6s; }
+  .screenshot-box:nth-child(8) { animation-delay: 7s; }
+
+  @keyframes fadeBox {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.05); }
+  }
 
     /* Abstract UI Elements to create "Placeholder Vibe" */
     .abstract-sidebar {
       position: absolute;
       left: 0; top: 0; bottom: 0;
       width: 20%;
-      background: #f9fafb;
+      background: white;
       border-right: 1px solid #e5e7eb;
     }
     .abstract-header {
@@ -174,7 +202,7 @@ export function renderHome(): HTMLElement {
       top: 0; left: 20%; right: 0;
       height: 50px;
       border-bottom: 1px solid #e5e7eb;
-      background: white;
+      background: var(--primary);
     }
     .abstract-bubble {
       position: absolute;
@@ -192,7 +220,9 @@ export function renderHome(): HTMLElement {
       transform: translateX(-50%);
       width: 60%;
       height: 180px;
-      background: rgba(255, 255, 255, 0.9);
+      background: 
+    linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(243,244,246,0.3) 100%),
+    url('/assets/shot1.png') center/cover no-repeat;
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255,255,255,0.8);
       border-radius: 16px;
@@ -205,10 +235,10 @@ export function renderHome(): HTMLElement {
     }
     
     .loading-pulse {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: var(--badge-bg);
+      width: 80px;
+      height: 80px;
+      border-radius:50%;
+      background: transparent;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -273,6 +303,25 @@ export function renderHome(): HTMLElement {
 
   const visual = document.createElement('div');
   visual.className = 'visual-placeholder';
+
+  const screenshots = [
+    '/assets/shot1.png',
+    '/assets/logo.png',
+    '/assets/shot2.png',
+    '/assets/shot3.png',
+    '/assets/logo.png',
+    '/assets/shot3.png',
+    '/assets/logo.png',
+    '/assets/shot5.png'
+  ];
+
+  screenshots.forEach(src => {
+    const box = document.createElement('div');
+    box.className = 'screenshot-box';
+    box.style.backgroundImage = `url('${src}')`;
+    visual.appendChild(box);
+  });
+
   
   const sidebar = document.createElement('div');
   sidebar.className = 'abstract-sidebar';
@@ -285,9 +334,12 @@ export function renderHome(): HTMLElement {
   const floatingCard = document.createElement('div');
   floatingCard.className = 'floating-card';
   
-  const icon = document.createElement('div');
+  const icon = document.createElement('img');
+  icon.src = '/assets/logo.png';
   icon.className = 'loading-pulse';
-  icon.innerHTML = '✨';
+  icon.style.width = '40px';
+  icon.style.height = '40px';
+  icon.style.objectFit = 'contain';
   floatingCard.appendChild(icon);
   
   const line1 = document.createElement('div');

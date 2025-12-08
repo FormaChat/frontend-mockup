@@ -414,7 +414,7 @@ export async function renderChannelsDetail(businessId: string): Promise<HTMLElem
     const testCard = document.createElement('section');
     testCard.className = 'glass-card';
     testCard.innerHTML = `
-      <h2 class="card-title">🤖 Test Your Bot</h2>
+      <h2 class="card-title">Test Your Bot</h2>
       <p class="card-desc">Launch a live preview to test conversations before going public.</p>
     `;
     const testBtn = document.createElement('button');
@@ -436,7 +436,7 @@ export async function renderChannelsDetail(businessId: string): Promise<HTMLElem
     const qrCard = document.createElement('section');
     qrCard.className = 'glass-card';
     qrCard.innerHTML = `
-      <h2 class="card-title">📱 QR Code</h2>
+      <h2 class="card-title">QR Code</h2>
       <p class="card-desc">Perfect for print materials, menus, or in-store displays.</p>
     `;
 
@@ -505,7 +505,7 @@ export async function renderChannelsDetail(businessId: string): Promise<HTMLElem
     const shareCard = document.createElement('section');
     shareCard.className = 'glass-card full-width';
     shareCard.innerHTML = `
-      <h2 class="card-title">🔗 Share & Embed</h2>
+      <h2 class="card-title">Share & Embed</h2>
       <p class="card-desc">Direct links and embed codes for your website or social media.</p>
     `;
     
@@ -524,12 +524,12 @@ export async function renderChannelsDetail(businessId: string): Promise<HTMLElem
     
     const widgetBtn = document.createElement('button');
     widgetBtn.className = 'code-type-btn active';
-    widgetBtn.textContent = '💬 Widget (Recommended)';
+    widgetBtn.textContent = 'Widget (Recommended)';
     widgetBtn.dataset.type = 'widget';
     
     const iframeBtn = document.createElement('button');
     iframeBtn.className = 'code-type-btn';
-    iframeBtn.textContent = '📄 Iframe';
+    iframeBtn.textContent = 'Iframe';
     iframeBtn.dataset.type = 'iframe';
     
     codeSelector.appendChild(widgetBtn);
