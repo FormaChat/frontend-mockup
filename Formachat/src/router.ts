@@ -174,7 +174,7 @@ class Router {
       const params = this.getParams();
       const embedMode = this.isEmbedMode();
       
-      console.log('[Router] 💬 Loading chat widget...', { businessId: params.businessId, embedMode });
+      console.log('[Router] Loading chat widget...', { businessId: params.businessId, embedMode });
       
       try {
         const content = await renderChatWidget(params.businessId, embedMode);

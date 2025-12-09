@@ -18,8 +18,9 @@ function injectRegisterStyles() {
         
         /* 1. Main Container (Glassmorphism Card) */
         .register-container {
-            max-width: 440px;
-            margin: 50px auto;
+            max-width: 400px;
+            max-height: 600px;
+            margin: 10px auto;
             padding: 30px;
             background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(8px);
@@ -40,13 +41,13 @@ function injectRegisterStyles() {
             font-size: 2rem;
             font-weight: 700;
             color: var(--primary);
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             text-align: center;
         }
 
         /* 3. Form Fields & Inputs */
         .form-field {
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
         .form-label {

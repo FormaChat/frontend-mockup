@@ -21,12 +21,23 @@ function isEmbedMode(): boolean {
          (window.self !== window.top);
 }
 
+function isChatRoute(): boolean {
+  const hash = window.location.hash.slice(1);
+  return hash.startsWith('/chat/');
+}
+
 async function initApp() {
   if (isEmbedMode()) {
     console.log('[App] Embed/Widget mode detected.');
     (window as any).__EMBED_MODE__ = true;
     router.init();
     return; 
+  }
+
+  if (isChatRoute()) {
+    console.log('[App] Public chat route detected');
+    router.init();
+    return;
   }
 
   console.log('[App] Standard app mode');

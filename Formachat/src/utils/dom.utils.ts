@@ -1,3 +1,5 @@
+import { showModal } from '../components/modal';
+
 export const getElementById = <T extends HTMLElement = HTMLElement>(id: string): T | null => {
   return document.getElementById(id) as T | null;
 };
@@ -237,5 +239,9 @@ export const confirm = (message: string): boolean => {
 };
 
 export const alert = (message: string): void => {
-  window.alert(message);
+  showModal({
+    title: 'Notification',
+    content: `<p style="margin: 0; line-height: 1.6;">${message}</p>`,
+    showCloseButton: true
+  });
 };

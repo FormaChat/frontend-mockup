@@ -2,6 +2,7 @@ import { createBreadcrumb } from '../../../components/breadcrumb';
 import { createLoadingSpinner, hideLoadingSpinner } from '../../../components/loading-spinner';
 import { getBusinessById, updateBusiness } from '../../../services/business.service';
 import type { UpdateBusinessRequest, Business } from '../../../types/business.types';
+import { showModal } from '../../../components/modal';
 
 function injectEditWizardStyles() {
   if (document.getElementById('business-wizard-styles')) return;
@@ -811,7 +812,11 @@ async function handleUpdateBusiness(
 
     await updateBusiness(businessId, updateData);
     
-    alert('Business updated successfully!');
+    showModal({
+      title: 'Success',
+      content: '<p style="margin: 0;">Business updated successfully!</p>',
+      showCloseButton: true
+    });
     window.location.hash = '#/dashboard/businesses';
 
   } catch (error: any) {

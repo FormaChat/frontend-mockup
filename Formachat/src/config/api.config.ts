@@ -46,6 +46,8 @@ export const CHAT_ENDPOINTS = {
     `${API_BASE_URLS.CHAT}/business/${businessId}/session/${sessionId}`,
   BUSINESS_DASHBOARD_SUMMARY: (businessId: string) => 
     `${API_BASE_URLS.CHAT}/business/${businessId}/dashboard-summary`,
+  SESSION_DELETE: (businessId: string, sessionId: string) => 
+  `${API_BASE_URLS.CHAT}/business/${businessId}/session/${sessionId}`,
 } as const;
 
 export const HTTP_METHODS = {

@@ -5,6 +5,7 @@ import { createEmptyState } from '../../../components/empty-state';
 import { createLoadingSpinner, hideLoadingSpinner } from '../../../components/loading-spinner';
 import { showDeleteConfirmation } from '../../../components/delete-confirmation';
 import { getBusinesses, deleteBusiness } from '../../../services/business.service';
+import { showModal } from '../../../components/modal';
 
 function injectListStyles() {
   if (document.getElementById('business-list-styles')) return;
@@ -271,13 +272,21 @@ async function handleDeleteBusiness(
         
         cardElement.remove();
         
-        alert(`Business "${businessName}" deleted successfully`);
+       showModal({
+        title: 'Success',
+        content: `<p style="margin: 0;">Business "${businessName}" deleted successfully.</p>`,
+        showCloseButton: true
+      });
       } catch (error) {
        
         cardElement.style.opacity = '1';
         cardElement.style.pointerEvents = 'auto';
         
-        alert('Failed to delete business. Please try again.');
+        showModal({
+          title: 'Error',
+          content: '<p style="margin: 0;">Failed to delete business. Please try again.</p>',
+          showCloseButton: true
+        });
         console.error('Delete error:', error);
       }
     },

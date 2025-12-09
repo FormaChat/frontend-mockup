@@ -1,6 +1,7 @@
 import { createBreadcrumb } from '../../../components/breadcrumb';
 import { createLoadingSpinner, hideLoadingSpinner } from '../../../components/loading-spinner';
 import { getBusinessById } from '../../../services/business.service';
+import { showModal } from '../../../components/modal';
 import QRCode from 'qrcode';
 
 function injectChannelStyles() {
@@ -481,7 +482,11 @@ export async function renderChannelsDetail(businessId: string): Promise<HTMLElem
         btnGenerate.disabled = false;
       } catch (e) {
         console.error(e);
-        alert('Failed to generate QR code');
+        showModal({
+          title: 'Error',
+          content: '<p style="margin: 0;">Failed to generate QR code. Please try again.</p>',
+          showCloseButton: true
+        });
         btnGenerate.textContent = 'Generate QR';
         btnGenerate.disabled = false;
       }

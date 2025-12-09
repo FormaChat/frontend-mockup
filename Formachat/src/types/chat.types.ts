@@ -48,6 +48,7 @@ export interface ChatSession {
   hasUnreadMessages: boolean;
   isStarred: boolean;
   tags: string[];
+  deletedAt?: Date;
 }
 
 export interface ChatMessage {

@@ -28,6 +28,7 @@ function injectLeadDetailsStyles() {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       max-height: 70vh;
       overflow-y: auto;
+      padding-bottom: 20px;
     }
 
     /* Scrollbar Styling */
@@ -237,6 +238,12 @@ function injectLeadDetailsStyles() {
       font-size: 0.7rem;
       font-weight: 700;
       text-transform: capitalize;
+    }
+
+    .session-status-deleted { 
+      background: #fee2e2; 
+      color: #991b1b; 
+      border: 1px solid #fecaca; 
     }
 
     .session-status-active { background: var(--success); color: white; }
@@ -604,7 +611,13 @@ function buildLeadDetailsContent(
 
       const statusCell = document.createElement('div');
       statusCell.className = 'session-cell';
-      statusCell.innerHTML = `<span class="session-status-badge session-status-${session.status}">${session.status}</span>`;
+      const isDeleted = session.deletedAt;
+      if (isDeleted) {
+        statusCell.innerHTML = `<span class="session-status-badge session-status-deleted">Deleted</span>`;
+      } else {
+        statusCell.innerHTML = `<span class="session-status-badge session-status-${session.status}">${session.status}</span>`;
+      }
+  row.appendChild(statusCell);
       row.appendChild(statusCell);
 
       const arrowCell = document.createElement('div');

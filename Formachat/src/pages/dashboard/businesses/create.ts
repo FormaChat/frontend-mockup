@@ -1,6 +1,7 @@
 import { createBreadcrumb } from '../../../components/breadcrumb';
 import { createBusiness } from '../../../services/business.service';
 import type { CreateBusinessRequest } from '../../../types/business.types';
+import { showModal } from '../../../components/modal';
 
 function injectWizardStyles() {
   if (document.getElementById('business-wizard-styles')) return;
@@ -1258,8 +1259,12 @@ async function handleCreateBusiness(
     
     await createBusiness(businessData);
     
-    alert('Business created successfully!');
-    window.location.hash = '#/dashboard/businesses';
+    showModal({
+      title: 'Success',
+      content: '<p style="margin: 0;">Business created successfully!</p>',
+      showCloseButton: true
+    });
+        window.location.hash = '#/dashboard/businesses';
     
   } catch (error: any) {
     errorContainer.textContent = error.message || 'Failed to create business';

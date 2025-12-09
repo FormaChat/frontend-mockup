@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from '../utils/api.utils';
+import { apiDelete, apiGet, apiPost } from '../utils/api.utils';
 import { CHAT_ENDPOINTS } from '../config/api.config';
 import type { ApiResponse } from '../config/api.config';
 import type {
@@ -292,6 +292,26 @@ export const getDashboardSummary = async (
   console.log('[ChatService] ✓ Dashboard summary retrieved');
   return response.data;
 };
+
+export const deleteSession = async (
+  businessId: string,
+  sessionId: string 
+): Promise<{success: boolean; error?: any}> => {
+  console.log('[ChatService] Deleting session:', sessionId);
+
+  const response = await apiDelete(
+    CHAT_ENDPOINTS.SESSION_DELETE(businessId, sessionId)
+  );
+
+  if (response.success === false){
+    return {
+      success: false,
+      error: response.error
+    }
+  }
+  console.log('[ChatService] ✓ Session deleted');
+  return {success:true};
+}
 
 
 export default {

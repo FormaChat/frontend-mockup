@@ -3,11 +3,8 @@ import { createLoadingSpinner, hideLoadingSpinner } from '../../../components/lo
 import { showSessionDetailsModal } from '../../../components/session-details-modal'; 
 import { getBusinessById } from '../../../services/business.service';
 import { showLeadDetailsModal } from '../../../components/lead-details-modal';
-
-import { 
-  
-  getDashboardSummary
-} from '../../../services/chat.service';
+import { getDashboardSummary} from '../../../services/chat.service';
+import { showModal } from '../../../components/modal';
 
 function formatDateTime(dateString: string | Date): string {
     const date = new Date(dateString);
@@ -252,8 +249,39 @@ function injectAnalyticsDetailStyles() {
             display: block;
         }
         .modal-content .table-row {
-            grid-template-columns: 120px 100px 80px 1fr 150px;
+            grid-template-columns: 40px 120px 100px 80px 1fr 150px;
         }
+
+        .header-delete-btn {
+            margin-right: auto; /* Pushes it to the left, near title */
+            margin-left: 15px;
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: none; /* Hidden by default */
+            align-items: center;
+            gap: 6px;
+            animation: fadeIn 0.2s;
+        }
+
+        .header-delete-btn.visible {
+            display: flex;
+        }
+
+        /* 3. Checkbox Style */
+        .row-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+
+
     `;
     document.head.appendChild(style);
 }
@@ -546,9 +574,16 @@ function createStatCard(label: string, value: string, change: string): HTMLEleme
 }
 
 async function showAllSessionsModal(businessId: string): Promise<void> {
-    const { showModal } = await import('../../../components/modal');
-    const { getBusinessSessions } = await import('../../../services/chat.service');
+    
+    const { getBusinessSessions, deleteSession } = await import('../../../services/chat.service');
     const { createLoadingSpinner } = await import('../../../components/loading-spinner');
+    
+    // 1. IMPORT CUSTOM CONFIRMATION
+    const { showDeleteConfirmation } = await import('../../../components/delete-confirmation'); 
+
+    // 2. STATE MANAGEMENT & FLAG
+    let hasDeletedItems = false; // <--- The flag to track if we need a reload
+    const selectedSessionIds = new Set<string>();
 
     const loadingContent = document.createElement('div');
     loadingContent.style.padding = '40px';
@@ -556,73 +591,232 @@ async function showAllSessionsModal(businessId: string): Promise<void> {
     const spinner = createLoadingSpinner('Loading all sessions...');
     loadingContent.appendChild(spinner);
 
-    const modal = showModal({
+    // 3. MODAL CONFIGURATION WITH RELOAD LOGIC
+    const modalOverlay = showModal({
         title: 'All Sessions',
         content: loadingContent,
-        showCloseButton: true
+        showCloseButton: true,
+        onClose: () => {
+            // If the user deleted anything, refresh the entire dashboard when they close the modal
+            if (hasDeletedItems) {
+                window.location.reload();
+            }
+        }
     });
 
-    try {
-        const sessions = await getBusinessSessions(businessId, undefined, 1, 100);
+    // INJECT DELETE BUTTON INTO HEADER
+    const modalHeader = modalOverlay.querySelector('.modal-header');
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'header-delete-btn';
+    deleteBtn.innerHTML = `
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        </svg>
+        Delete Selected
+    `;
+    
+    const titleEl = modalHeader?.querySelector('h2');
+    if (titleEl && titleEl.nextSibling) {
+        modalHeader?.insertBefore(deleteBtn, titleEl.nextSibling);
+    } else {
+        modalHeader?.appendChild(deleteBtn);
+    }
 
-        const tableContainer = document.createElement('div');
-        tableContainer.className = 'sessions-table';
-        
-        const tableHeader = document.createElement('div');
-        tableHeader.className = 'table-row table-header';
-        tableHeader.innerHTML = `
-            <div class="table-cell">ID</div>
-            <div class="table-cell">Status</div>
-            <div class="table-cell">Msgs</div>
-            <div class="table-cell">Contact</div>
-            <div class="table-cell">Started At</div>
-        `;
-        tableContainer.appendChild(tableHeader);
-
-        sessions.forEach(session => {
-            const row = document.createElement('div');
-            row.className = 'table-row';
-            row.style.cursor = 'pointer';
-
-            const contact = session.contact;
-            let contactDisplay = '-';
-            let contactClass = 'contact-not-captured';
-            
-            if (contact?.email) {
-                contactDisplay = contact.email;
-                contactClass = 'contact-captured';
-            } else if (contact?.phone) {
-                contactDisplay = contact.phone;
-                contactClass = 'contact-captured';
-            }
-
-            row.innerHTML = `
-                <div class="table-cell" title="${session.sessionId}">${session.sessionId.substring(0, 8)}...</div>
-                <div class="table-cell"><span class="status-badge status-${session.status}">${session.status}</span></div>
-                <div class="table-cell">${session.messageCount}</div>
-                <div class="table-cell ${contactClass}">${contactDisplay}</div>
-                <div class="table-cell">${formatDateTime(session.startedAt)}</div>
-            `;
-
-            row.addEventListener('click', async () => {
-                await showSessionDetailsModal(businessId, session.sessionId);
-            });
-
-            tableContainer.appendChild(row);
-        });
-
-        const modalContent = modal.querySelector('.modal-content');
+    const refreshList = async () => {
+        const modalContent = modalOverlay.querySelector('.modal-content');
         if (modalContent) {
             modalContent.innerHTML = '';
-            modalContent.appendChild(tableContainer);
+            modalContent.appendChild(createLoadingSpinner('Refreshing...'));
         }
-    } catch (error) {
-        console.error('Failed to load sessions:', error);
-        const modalContent = modal.querySelector('.modal-content');
-        if (modalContent) {
-            modalContent.innerHTML = '<p class="error-message">Failed to load sessions.</p>';
+        await loadSessions();
+    };
+
+    // --- DELETE LOGIC ---
+    deleteBtn.addEventListener('click', async () => {
+        const count = selectedSessionIds.size;
+        if (count === 0) return;
+
+        showDeleteConfirmation({
+            itemName: `${count} Selected Sessions`,
+            onConfirm: async () => {
+                try {
+                    deleteBtn.textContent = 'Deleting...';
+                    deleteBtn.disabled = true;
+
+                    // Execute all deletions and track results
+                    const deleteResults = await Promise.allSettled(
+                        Array.from(selectedSessionIds).map(id => deleteSession(businessId, id))
+                    );
+
+                    // Count successes and failures
+                    let successCount = 0;
+                    let skippedWithLeads = 0;
+                    let otherFailures = 0;
+
+                    deleteResults.forEach((result) => {
+                        if (result.status === 'fulfilled') {
+                            if (result.value.success) {
+                                successCount++;
+                            } else if (result.value.error?.code === 'SESSION_HAS_LEADS') {
+                                skippedWithLeads++;
+                            } else {
+                                otherFailures++;
+                            }
+                        } else {
+                            otherFailures++;
+                        }
+                    });
+
+                    // Update the flag if anything was deleted
+                    if (successCount > 0) {
+                        hasDeletedItems = true;
+                    }
+
+                    // Clear selection and refresh list
+                    selectedSessionIds.clear();
+                    deleteBtn.classList.remove('visible');
+                    deleteBtn.innerHTML = `Delete Selected`;
+                    deleteBtn.disabled = false;
+                    
+                    await refreshList();
+
+                    // Show summary message
+                    let message = '';
+                    if (successCount > 0) {
+                        message += `✓ ${successCount} session(s) deleted successfully.\n`;
+                    }
+                    if (skippedWithLeads > 0) {
+                        message += ` * ${skippedWithLeads} session(s) skipped (contain leads).\n`;
+                    }
+                    if (otherFailures > 0) {
+                        message += `✗ ${otherFailures} session(s) failed to delete.`;
+                    }
+
+                    showModal({
+                        title: 'Deletion Summary',
+                        content: `<p style="margin: 0; white-space: pre-line;">${message.trim()}</p>`,
+                        showCloseButton: true
+                    });
+
+                } catch (error) {
+                    console.error(error);
+                    showModal({
+                        title: 'Error',
+                        content: '<p style="margin: 0;">An unexpected error occurred during deletion.</p>',
+                        showCloseButton: true
+                    });
+                    deleteBtn.textContent = 'Delete Selected';
+                    deleteBtn.disabled = false;
+                }
+            },
+            onCancel: () => {
+                console.log('Bulk delete cancelled');
+            }
+        });
+    });
+
+    // DATA LOADER
+    const loadSessions = async () => {
+        try {
+            selectedSessionIds.clear();
+            deleteBtn.classList.remove('visible');
+
+            const sessions = await getBusinessSessions(businessId, undefined, 1, 100);
+
+            const tableContainer = document.createElement('div');
+            tableContainer.className = 'sessions-table';
+            
+            const tableHeader = document.createElement('div');
+            tableHeader.className = 'table-row table-header';
+            tableHeader.innerHTML = `
+                <div class="table-cell"></div>
+                <div class="table-cell">ID</div>
+                <div class="table-cell">Status</div>
+                <div class="table-cell">Msgs</div>
+                <div class="table-cell">Contact</div>
+                <div class="table-cell">Started At</div>
+            `;
+            tableContainer.appendChild(tableHeader);
+
+            if (sessions.length === 0) {
+                 tableContainer.innerHTML = '<div style="padding:20px; text-align:center;">No sessions found.</div>';
+            }
+
+            sessions.forEach(session => {
+                const row = document.createElement('div');
+                row.className = 'table-row';
+                row.style.cursor = 'pointer';
+
+                const contact = session.contact;
+                let contactDisplay = '-';
+                let contactClass = 'contact-not-captured';
+                
+                if (contact?.email) {
+                    contactDisplay = contact.email;
+                    contactClass = 'contact-captured';
+                } else if (contact?.phone) {
+                    contactDisplay = contact.phone;
+                    contactClass = 'contact-captured';
+                }
+
+                row.innerHTML = `
+                    <div class="table-cell">
+                        <input type="checkbox" class="row-checkbox" value="${session.sessionId}">
+                    </div>
+                    <div class="table-cell" title="${session.sessionId}">${session.sessionId.substring(0, 8)}...</div>
+                    <div class="table-cell"><span class="status-badge status-${session.status}">${session.status}</span></div>
+                    <div class="table-cell">${session.messageCount}</div>
+                    <div class="table-cell ${contactClass}">${contactDisplay}</div>
+                    <div class="table-cell">${formatDateTime(session.startedAt)}</div>
+                `;
+
+                const checkbox = row.querySelector('.row-checkbox') as HTMLInputElement;
+                
+                // Prevent row click when clicking checkbox
+                checkbox.addEventListener('click', (e) => e.stopPropagation());
+
+                checkbox.addEventListener('change', (e) => {
+                    const checked = (e.target as HTMLInputElement).checked;
+                    if (checked) {
+                        selectedSessionIds.add(session.sessionId);
+                    } else {
+                        selectedSessionIds.delete(session.sessionId);
+                    }
+
+                    if (selectedSessionIds.size > 0) {
+                        deleteBtn.classList.add('visible');
+                        deleteBtn.innerHTML = `Delete (${selectedSessionIds.size})`;
+                    } else {
+                        deleteBtn.classList.remove('visible');
+                    }
+                });
+
+                row.addEventListener('click', async () => {
+                    // Note: We don't check hasDeletedItems here because single session deletion 
+                    // handles its own reload inside session-details-modal if you updated that too.
+                    // If not, simply closing this main modal will trigger the reload anyway.
+                    await showSessionDetailsModal(businessId, session.sessionId);
+                });
+
+                tableContainer.appendChild(row);
+            });
+
+            const modalContent = modalOverlay.querySelector('.modal-content');
+            if (modalContent) {
+                modalContent.innerHTML = '';
+                modalContent.appendChild(tableContainer);
+            }
+        } catch (error) {
+            console.error('Failed to load sessions:', error);
+            const modalContent = modalOverlay.querySelector('.modal-content');
+            if (modalContent) {
+                modalContent.innerHTML = '<p class="error-message">Failed to load sessions.</p>';
+            }
         }
-    }
+    };
+
+    await loadSessions();
 }
 
 async function showAllLeadsModal(businessId: string): Promise<void> {
