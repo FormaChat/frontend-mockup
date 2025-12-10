@@ -7,7 +7,7 @@
       position: 'bottom-right', 
       primaryColor: '#636b2f', 
       // baseUrl: 'https://formachat.com'
-      baseUrl: 'http://localhost:5173'
+      baseUrl: 'https://frontend-mockup-phi.vercel.app'
     },
     
     isOpen: false,

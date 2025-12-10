@@ -407,9 +407,9 @@ export async function renderChannelsDetail(businessId: string): Promise<HTMLElem
     grid.className = 'channels-grid';
 
 
-    const currentDomain = window.location.origin;
-    const productionDomain = 'https://formachat.com'; 
-    const localChatUrl = `${currentDomain}/#/chat/${business._id}`;
+    // const currentDomain = window.location.origin;
+    const productionDomain = 'https://frontend-mockup-phi.vercel.app'; 
+    // const localChatUrl = `${currentDomain}/#/chat/${business._id}`;
     const prodChatUrl = `${productionDomain}/#/chat/${business._id}`;
 
     const testCard = document.createElement('section');
@@ -429,7 +429,7 @@ export async function renderChannelsDetail(businessId: string): Promise<HTMLElem
       </svg>
     `;
     testBtn.addEventListener('click', () => {
-      window.open(localChatUrl, '_blank', 'width=450,height=650');
+      window.open(prodChatUrl, '_blank', 'width=450,height=650');
     });
     testCard.appendChild(testBtn);
     grid.appendChild(testCard);
@@ -542,7 +542,7 @@ export async function renderChannelsDetail(businessId: string): Promise<HTMLElem
     embedWrapper.appendChild(codeSelector);
     
     // Code snippets
-    const widgetScript = `<script src="http://localhost:5173/widget.js"></script>
+    const widgetScript = `<script src="https://frontend-mockup-phi.vercel.app/widget.js"></script>
 <script>FormachatWidget.init({ businessId: '${business._id}' });</script>`;
     
     const iframeScript = `<iframe src="${prodChatUrl}" width="100%" height="600" frameborder="0"></iframe>`;
