@@ -29,13 +29,21 @@ function injectAnalyticsDetailStyles() {
             --bg-glass: rgba(255, 255, 255, 0.85);
             --success: #10b981; /* Green for Active/Completed */
             --warning: #f59e0b; /* Yellow for Pending/In Progress */
-            --danger: #ef4444;  /* Red for Error */
+            --danger: #ef4444;  /* Red for Error */  
         }
         
+        /* Smooth fonts */
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
         .analytics-detail {
-            max-width: 1400px;
-            margin: 0 auto;
+            max-width: 1200px; /* Constrain width */
+            width: 95%; /* Mobile width */
+            margin: 0 auto; /* Center everything */
             padding-bottom: 60px;
+            font-family: 'Inter', system-ui, sans-serif;
             animation: fadeIn 0.4s ease-out;
         }
 
@@ -44,35 +52,48 @@ function injectAnalyticsDetailStyles() {
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Header */
-        .page-header h1 { 
-            font-size: 2.2rem; 
-            font-weight: 800; 
-            margin: 15px 0 25px 0; 
+        /* --- NEW: Page Header Section --- */
+        .page-header {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: linear-gradient(to bottom, transparent, rgba(99, 107, 47, 0.05));
+            border-radius: 12px;
+        }
+        .page-header h1 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin: 0 0 10px 0;
+            font-weight: 800;
+        }
+        .page-header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin: 0;
+            max-width: 600px;
+            margin: 0 auto;
         }
 
         /* Stats Grid */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 20px;
             margin-bottom: 40px;
         }
 
-        /* Stat Card (Glassmorphism) */
         .stat-card {
-            background: var(--bg-glass);
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.6);
-            border-radius: 16px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            padding: 20px;
+            text-align: center; /* Center content in cards */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            color: var(--text-main);
             transition: transform 0.2s;
         }
-        .stat-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-        }
+        
         .stat-label {
             font-size: 0.95rem;
             color: var(--text-muted);
@@ -92,13 +113,14 @@ function injectAnalyticsDetailStyles() {
             font-weight: 600;
         }
 
-        /* Main Content Layout (Sessions/Leads) */
+        /* Layout */
         .main-content-grid {
             display: grid;
             grid-template-columns: 1fr;
             gap: 30px;
         }
-        @media (min-width: 900px) {
+        
+        @media (min-width: 1024px) {
             .main-content-grid {
                 grid-template-columns: 1fr 1fr;
             }
@@ -112,7 +134,9 @@ function injectAnalyticsDetailStyles() {
             border-radius: 16px;
             padding: 25px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            
         }
+        
         .sessions-section h2, .leads-section h2 {
             font-size: 1.5rem;
             font-weight: 700;
@@ -123,59 +147,81 @@ function injectAnalyticsDetailStyles() {
             padding-bottom: 10px;
         }
 
-        /* Table Styling */
+        /* --- RESPONSIVE TABLE --- */
         .sessions-table, .leads-table {
             border-radius: 8px;
-            overflow: hidden;
+            overflow: hidden; /* Clear floats/margins */
+            border: 1px solid #eee;
             margin-bottom: 15px;
-            display: grid; 
         }
 
         .table-row {
             display: grid;
-            grid-template-columns: 100px 100px 80px 1fr 150px;
-            padding: 12px 15px;
+            padding: 14px 10px;
             align-items: center;
             border-bottom: 1px solid #eee;
-        }
-        
-        /* Updated for new leads table structure */
-        .leads-table .table-row {
-            grid-template-columns: 120px 1fr 1fr 1fr 180px;
+            gap: 10px;
+            font-size: 0.9rem;
         }
 
+       
+        .table-row {
+            grid-template-columns: 80px 1fr 100px; 
+            text-align: center;
+        }
+
+       
+        /* The header needs to match the row alignment */
         .table-header {
-            background: var(--primary-light);
+            background: #636b2f;
+            color: white;
             font-weight: 700;
-            color: var(--text-main);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
             position: sticky;
             top: 0;
             z-index: 10;
         }
-        .table-row:not(.table-header):hover {
-            background: rgba(99, 107, 47, 0.05);
-        }
+
         .table-cell {
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            color: var(--text-main);
             font-size: 0.9rem;
         }
-        
-        /* Contact captured styling */
-        .contact-captured {
-            color: var(--success);
-            font-weight: 600;
+
+        /* Utility class to hide items on mobile */
+        .desktop-only {
+            display: none;
         }
-        .contact-not-captured {
-            color: var(--text-muted);
+
+        /* DESKTOP VIEW (Screens larger than 768px) */
+        @media (min-width: 768px) {
+            .table-row {
+                /* Restore full grid layout */
+                grid-template-columns: 100px 100px 80px 1fr 150px;
+                text-align: left; /* Revert to left align on desktop if preferred */
+            }
+            
+            /* Leads table specific desktop grid */
+            .leads-table .table-row {
+                 grid-template-columns: 100px 1fr 1.5fr 120px 140px;
+            }
+
+            .desktop-only {
+                display: block; /* Show hidden items */
+            }
         }
+
+        /* Specific Cell Styling */
+        .contact-captured { color: var(--success); font-weight: 600; }
+        .contact-not-captured { color: var(--text-muted); font-style: italic; }
         
-        /* Status Badges */
         .status-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 12px;
+            padding: 4px 8px;
+            border-radius: 6px;
             font-size: 0.75rem;
             font-weight: 700;
             text-transform: capitalize;
@@ -184,7 +230,6 @@ function injectAnalyticsDetailStyles() {
         .status-error { background: var(--danger); color: white; }
         .status-pending { background: var(--warning); color: white; }
 
-        /* Buttons */
         .btn-secondary {
             background: white; 
             border: 1px solid var(--primary-light); 
@@ -199,10 +244,10 @@ function injectAnalyticsDetailStyles() {
             background: #f0f0f0;
         }
 
-        /* Lead Details Modal Styles */
         .lead-details-content {
             padding: 20px;
         }
+
         .lead-detail-row {
             display: grid;
             grid-template-columns: 150px 1fr;
@@ -210,14 +255,13 @@ function injectAnalyticsDetailStyles() {
             border-bottom: 1px solid #eee;
             gap: 20px;
         }
-        .lead-detail-row:last-child {
-            border-bottom: none;
-        }
+
         .lead-detail-label {
             font-weight: 600;
             color: var(--text-muted);
             font-size: 0.9rem;
         }
+
         .lead-detail-value {
             color: var(--text-main);
             font-size: 0.95rem;
@@ -232,6 +276,7 @@ function injectAnalyticsDetailStyles() {
             cursor: pointer;
             transition: background 0.2s;
         }
+
         .lead-detail-value.session-id:hover {
             background: #e8e8e8;
         }
@@ -242,14 +287,17 @@ function injectAnalyticsDetailStyles() {
             justify-content: flex-end;
         }
 
-        /* Modals */
-        .modal-content .sessions-table, .modal-content .leads-table {
-            max-height: 500px;
-            overflow-y: auto;
-            display: block;
-        }
+        /* Modal fixes */
         .modal-content .table-row {
-            grid-template-columns: 40px 120px 100px 80px 1fr 150px;
+             /* In modal, force a scrollable layout */
+             grid-template-columns: 100px 100px 80px 1fr 150px !important;
+        }
+        .modal-content .sessions-table, .modal-content .leads-table {
+           
+            overflow: auto;
+        }
+        .modal-content .desktop-only {
+            display: block !important; /* Show everything in modal */
         }
 
         .header-delete-btn {
@@ -273,15 +321,12 @@ function injectAnalyticsDetailStyles() {
             display: flex;
         }
 
-        /* 3. Checkbox Style */
         .row-checkbox {
             width: 18px;
             height: 18px;
             cursor: pointer;
             accent-color: var(--primary);
         }
-
-
     `;
     document.head.appendChild(style);
 }
@@ -310,10 +355,14 @@ export async function renderAnalyticsDetail(businessId: string): Promise<HTMLEle
         ]);
         container.appendChild(breadcrumb);
         
-        const heading = document.createElement('h1');
-        heading.textContent = `${business.basicInfo.businessName} Dashboard`;
-        heading.className = 'page-header';
-        container.appendChild(heading);
+        const header = document.createElement('div');
+        header.className = 'page-header';
+        header.innerHTML = `
+            <h1>Dashboard Analytics</h1>
+            <p>View your bot's performance, manage captured leads, and monitor active session messages.</p>
+        `;
+        container.appendChild(header);
+        
         
         const statsSection = document.createElement('section');
         statsSection.className = 'stats-section';
@@ -367,9 +416,9 @@ export async function renderAnalyticsDetail(businessId: string): Promise<HTMLEle
             tableHeader.innerHTML = `
                 <div class="table-cell">ID</div>
                 <div class="table-cell">Status</div>
-                <div class="table-cell">Msgs</div>
+                <div class="table-cell desktop-only">Msgs</div>
                 <div class="table-cell">Contact</div>
-                <div class="table-cell">Started At</div>
+                <div class="table-cell desktop-only">Started At</div>
             `;
             sessionsTable.appendChild(tableHeader);
             
@@ -379,7 +428,7 @@ export async function renderAnalyticsDetail(businessId: string): Promise<HTMLEle
                 
                 const sessionIdCell = document.createElement('div');
                 sessionIdCell.className = 'table-cell';
-                sessionIdCell.textContent = session.sessionId.substring(0, 8) + '...';
+                sessionIdCell.textContent = session.sessionId.substring(0, 6) + '...';
                 sessionIdCell.title = session.sessionId;
                 row.appendChild(sessionIdCell);
                 
@@ -389,7 +438,7 @@ export async function renderAnalyticsDetail(businessId: string): Promise<HTMLEle
                 row.appendChild(statusCell);
                 
                 const messagesCell = document.createElement('div');
-                messagesCell.className = 'table-cell';
+                messagesCell.className = 'table-cell desktop-only';
                 messagesCell.textContent = session.messageCount.toString();
                 row.appendChild(messagesCell);
                 
@@ -412,7 +461,7 @@ export async function renderAnalyticsDetail(businessId: string): Promise<HTMLEle
                 row.appendChild(contactCell);
                 
                 const dateCell = document.createElement('div');
-                dateCell.className = 'table-cell';
+                dateCell.className = 'table-cell desktop-only';
                 dateCell.textContent = formatDateTime(session.startedAt);
                 row.appendChild(dateCell);
                 
@@ -453,9 +502,9 @@ export async function renderAnalyticsDetail(businessId: string): Promise<HTMLEle
             tableHeader.className = 'table-row table-header';
             tableHeader.innerHTML = `
                 <div class="table-cell">Session ID</div>
-                <div class="table-cell">Name</div>
+                <div class="table-cell desktop-only">Name</div>
                 <div class="table-cell">Email</div>
-                <div class="table-cell">Phone</div>
+                <div class="table-cell desktop-only">Phone</div>
                 <div class="table-cell">Captured At</div>
             `;
             leadsTable.appendChild(tableHeader);
@@ -473,19 +522,19 @@ export async function renderAnalyticsDetail(businessId: string): Promise<HTMLEle
                 
              
                 const nameCell = document.createElement('div');
-                nameCell.className = 'table-cell';
+                nameCell.className = 'table-cell desktop-only';
                 nameCell.textContent = lead.name || '-';
                 row.appendChild(nameCell);
                 
             
                 const emailCell = document.createElement('div');
-                emailCell.className = 'table-cell';
+                emailCell.className = 'table-cell contact-captured';
                 emailCell.textContent = lead.email || '-';
                 row.appendChild(emailCell);
                 
             
                 const phoneCell = document.createElement('div');
-                phoneCell.className = 'table-cell';
+                phoneCell.className = 'table-cell desktop-only';
                 phoneCell.textContent = lead.phone || '-';
                 row.appendChild(phoneCell);
                 
@@ -733,9 +782,9 @@ async function showAllSessionsModal(businessId: string): Promise<void> {
                 <div class="table-cell"></div>
                 <div class="table-cell">ID</div>
                 <div class="table-cell">Status</div>
-                <div class="table-cell">Msgs</div>
+                <div class="table-cell desktop-only">Msgs</div>
                 <div class="table-cell">Contact</div>
-                <div class="table-cell">Started At</div>
+                <div class="table-cell desktop-only">Started At</div>
             `;
             tableContainer.appendChild(tableHeader);
 
@@ -766,9 +815,9 @@ async function showAllSessionsModal(businessId: string): Promise<void> {
                     </div>
                     <div class="table-cell" title="${session.sessionId}">${session.sessionId.substring(0, 8)}...</div>
                     <div class="table-cell"><span class="status-badge status-${session.status}">${session.status}</span></div>
-                    <div class="table-cell">${session.messageCount}</div>
+                    <div class="table-cell desktop-only">${session.messageCount}</div>
                     <div class="table-cell ${contactClass}">${contactDisplay}</div>
-                    <div class="table-cell">${formatDateTime(session.startedAt)}</div>
+                    <div class="table-cell desktop-only">${formatDateTime(session.startedAt)}</div>
                 `;
 
                 const checkbox = row.querySelector('.row-checkbox') as HTMLInputElement;
