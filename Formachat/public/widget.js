@@ -105,7 +105,7 @@
       
       return `
         position: fixed;
-        bottom: 20px;
+        bottom: 10px;
         right: ${right};
         left: ${left};
         z-index: 999999;
@@ -138,11 +138,10 @@
         position: absolute;
         bottom: 80px;
         right: 0;
-        width: ${isOpen ? '380px' : '0'};
-        height: ${isOpen ? '650px' : '0'};
+        width: ${isOpen ? '400px' : '0'};
+        height: ${isOpen ? '900px' : '0'};
         max-height: calc(100vh - 120px);
         max-width: calc(100vw - 40px);
-        border-radius: 16px; /* Softer corners */
         /* Deep, soft shadow for floating effect */
         box-shadow: ${isOpen ? '0 12px 48px rgba(0, 0, 0, 0.12)' : 'none'};
         opacity: ${isOpen ? '1' : '0'};
@@ -150,7 +149,7 @@
         transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* Smooth spring-like open */
         transform: ${isOpen ? 'translateY(0)' : 'translateY(20px)'}; /* Slide up effect */
         background: white;
-        overflow: hidden;
+        
       `;
     }
   };

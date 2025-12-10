@@ -21,21 +21,16 @@ function injectLeadDetailsStyles() {
       --danger: #ef4444;
     }
 
+    /* UPDATED CONTAINER: Removed max-height and overflow to prevent double scrollbar */
     .lead-details-container {
       display: flex;
       flex-direction: column;
       gap: 24px;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      max-height: 70vh;
-      overflow-y: auto;
+      /* max-height: 70vh;  <-- REMOVED */
+      /* overflow-y: auto;  <-- REMOVED */
       padding-bottom: 20px;
-    }
-
-    /* Scrollbar Styling */
-    .lead-details-container::-webkit-scrollbar { width: 6px; }
-    .lead-details-container::-webkit-scrollbar-thumb { 
-      background: var(--secondary); 
-      border-radius: 3px; 
+      width: 100%; /* Ensure it fills the modal width */
     }
 
     /* --- INFO CARDS (Glassmorphism) --- */
@@ -48,12 +43,20 @@ function injectLeadDetailsStyles() {
       box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     }
 
+    /* Header for cards (Title + Action) */
+    .card-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
     .lead-section-title {
       font-size: 0.85rem;
       text-transform: uppercase;
       letter-spacing: 1px;
       color: var(--text-muted);
-      margin: 0 0 15px 0;
+      margin: 0; 
       font-weight: 700;
       display: flex;
       align-items: center;
@@ -64,15 +67,15 @@ function injectLeadDetailsStyles() {
     .contact-info-grid {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 15px;
+      gap: 12px;
     }
 
     .contact-info-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid rgba(0,0,0,0.05);
+      padding: 8px 0;
+      border-bottom: 1px dashed rgba(0,0,0,0.1);
     }
 
     .contact-info-row:last-child {
@@ -91,7 +94,9 @@ function injectLeadDetailsStyles() {
       color: var(--text-main);
       font-weight: 500;
       flex: 1;
+      text-align: right;
       word-break: break-all;
+      margin-left: 10px;
     }
 
     .contact-value.empty {
@@ -99,48 +104,39 @@ function injectLeadDetailsStyles() {
       font-style: italic;
     }
 
-    /* Copy Button */
-    .copy-btn {
-      background: white;
-      border: 1px solid var(--secondary);
+    /* Copy Button (Icon only style) */
+    .copy-btn-icon {
+      background: transparent;
+      border: none;
       color: var(--primary);
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 0.75rem;
-      font-weight: 600;
       cursor: pointer;
+      padding: 4px;
+      margin-left: 8px;
+      opacity: 0.7;
       transition: all 0.2s;
+    }
+    .copy-btn-icon:hover { opacity: 1; transform: scale(1.1); }
+    
+    .value-wrapper {
       display: flex;
       align-items: center;
-      gap: 4px;
+      justify-content: flex-end;
+      flex: 1;
     }
 
-    .copy-btn:hover {
-      background: var(--secondary);
-      color: white;
+    /* Lead Status Text */
+    .lead-status-text {
+      font-weight: 800;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
-
-    .copy-btn.copied {
-      background: var(--success);
-      color: white;
-      border-color: var(--success);
-    }
-
-    /* Status Badge */
-    .lead-status-badge {
-      display: inline-block;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: capitalize;
-    }
-
-    .status-new { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
-    .status-contacted { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
-    .status-qualified { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
-    .status-converted { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
-    .status-spam { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+    .text-new { color: #2563eb; } 
+    .text-contacted { color: #d97706; } 
+    .text-qualified { color: #059669; } 
+    .text-converted { color: #15803d; } 
+    .text-spam { color: #dc2626; } 
+    .text-trusted { color: #7c3aed; } 
 
     /* --- METRICS GRID --- */
     .metrics-grid {
@@ -168,13 +164,6 @@ function injectLeadDetailsStyles() {
     }
 
     /* --- SESSION HISTORY TABLE --- */
-    .session-history-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
     .session-count {
       font-size: 0.85rem;
       color: var(--text-muted);
@@ -184,11 +173,12 @@ function injectLeadDetailsStyles() {
     .sessions-table {
       border-radius: 8px;
       overflow: hidden;
+      border: 1px solid rgba(0,0,0,0.05);
     }
 
     .session-table-row {
       display: grid;
-      grid-template-columns: 120px 1fr 80px 100px 40px;
+      grid-template-columns: 100px 1fr 60px 80px 30px; 
       padding: 12px 15px;
       align-items: center;
       border-bottom: 1px solid #eee;
@@ -196,10 +186,11 @@ function injectLeadDetailsStyles() {
     }
 
     .session-table-header {
-      background: var(--secondary);
+      background: #f8f9fa;
       font-weight: 700;
-      color: var(--text-main);
-      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
     }
 
     .session-table-row:not(.session-table-header) {
@@ -222,6 +213,7 @@ function injectLeadDetailsStyles() {
       font-family: 'Courier New', monospace;
       font-size: 0.85rem;
       color: var(--primary);
+      font-weight: 600;
     }
 
     .session-arrow {
@@ -233,22 +225,16 @@ function injectLeadDetailsStyles() {
     /* Session Status Badges */
     .session-status-badge {
       display: inline-block;
-      padding: 4px 8px;
+      padding: 3px 8px;
       border-radius: 12px;
       font-size: 0.7rem;
       font-weight: 700;
       text-transform: capitalize;
     }
-
-    .session-status-deleted { 
-      background: #fee2e2; 
-      color: #991b1b; 
-      border: 1px solid #fecaca; 
-    }
-
-    .session-status-active { background: var(--success); color: white; }
-    .session-status-ended { background: #9ca3af; color: white; }
-    .session-status-abandoned { background: var(--warning); color: white; }
+    .session-status-deleted { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+    .session-status-active { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+    .session-status-ended { background: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; }
+    .session-status-abandoned { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
 
     /* Empty State */
     .sessions-empty-state {
@@ -258,107 +244,65 @@ function injectLeadDetailsStyles() {
       font-style: italic;
     }
 
-    /* --- EXPORT BUTTON --- */
-    .lead-export-btn {
-      width: 100%;
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 8px;
+    /* --- EXPORT BUTTON (Small Header Version) --- */
+    .lead-export-btn-sm {
+      background: transparent;
+      color: var(--primary);
+      border: 1px solid var(--primary);
+      padding: 4px 10px;
+      border-radius: 6px;
       font-weight: 600;
-      font-size: 0.95rem;
+      font-size: 0.75rem;
       cursor: pointer;
       transition: all 0.2s;
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 8px;
+      gap: 6px;
     }
 
-    .lead-export-btn:hover {
-      background: #4a5224;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    .lead-export-btn-sm:hover {
+      background: var(--primary);
+      color: white;
     }
 
-    /* Loading state in modal */
-    .lead-loading-container {
-      padding: 60px 20px;
-      text-align: center;
-    }
-
-    /* Error state */
-    .lead-error-message {
-      padding: 30px;
-      text-align: center;
-      color: var(--danger);
-    }
+    /* Loading/Error */
+    .lead-loading-container { padding: 60px 20px; text-align: center; }
+    .lead-error-message { padding: 30px; text-align: center; color: var(--danger); }
   `;
   document.head.appendChild(style);
 }
-
 function formatDate(dateString: string | Date): string {
   const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric'
-  });
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 function formatDateTime(dateString: string | Date): string {
   const date = new Date(dateString);
-  return date.toLocaleString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true
-  });
+  return date.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true });
 }
 
-
-async function copyToClipboard(text: string, button: HTMLButtonElement): Promise<void> {
+async function copyToClipboard(text: string, button: HTMLElement): Promise<void> {
   try {
     await navigator.clipboard.writeText(text);
-    
-    const originalHTML = button.innerHTML;
-    button.innerHTML = '✓ Copied!';
-    button.classList.add('copied');
-    
+    const originalContent = button.innerHTML;
+    button.innerHTML = '✓'; 
+    button.style.color = 'var(--success)';
     setTimeout(() => {
-      button.innerHTML = originalHTML;
-      button.classList.remove('copied');
+      button.innerHTML = originalContent;
+      button.style.color = '';
     }, 2000);
   } catch (error) {
     console.error('Failed to copy:', error);
-    button.innerHTML = '✗ Failed';
-    setTimeout(() => {
-      button.innerHTML = '📋 Copy';
-    }, 2000);
   }
 }
 
-function filterSessionsForLead(
-  allSessions: ChatSession[],
-  lead: ContactLead
-): ChatSession[] {
+function filterSessionsForLead(allSessions: ChatSession[], lead: ContactLead): ChatSession[] {
   return allSessions.filter(session => {
-    
-    if (lead.email && session.contact?.email === lead.email) {
-      return true;
-    }
-    
-    if (lead.phone && session.contact?.phone === lead.phone) {
-      return true;
-    }
-    
+    if (lead.email && session.contact?.email === lead.email) return true;
+    if (lead.phone && session.contact?.phone === lead.phone) return true;
     return false;
   });
 }
-
 
 function exportLeadToCSV(lead: ContactLead): void {
   const headers = ['Field', 'Value'];
@@ -396,109 +340,129 @@ function exportLeadToCSV(lead: ContactLead): void {
   document.body.removeChild(link);
 }
 
-function buildLeadDetailsContent(
-  lead: ContactLead,
-  leadSessions: ChatSession[],
-  businessId: string
-): HTMLElement {
+function buildLeadDetailsContent(lead: ContactLead, leadSessions: ChatSession[], businessId: string): HTMLElement {
   const container = document.createElement('div');
   container.className = 'lead-details-container';
 
+  // --- 1. CONTACT CARD (With Export Button in Header) ---
   const contactCard = document.createElement('div');
   contactCard.className = 'lead-info-card';
+
+  // Card Header Row
+  const headerRow = document.createElement('div');
+  headerRow.className = 'card-header-row';
 
   const contactTitle = document.createElement('h4');
   contactTitle.className = 'lead-section-title';
   contactTitle.innerHTML = `
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-      <circle cx="12" cy="7" r="4"></circle>
-    </svg>
-    Contact Information
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+    Contact Info
   `;
-  contactCard.appendChild(contactTitle);
+  headerRow.appendChild(contactTitle);
 
+  // EXPORT BUTTON (Moved Here)
+  const exportBtn = document.createElement('button');
+  exportBtn.className = 'lead-export-btn-sm';
+  exportBtn.innerHTML = `
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+    Export
+  `;
+  exportBtn.addEventListener('click', () => exportLeadToCSV(lead));
+  headerRow.appendChild(exportBtn);
+
+  contactCard.appendChild(headerRow);
+
+  // Contact Info Grid
   const contactGrid = document.createElement('div');
   contactGrid.className = 'contact-info-grid';
 
+  // Name
   const nameRow = document.createElement('div');
   nameRow.className = 'contact-info-row';
   nameRow.innerHTML = `
-    <span class="contact-label">Name:</span>
+    <span class="contact-label">Name</span>
     <span class="contact-value ${!lead.name ? 'empty' : ''}">${lead.name || 'Not provided'}</span>
   `;
   contactGrid.appendChild(nameRow);
 
+  // Email
   if (lead.email) {
     const emailRow = document.createElement('div');
     emailRow.className = 'contact-info-row';
     
-    const emailLabel = document.createElement('span');
-    emailLabel.className = 'contact-label';
-    emailLabel.textContent = 'Email:';
+    const label = document.createElement('span');
+    label.className = 'contact-label';
+    label.textContent = 'Email';
+    emailRow.appendChild(label);
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'value-wrapper';
     
-    const emailValue = document.createElement('span');
-    emailValue.className = 'contact-value';
-    emailValue.textContent = lead.email;
+    const value = document.createElement('span');
+    value.textContent = lead.email;
+    value.style.fontSize = '0.95rem';
     
-    const copyEmailBtn = document.createElement('button');
-    copyEmailBtn.className = 'copy-btn';
-    copyEmailBtn.innerHTML = '📋 Copy';
-    copyEmailBtn.addEventListener('click', () => copyToClipboard(lead.email!, copyEmailBtn));
-    
-    emailRow.appendChild(emailLabel);
-    emailRow.appendChild(emailValue);
-    emailRow.appendChild(copyEmailBtn);
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'copy-btn-icon';
+    copyBtn.title = 'Copy Email';
+    copyBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+    copyBtn.onclick = () => copyToClipboard(lead.email!, copyBtn);
+
+    wrapper.appendChild(value);
+    wrapper.appendChild(copyBtn);
+    emailRow.appendChild(wrapper);
     contactGrid.appendChild(emailRow);
   }
 
+  // Phone
   if (lead.phone) {
     const phoneRow = document.createElement('div');
     phoneRow.className = 'contact-info-row';
     
-    const phoneLabel = document.createElement('span');
-    phoneLabel.className = 'contact-label';
-    phoneLabel.textContent = 'Phone:';
+    const label = document.createElement('span');
+    label.className = 'contact-label';
+    label.textContent = 'Phone';
+    phoneRow.appendChild(label);
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'value-wrapper';
     
-    const phoneValue = document.createElement('span');
-    phoneValue.className = 'contact-value';
-    phoneValue.textContent = lead.phone;
+    const value = document.createElement('span');
+    value.textContent = lead.phone;
+    value.style.fontSize = '0.95rem';
     
-    const copyPhoneBtn = document.createElement('button');
-    copyPhoneBtn.className = 'copy-btn';
-    copyPhoneBtn.innerHTML = '📋 Copy';
-    copyPhoneBtn.addEventListener('click', () => copyToClipboard(lead.phone!, copyPhoneBtn));
-    
-    phoneRow.appendChild(phoneLabel);
-    phoneRow.appendChild(phoneValue);
-    phoneRow.appendChild(copyPhoneBtn);
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'copy-btn-icon';
+    copyBtn.title = 'Copy Phone';
+    copyBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+    copyBtn.onclick = () => copyToClipboard(lead.phone!, copyBtn);
+
+    wrapper.appendChild(value);
+    wrapper.appendChild(copyBtn);
+    phoneRow.appendChild(wrapper);
     contactGrid.appendChild(phoneRow);
   }
 
+  // Status (New Text Style)
   const statusRow = document.createElement('div');
   statusRow.className = 'contact-info-row';
   statusRow.innerHTML = `
-    <span class="contact-label">Status:</span>
-    <span class="lead-status-badge status-${lead.status}">${lead.status}</span>
+    <span class="contact-label">Status</span>
+    <span class="lead-status-text text-${lead.status}">${lead.status}</span>
   `;
   contactGrid.appendChild(statusRow);
 
   contactCard.appendChild(contactGrid);
   container.appendChild(contactCard);
 
+
+  // --- 2. METRICS CARD ---
   const metricsCard = document.createElement('div');
   metricsCard.className = 'lead-info-card';
 
   const metricsTitle = document.createElement('h4');
   metricsTitle.className = 'lead-section-title';
-  metricsTitle.innerHTML = `
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <line x1="12" y1="20" x2="12" y2="10"></line>
-      <line x1="18" y1="20" x2="18" y2="4"></line>
-      <line x1="6" y1="20" x2="6" y2="16"></line>
-    </svg>
-    Engagement Metrics
-  `;
+  metricsTitle.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg> Engagement`;
   metricsCard.appendChild(metricsTitle);
 
   const metricsGrid = document.createElement('div');
@@ -513,15 +477,12 @@ function buildLeadDetailsContent(
   metrics.forEach(metric => {
     const metricItem = document.createElement('div');
     metricItem.className = 'metric-item';
-    metricItem.innerHTML = `
-      <span class="metric-label">${metric.label}</span>
-      <span class="metric-value">${metric.value}</span>
-    `;
+    metricItem.innerHTML = `<span class="metric-label">${metric.label}</span><span class="metric-value">${metric.value}</span>`;
     metricsGrid.appendChild(metricItem);
   });
-
   metricsCard.appendChild(metricsGrid);
 
+  // Dates Divider
   const datesGrid = document.createElement('div');
   datesGrid.className = 'metrics-grid';
   datesGrid.style.marginTop = '15px';
@@ -536,32 +497,25 @@ function buildLeadDetailsContent(
   dates.forEach(date => {
     const dateItem = document.createElement('div');
     dateItem.className = 'metric-item';
-    dateItem.innerHTML = `
-      <span class="metric-label">${date.label}</span>
-      <span class="metric-value" style="font-size: 1rem;">${date.value}</span>
-    `;
+    dateItem.innerHTML = `<span class="metric-label">${date.label}</span><span class="metric-value" style="font-size: 1rem;">${date.value}</span>`;
     datesGrid.appendChild(dateItem);
   });
-
   metricsCard.appendChild(datesGrid);
   container.appendChild(metricsCard);
 
+
+  // --- 3. SESSION HISTORY ---
   const sessionsCard = document.createElement('div');
   sessionsCard.className = 'lead-info-card';
 
   const sessionsHeader = document.createElement('div');
-  sessionsHeader.className = 'session-history-header';
+  sessionsHeader.className = 'card-header-row';
+  sessionsHeader.style.marginBottom = '10px';
 
   const sessionsTitle = document.createElement('h4');
   sessionsTitle.className = 'lead-section-title';
-  sessionsTitle.style.margin = '0';
-  sessionsTitle.innerHTML = `
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-    </svg>
-    Session History
-  `;
-
+  sessionsTitle.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg> Session History`;
+  
   const sessionCount = document.createElement('span');
   sessionCount.className = 'session-count';
   sessionCount.textContent = `${leadSessions.length} session${leadSessions.length !== 1 ? 's' : ''}`;
@@ -577,7 +531,7 @@ function buildLeadDetailsContent(
     const tableHeader = document.createElement('div');
     tableHeader.className = 'session-table-row session-table-header';
     tableHeader.innerHTML = `
-      <div class="session-cell">Session ID</div>
+      <div class="session-cell">ID</div>
       <div class="session-cell">Date</div>
       <div class="session-cell">Msgs</div>
       <div class="session-cell">Status</div>
@@ -609,6 +563,7 @@ function buildLeadDetailsContent(
       msgsCell.textContent = session.messageCount.toString();
       row.appendChild(msgsCell);
 
+      // Status Logic
       const statusCell = document.createElement('div');
       statusCell.className = 'session-cell';
       const isDeleted = session.deletedAt;
@@ -617,7 +572,6 @@ function buildLeadDetailsContent(
       } else {
         statusCell.innerHTML = `<span class="session-status-badge session-status-${session.status}">${session.status}</span>`;
       }
-  row.appendChild(statusCell);
       row.appendChild(statusCell);
 
       const arrowCell = document.createElement('div');
@@ -642,29 +596,13 @@ function buildLeadDetailsContent(
 
   container.appendChild(sessionsCard);
 
-  const exportBtn = document.createElement('button');
-  exportBtn.className = 'lead-export-btn';
-  exportBtn.innerHTML = `
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-      <polyline points="7 10 12 15 17 10"></polyline>
-      <line x1="12" y1="15" x2="12" y2="3"></line>
-    </svg>
-    Export Lead Data
-  `;
-  exportBtn.addEventListener('click', () => exportLeadToCSV(lead));
-  container.appendChild(exportBtn);
+  // Removed the previous bottom export button
 
   return container;
 }
 
-
-export async function showLeadDetailsModal(
-  lead: ContactLead,
-  businessId: string
-): Promise<void> {
+export async function showLeadDetailsModal(lead: ContactLead, businessId: string): Promise<void> {
   injectLeadDetailsStyles();
-
 
   const loadingContent = document.createElement('div');
   loadingContent.className = 'lead-loading-container';
@@ -680,9 +618,7 @@ export async function showLeadDetailsModal(
 
   try {
     const allSessions = await getBusinessSessions(businessId, undefined, 1, 1000);
-
     const leadSessions = filterSessionsForLead(allSessions, lead);
-
     const content = buildLeadDetailsContent(lead, leadSessions, businessId);
 
     const modalContent = modal.querySelector('.modal-content');
@@ -692,7 +628,6 @@ export async function showLeadDetailsModal(
     }
   } catch (error) {
     console.error('Failed to load lead details:', error);
-
     const errorContent = document.createElement('div');
     errorContent.className = 'lead-error-message';
     errorContent.innerHTML = `
@@ -700,7 +635,6 @@ export async function showLeadDetailsModal(
       <h3 style="margin: 0; color: #dc2626;">Failed to load lead details</h3>
       <p style="color: #666;">Please check your connection and try again.</p>
     `;
-
     const modalContent = modal.querySelector('.modal-content');
     if (modalContent) {
       modalContent.innerHTML = '';
