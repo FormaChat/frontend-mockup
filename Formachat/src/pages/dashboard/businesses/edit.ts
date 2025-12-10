@@ -116,6 +116,7 @@ function injectEditWizardStyles() {
       font-family: inherit;
       box-sizing: border-box;
       transition: all 0.2s ease;
+      color: black;
     }
 
     input:focus, textarea:focus, select:focus {
