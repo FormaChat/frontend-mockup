@@ -66,6 +66,7 @@ function injectRegisterStyles() {
             background: var(--bg-light);
             transition: all 0.3s ease;
             font-size: 1rem;
+            color: black;
         }
 
         .form-input:focus {
