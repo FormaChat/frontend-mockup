@@ -17,6 +17,8 @@ export function renderHome(): HTMLElement {
       padding: 40px 20px;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       overflow: hidden; /* Prevents animation scrollbars */
+      min-height: 100vh; /* Add this - ensures container fills viewport */
+      overflow-x: hidden;
     }
 
     /* Animations */
