@@ -1,7 +1,7 @@
 export const API_BASE_URLS = {
-  AUTH: 'http://localhost:4000/api/v1/auth',
-  BUSINESS: 'http://localhost:4001/api/v1',
-  CHAT: 'http://localhost:4002/api/chat',
+  AUTH: 'https://formachat-app-backend.onrender.com/api/v1/auth',
+  BUSINESS: 'https://formachat-business.onrender.com/api/v1',
+  CHAT: 'https://formachat-chat.onrender.com/api/chat',
 } as const;
 
 export const AUTH_ENDPOINTS = {
