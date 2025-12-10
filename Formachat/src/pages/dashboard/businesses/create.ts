@@ -158,6 +158,7 @@ function injectWizardStyles() {
       font-family: inherit;
       transition: all 0.2s ease;
       box-sizing: border-box;
+      color: black;
     }
 
     input:focus, textarea:focus, select:focus {
