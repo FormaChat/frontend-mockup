@@ -220,7 +220,7 @@ export function renderHome(): HTMLElement {
       transform: translateX(-50%);
       width: 60%;
       height: 180px;
-      background: 
+     
     linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(243,244,246,0.3) 100%),
     url('/assets/shot1.png') center/cover no-repeat;
       backdrop-filter: blur(10px);

@@ -43,7 +43,7 @@ h1 {
 
 @media (prefers-color-scheme: light) {
   :root {
-    color: #213547;
+    color: #f5f5f5;
     background-color: #f5f5f5;
   }
   
