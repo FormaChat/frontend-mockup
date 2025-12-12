@@ -143,6 +143,35 @@ function injectLoginStyles() {
             color: #4f5625;
             text-decoration: underline;
         }
+
+         /* Password Toggle Button */
+        .password-toggle-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            transition: color 0.2s ease;
+        }
+
+        .password-toggle-btn:hover {
+            color: var(--primary);
+        }
+
+        .password-toggle-btn:focus {
+            outline: none;
+        }
+
+        .eye-icon {
+            pointer-events: none;
+        }
     `;
     document.head.appendChild(style);
 }
@@ -152,7 +181,6 @@ export function renderLogin(): HTMLElement {
 
     const container = document.createElement('div');
     container.className = 'login-container';
-
 
     const title = document.createElement('h1');
     title.textContent = 'Welcome Back'; 
@@ -166,6 +194,7 @@ export function renderLogin(): HTMLElement {
 
     const form = document.createElement('form');
 
+    // === EMAIL FIELD ===
     const emailDiv = document.createElement('div');
     emailDiv.className = 'form-group';
 
@@ -184,6 +213,7 @@ export function renderLogin(): HTMLElement {
 
     form.appendChild(emailDiv);
 
+    // === PASSWORD FIELD WITH TOGGLE ===
     const passwordDiv = document.createElement('div');
     passwordDiv.className = 'form-group';
 
@@ -192,29 +222,70 @@ export function renderLogin(): HTMLElement {
     passwordLabel.className = 'form-label';
     passwordDiv.appendChild(passwordLabel);
 
+    // Create wrapper for input + toggle button
+    const inputWrapper = document.createElement('div');
+    inputWrapper.style.position = 'relative';
+
     const passwordInput = document.createElement('input');
     passwordInput.type = 'password';
     passwordInput.name = 'password';
     passwordInput.required = true;
     passwordInput.className = 'form-input';
-    passwordInput.placeholder = '••••••••'; 
-    passwordDiv.appendChild(passwordInput);
+    passwordInput.placeholder = 'password';
+    passwordInput.style.paddingRight = '45px'; // Make room for the icon
+
+    const toggleBtn = document.createElement('button');
+    toggleBtn.type = 'button';
+    toggleBtn.className = 'password-toggle-btn';
+    toggleBtn.innerHTML = `
+        <svg class="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+            <line x1="1" y1="1" x2="23" y2="23"></line>
+        </svg>
+    `;
+
+    toggleBtn.addEventListener('click', () => {
+        if (passwordInput.type === 'password') {
+            // Show password → use open eye
+            passwordInput.type = 'text';
+            toggleBtn.innerHTML = `
+                <svg class="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+            `;
+        } else {
+            // Hide password → use crossed eye
+            passwordInput.type = 'password';
+            toggleBtn.innerHTML = `
+                <svg class="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+            `;
+        }
+    });
+
+    inputWrapper.appendChild(passwordInput);
+    inputWrapper.appendChild(toggleBtn);
+    passwordDiv.appendChild(inputWrapper);
 
     form.appendChild(passwordDiv);
 
-
+    // === ERROR MESSAGE ===
     const errorDiv = document.createElement('div');
     errorDiv.className = 'error-message';
     errorDiv.style.display = 'none';
     form.appendChild(errorDiv);
 
-
+    // === SUBMIT BUTTON ===
     const submitBtn = document.createElement('button');
     submitBtn.type = 'submit';
     submitBtn.textContent = 'Sign In'; 
     submitBtn.className = 'btn-submit';
     form.appendChild(submitBtn);
 
+    // === FORM SUBMISSION ===
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -272,6 +343,7 @@ export function renderLogin(): HTMLElement {
 
     container.appendChild(form);
 
+    // === REGISTER LINK ===
     const registerLink = document.createElement('p');
     registerLink.className = 'register-link';
     registerLink.innerHTML = `Don't have an account? <a href="#/register">Create one now</a>`;
