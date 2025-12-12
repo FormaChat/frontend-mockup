@@ -507,7 +507,7 @@ function createEditForm(business: Business): HTMLFormElement {
 
   s4.appendChild(createCheckboxGroup({
     name: 'chatbotCapabilities', label: 'Capabilities',
-    options: ['Answer FAQs', 'Book appointments', 'Generate leads'],
+    options: ['Answer FAQs', 'Generate leads', 'Handle Complaints', 'Provide product info'],
     checkedValues: business.contactEscalation.chatbotCapabilities
   }));
 

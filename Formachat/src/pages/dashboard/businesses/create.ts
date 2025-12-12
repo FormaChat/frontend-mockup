@@ -822,7 +822,7 @@ function createSection4(): HTMLElement {
   section.appendChild(createCheckboxGroup({
     name: 'chatbotCapabilities',
     label: 'Chatbot Capabilities',
-    options: ['Answer FAQs', 'Book appointments', 'Generate leads', 'Handle Complaints', 'Provide product info', 'Process orders'],
+    options: ['Answer FAQs', 'Generate leads', 'Handle Complaints', 'Provide product info'],
     helpText: 'What should your chatbot be able to do?'
   }));
   
