@@ -26,6 +26,8 @@ function injectWizardStyles() {
       max-width: 900px;
       margin: 0 auto;
       padding-bottom: 80px;
+      padding: 0 20px;
+      box-sizing: border-box;
     }
 
     /* --- 1. GLASS CONTAINER --- */
@@ -39,6 +41,14 @@ function injectWizardStyles() {
       padding: 50px;
       margin-top: 30px;
       animation: floatUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+      box-sizing: border-box; 
+      width: 100%;
+    }
+
+    @media (max-width: 768px) {
+      .wizard-container {
+        padding: 30px 20px;
+      }
     }
 
     @keyframes floatUp {
