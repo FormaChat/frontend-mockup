@@ -847,7 +847,7 @@ function createFormField(options: FormFieldOptions): HTMLElement {
   fieldWrapper.className = 'form-field';
   
   const labelElement = document.createElement('label');
-  labelElement.textContent = label + (required ? ' *' : '');
+  labelElement.innerHTML = label + (required ? ' <span style="color: #dc2626; font-weight: 700;">*</span>' : '');
   labelElement.htmlFor = name;
   fieldWrapper.appendChild(labelElement);
   

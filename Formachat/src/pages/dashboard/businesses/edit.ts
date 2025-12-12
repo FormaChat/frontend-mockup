@@ -26,7 +26,8 @@ function injectEditWizardStyles() {
     .business-edit-wizard {
       max-width: 900px;
       margin: 0 auto;
-      padding-bottom: 80px;
+      padding-bottom: 0 20px;
+      box-sizing: border-box;
     }
 
     /* Glass Container */
@@ -40,6 +41,16 @@ function injectEditWizardStyles() {
       padding: 50px;
       margin-top: 30px;
       animation: floatUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+      box-sizing: border-box; 
+      width: 100%;
+    }
+
+    
+
+    @media (max-width: 768px) {
+      .wizard-container {
+        padding: 30px 20px;
+      }
     }
 
     @keyframes floatUp {
@@ -552,7 +563,7 @@ function createFormField(opts: { type: string, name: string, label: string, requ
   div.className = 'form-field';
   
   const label = document.createElement('label');
-  label.textContent = opts.label + (opts.required ? ' *' : '');
+  label.innerHTML = opts.label + (opts.required ? ' <span style="color: #dc2626; font-weight: 700;">*</span>' : '');
   div.appendChild(label);
 
   let input: HTMLElement;
@@ -578,7 +589,7 @@ function createSelectField(opts: { name: string, label: string, options: string[
   div.className = 'form-field';
   
   const label = document.createElement('label');
-  label.textContent = opts.label + (opts.required ? ' *' : '');
+ label.innerHTML = opts.label + (opts.required ? ' <span style="color: #dc2626; font-weight: 700;">*</span>' : '');
   div.appendChild(label);
 
   const select = document.createElement('select');
