@@ -408,7 +408,7 @@ export async function renderChannelsDetail(businessId: string): Promise<HTMLElem
 
 
     // const currentDomain = window.location.origin;
-    const productionDomain = 'https://frontend-mockup-phi.vercel.app'; 
+    const productionDomain = 'https://formachat.com'; 
     // const localChatUrl = `${currentDomain}/#/chat/${business._id}`;
     const prodChatUrl = `${productionDomain}/#/chat/${business._id}`;
 
@@ -542,7 +542,7 @@ export async function renderChannelsDetail(businessId: string): Promise<HTMLElem
     embedWrapper.appendChild(codeSelector);
     
     // Code snippets
-    const widgetScript = `<script src="https://frontend-mockup-phi.vercel.app/widget.js"></script>
+    const widgetScript = `<script src="https://formachat.com/widget.js"></script>
 <script>FormachatWidget.init({ businessId: '${business._id}' });</script>`;
     
     const iframeScript = `<iframe src="${prodChatUrl}" width="100%" height="600" frameborder="0"></iframe>`;
