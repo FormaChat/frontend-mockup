@@ -41,6 +41,7 @@ function injectDeleteStyles() {
       backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.5);
       width: 80%;
+      height: 300px;
       max-width: 300px;
       padding: 30px;
       border-radius: 12px; /* ✅ Matches your cards */
