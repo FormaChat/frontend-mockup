@@ -11,7 +11,7 @@ function formatDateTime(dateString: string | Date): string {
 
     return date.toLocaleString('en-US', {
         month: 'short', day: 'numeric', year: 'numeric', 
-        hour: 'numeric', minute: '2-digit', hour12: true
+        hour: 'numeric', minute: '2-digit', 
     });
 }
 
@@ -27,21 +27,20 @@ function injectAnalyticsDetailStyles() {
             --text-main: #1a1a1a;
             --text-muted: #666;
             --bg-glass: rgba(255, 255, 255, 0.85);
-            --success: #10b981; /* Green for Active/Completed */
-            --warning: #f59e0b; /* Yellow for Pending/In Progress */
-            --danger: #ef4444;  /* Red for Error */  
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
         }
         
-        /* Smooth fonts */
         body {
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
 
         .analytics-detail {
-            max-width: 1200px; /* Constrain width */
-            width: 95%; /* Mobile width */
-            margin: 0 auto; /* Center everything */
+            max-width: 1200px;
+            width: 95%;
+            margin: 0 auto;
             padding-bottom: 60px;
             font-family: 'Inter', system-ui, sans-serif;
             animation: fadeIn 0.4s ease-out;
@@ -52,7 +51,6 @@ function injectAnalyticsDetailStyles() {
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* --- NEW: Page Header Section --- */
         .page-header {
             text-align: center;
             margin: 30px 0;
@@ -86,11 +84,9 @@ function injectAnalyticsDetailStyles() {
             background: white;
             border: 1px solid #e5e7eb;
             border-radius: 12px;
-            backdrop-filter: blur(10px);
             padding: 20px;
-            text-align: center; /* Center content in cards */
+            text-align: center;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            color: var(--text-main);
             transition: transform 0.2s;
         }
         
@@ -134,7 +130,6 @@ function injectAnalyticsDetailStyles() {
             border-radius: 16px;
             padding: 25px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            
         }
         
         .sessions-section h2, .leads-section h2 {
@@ -147,10 +142,10 @@ function injectAnalyticsDetailStyles() {
             padding-bottom: 10px;
         }
 
-        /* --- RESPONSIVE TABLE --- */
+        /* ========== TABLE STYLING ========== */
         .sessions-table, .leads-table {
             border-radius: 8px;
-            overflow: hidden; /* Clear floats/margins */
+            overflow: hidden;
             border: 1px solid #eee;
             margin-bottom: 15px;
         }
@@ -164,14 +159,30 @@ function injectAnalyticsDetailStyles() {
             font-size: 0.9rem;
         }
 
-       
-        .table-row {
-            grid-template-columns: 80px 1fr 100px; 
-            text-align: center;
+        /* MAIN PAGE: Sessions = 3 columns (ID, Status, Contact) */
+        .sessions-section .sessions-table .table-row {
+            grid-template-columns: 1.5fr 1.5fr 1.5fr;
+            text-align: left;
         }
 
-       
-        /* The header needs to match the row alignment */
+        /* MAIN PAGE: Leads = 3 columns (Session ID, Email, Date) */
+        .leads-section .leads-table .table-row {
+            grid-template-columns: 1.5fr 1.5fr 1.5fr;
+            text-align: left;
+        }
+
+        /* MODAL: All Sessions with checkboxes = 4 columns */
+        .modal-content .sessions-table .table-row {
+            grid-template-columns: 40px 100px 110px 1fr !important;
+            text-align: left;
+        }
+
+        /* MODAL: All Leads = 3 columns (same as main page) */
+        .modal-content .leads-table .table-row {
+            grid-template-columns: 120px 1fr 150px !important;
+            text-align: left;
+        }
+
         .table-header {
             background: #636b2f;
             color: white;
@@ -182,6 +193,7 @@ function injectAnalyticsDetailStyles() {
             position: sticky;
             top: 0;
             z-index: 10;
+            border-radius: 8px 8px 0 0;
         }
 
         .table-cell {
@@ -192,30 +204,7 @@ function injectAnalyticsDetailStyles() {
             font-size: 0.9rem;
         }
 
-        /* Utility class to hide items on mobile */
-        .desktop-only {
-            display: none;
-        }
-
-        /* DESKTOP VIEW (Screens larger than 768px) */
-        @media (min-width: 768px) {
-            .table-row {
-                /* Restore full grid layout */
-                grid-template-columns: 100px 100px 80px 1fr 150px;
-                text-align: left; /* Revert to left align on desktop if preferred */
-            }
-            
-            /* Leads table specific desktop grid */
-            .leads-table .table-row {
-                 grid-template-columns: 100px 1fr 1.5fr 120px 140px;
-            }
-
-            .desktop-only {
-                display: block; /* Show hidden items */
-            }
-        }
-
-        /* Specific Cell Styling */
+        /* Cell Styling */
         .contact-captured { color: var(--success); font-weight: 600; }
         .contact-not-captured { color: var(--text-muted); font-style: italic; }
         
@@ -230,6 +219,7 @@ function injectAnalyticsDetailStyles() {
         .status-error { background: var(--danger); color: white; }
         .status-pending { background: var(--warning); color: white; }
 
+        /* Buttons */
         .btn-secondary {
             background: white; 
             border: 1px solid var(--primary-light); 
@@ -244,64 +234,9 @@ function injectAnalyticsDetailStyles() {
             background: #f0f0f0;
         }
 
-        .lead-details-content {
-            padding: 20px;
-        }
-
-        .lead-detail-row {
-            display: grid;
-            grid-template-columns: 150px 1fr;
-            padding: 12px 0;
-            border-bottom: 1px solid #eee;
-            gap: 20px;
-        }
-
-        .lead-detail-label {
-            font-weight: 600;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-
-        .lead-detail-value {
-            color: var(--text-main);
-            font-size: 0.95rem;
-            word-break: break-all;
-        }
-        .lead-detail-value.session-id {
-            font-family: 'Courier New', monospace;
-            font-size: 0.85rem;
-            background: #f5f5f5;
-            padding: 6px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .lead-detail-value.session-id:hover {
-            background: #e8e8e8;
-        }
-        .lead-modal-actions {
-            margin-top: 20px;
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-        }
-
-        /* Modal fixes */
-        .modal-content .table-row {
-             /* In modal, force a scrollable layout */
-             grid-template-columns: 100px 100px 80px 1fr 150px !important;
-        }
-        .modal-content .sessions-table, .modal-content .leads-table {
-           
-            overflow: auto;
-        }
-        .modal-content .desktop-only {
-            display: block !important; /* Show everything in modal */
-        }
-
+        /* Delete Button in Modal Header */
         .header-delete-btn {
-            margin-right: auto; /* Pushes it to the left, near title */
+            margin-right: auto;
             margin-left: 15px;
             background: #dc2626;
             color: white;
@@ -311,10 +246,9 @@ function injectAnalyticsDetailStyles() {
             font-size: 0.85rem;
             font-weight: 600;
             cursor: pointer;
-            display: none; /* Hidden by default */
+            display: none;
             align-items: center;
             gap: 6px;
-            animation: fadeIn 0.2s;
         }
 
         .header-delete-btn.visible {
@@ -344,10 +278,9 @@ export async function renderAnalyticsDetail(businessId: string): Promise<HTMLEle
         const business = await getBusinessById(businessId);
 
         const { sessions: recentSessions, leads: recentLeads, analytics: analyticsSummary } = 
-    await getDashboardSummary(businessId);
+            await getDashboardSummary(businessId);
         
         hideLoadingSpinner(spinner);
-        
         
         const breadcrumb = createBreadcrumb([
             { label: 'Analytics', path: '#/dashboard/analytics' },
@@ -362,7 +295,6 @@ export async function renderAnalyticsDetail(businessId: string): Promise<HTMLEle
             <p>View your bot's performance, manage captured leads, and monitor active session messages.</p>
         `;
         container.appendChild(header);
-        
         
         const statsSection = document.createElement('section');
         statsSection.className = 'stats-section';
@@ -400,6 +332,7 @@ export async function renderAnalyticsDetail(businessId: string): Promise<HTMLEle
         const mainContentGrid = document.createElement('div');
         mainContentGrid.className = 'main-content-grid';
 
+        // ========== SESSIONS TABLE (3 columns: ID, Status, Contact) ==========
         if (recentSessions.length > 0) {
             const sessionsSection = document.createElement('section');
             sessionsSection.className = 'sessions-section';
@@ -411,61 +344,40 @@ export async function renderAnalyticsDetail(businessId: string): Promise<HTMLEle
             const sessionsTable = document.createElement('div');
             sessionsTable.className = 'sessions-table';
             
+            // HEADER: Only 3 columns
             const tableHeader = document.createElement('div');
             tableHeader.className = 'table-row table-header';
             tableHeader.innerHTML = `
-                <div class="table-cell">ID</div>
+                <div class="table-cell">Session ID</div>
                 <div class="table-cell">Status</div>
-                <div class="table-cell desktop-only">Msgs</div>
                 <div class="table-cell">Contact</div>
-                <div class="table-cell desktop-only">Started At</div>
             `;
             sessionsTable.appendChild(tableHeader);
             
             recentSessions.forEach(session => {
                 const row = document.createElement('div');
                 row.className = 'table-row';
+                row.style.cursor = 'pointer';
                 
-                const sessionIdCell = document.createElement('div');
-                sessionIdCell.className = 'table-cell';
-                sessionIdCell.textContent = session.sessionId.substring(0, 6) + '...';
-                sessionIdCell.title = session.sessionId;
-                row.appendChild(sessionIdCell);
-                
-                const statusCell = document.createElement('div');
-                statusCell.className = 'table-cell';
-                statusCell.innerHTML = `<span class="status-badge status-${session.status}">${session.status}</span>`;
-                row.appendChild(statusCell);
-                
-                const messagesCell = document.createElement('div');
-                messagesCell.className = 'table-cell desktop-only';
-                messagesCell.textContent = session.messageCount.toString();
-                row.appendChild(messagesCell);
-                
-                const contactCell = document.createElement('div');
-                contactCell.className = 'table-cell';
-
                 const contact = session.contact;
+                let contactDisplay = '-';
+                let contactClass = 'contact-not-captured';
                 
                 if (contact?.email) {
-                    contactCell.textContent = contact.email;
-                    contactCell.className = 'table-cell contact-captured';
+                    contactDisplay = contact.email;
+                    contactClass = 'contact-captured';
                 } else if (contact?.phone) {
-                    contactCell.textContent = contact.phone;
-                    contactCell.className = 'table-cell contact-captured';
-                } else {
-                    contactCell.textContent = '-';
-                    contactCell.className = 'table-cell contact-not-captured';
+                    contactDisplay = contact.phone;
+                    contactClass = 'contact-captured';
                 }
                 
-                row.appendChild(contactCell);
+                // ROW: Only 3 columns (removed msgs and date)
+                row.innerHTML = `
+                    <div class="table-cell" title="${session.sessionId}">${session.sessionId.substring(0, 10)}...</div>
+                    <div class="table-cell"><span class="status-badge status-${session.status}">${session.status}</span></div>
+                    <div class="table-cell ${contactClass}">${contactDisplay}</div>
+                `;
                 
-                const dateCell = document.createElement('div');
-                dateCell.className = 'table-cell desktop-only';
-                dateCell.textContent = formatDateTime(session.startedAt);
-                row.appendChild(dateCell);
-                
-                row.style.cursor = 'pointer';
                 row.addEventListener('click', async () => {
                     await showSessionDetailsModal(businessId, session.sessionId);
                 });
@@ -486,7 +398,7 @@ export async function renderAnalyticsDetail(businessId: string): Promise<HTMLEle
             mainContentGrid.appendChild(sessionsSection);
         }
         
-
+        // ========== LEADS TABLE (3 columns: Session ID, Email, Captured At) ==========
         if (recentLeads.length > 0) {
             const leadsSection = document.createElement('section');
             leadsSection.className = 'leads-section';
@@ -498,13 +410,12 @@ export async function renderAnalyticsDetail(businessId: string): Promise<HTMLEle
             const leadsTable = document.createElement('div');
             leadsTable.className = 'leads-table';
             
+            // HEADER: Only 3 columns
             const tableHeader = document.createElement('div');
             tableHeader.className = 'table-row table-header';
             tableHeader.innerHTML = `
                 <div class="table-cell">Session ID</div>
-                <div class="table-cell desktop-only">Name</div>
-                <div class="table-cell">Email</div>
-                <div class="table-cell desktop-only">Phone</div>
+                <div class="table-cell">Contact</div>
                 <div class="table-cell">Captured At</div>
             `;
             leadsTable.appendChild(tableHeader);
@@ -514,35 +425,15 @@ export async function renderAnalyticsDetail(businessId: string): Promise<HTMLEle
                 row.className = 'table-row';
                 row.style.cursor = 'pointer';
                 
-                const sessionIdCell = document.createElement('div');
-                sessionIdCell.className = 'table-cell';
-                sessionIdCell.textContent = lead.firstSessionId.substring(0, 8) + '...';
-                sessionIdCell.title = lead.firstSessionId;
-                row.appendChild(sessionIdCell);
-                
-             
-                const nameCell = document.createElement('div');
-                nameCell.className = 'table-cell desktop-only';
-                nameCell.textContent = lead.name || '-';
-                row.appendChild(nameCell);
-                
-            
-                const emailCell = document.createElement('div');
-                emailCell.className = 'table-cell contact-captured';
-                emailCell.textContent = lead.email || '-';
-                row.appendChild(emailCell);
-                
-            
-                const phoneCell = document.createElement('div');
-                phoneCell.className = 'table-cell desktop-only';
-                phoneCell.textContent = lead.phone || '-';
-                row.appendChild(phoneCell);
-                
-        
-                const dateCell = document.createElement('div');
-                dateCell.className = 'table-cell';
-                dateCell.textContent = formatDateTime(lead.firstContactDate);
-                row.appendChild(dateCell);
+                const contactDisplay = lead.email || lead.phone || '-';
+               
+
+                // ROW: Only 3 columns (removed name and phone)
+                row.innerHTML = `
+                    <div class="table-cell" title="${lead.firstSessionId}">${lead.firstSessionId.substring(0, 10)}...</div>
+                    <div class="table-cell contact-captured">${contactDisplay}</div>
+                    <div class="table-cell">${formatDateTime(lead.firstContactDate)}</div>
+                `;
                 
                 row.addEventListener('click', () => {
                     showLeadDetailsModal(lead, businessId);
@@ -593,7 +484,6 @@ export async function renderAnalyticsDetail(businessId: string): Promise<HTMLEle
     
     return container;
 }
-
 
 function createStatCard(label: string, value: string, change: string): HTMLElement {
     const card = document.createElement('div');
@@ -780,11 +670,10 @@ async function showAllSessionsModal(businessId: string): Promise<void> {
             tableHeader.className = 'table-row table-header';
             tableHeader.innerHTML = `
                 <div class="table-cell"></div>
-                <div class="table-cell">ID</div>
+                <div class="table-cell">Session ID</div>
                 <div class="table-cell">Status</div>
-                <div class="table-cell desktop-only">Msgs</div>
                 <div class="table-cell">Contact</div>
-                <div class="table-cell desktop-only">Started At</div>
+
             `;
             tableContainer.appendChild(tableHeader);
 
@@ -813,11 +702,11 @@ async function showAllSessionsModal(businessId: string): Promise<void> {
                     <div class="table-cell">
                         <input type="checkbox" class="row-checkbox" value="${session.sessionId}">
                     </div>
-                    <div class="table-cell" title="${session.sessionId}">${session.sessionId.substring(0, 8)}...</div>
+                    <div class="table-cell" title="${session.sessionId}">${session.sessionId.substring(0, 10)}...</div>
                     <div class="table-cell"><span class="status-badge status-${session.status}">${session.status}</span></div>
-                    <div class="table-cell desktop-only">${session.messageCount}</div>
+                 
                     <div class="table-cell ${contactClass}">${contactDisplay}</div>
-                    <div class="table-cell desktop-only">${formatDateTime(session.startedAt)}</div>
+                  
                 `;
 
                 const checkbox = row.querySelector('.row-checkbox') as HTMLInputElement;
@@ -888,8 +777,7 @@ async function showAllLeadsModal(businessId: string): Promise<void> {
     try {
         const leads = await getBusinessLeads(businessId, undefined, 1, 100);
 
-        const tableContainer = document.createElement('div');
-        tableContainer.className = 'leads-table';
+        const wrapper = document.createElement('div');
 
         const exportBtn = document.createElement('button');
         exportBtn.textContent = 'Export All to CSV 📥';
@@ -898,15 +786,16 @@ async function showAllLeadsModal(businessId: string): Promise<void> {
         exportBtn.addEventListener('click', () => {
             exportLeadsToCSV(leads);
         });
-        tableContainer.appendChild(exportBtn);
+        wrapper.appendChild(exportBtn);
+
+        const tableContainer = document.createElement('div');
+        tableContainer.className = 'leads-table';
 
         const tableHeader = document.createElement('div');
         tableHeader.className = 'table-row table-header';
         tableHeader.innerHTML = `
             <div class="table-cell">Session ID</div>
-            <div class="table-cell">Name</div>
-            <div class="table-cell">Email</div>
-            <div class="table-cell">Phone</div>
+            <div class="table-cell">Contact</div>
             <div class="table-cell">Captured At</div>
         `;
         tableContainer.appendChild(tableHeader);
@@ -917,10 +806,8 @@ async function showAllLeadsModal(businessId: string): Promise<void> {
             row.style.cursor = 'pointer';
 
             row.innerHTML = `
-                <div class="table-cell" title="${lead.firstSessionId}">${lead.firstSessionId.substring(0, 8)}...</div>
-                <div class="table-cell">${lead.name || '-'}</div>
+                <div class="table-cell" title="${lead.firstSessionId}">${lead.firstSessionId.substring(0, 10)}...</div>
                 <div class="table-cell">${lead.email || '-'}</div>
-                <div class="table-cell">${lead.phone || '-'}</div>
                 <div class="table-cell">${formatDateTime(lead.firstContactDate)}</div>
             `;
 
@@ -934,6 +821,7 @@ async function showAllLeadsModal(businessId: string): Promise<void> {
         const modalContent = modal.querySelector('.modal-content');
         if (modalContent) {
             modalContent.innerHTML = '';
+            modalContent.appendChild(wrapper); 
             modalContent.appendChild(tableContainer);
         }
     } catch (error) {
