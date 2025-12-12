@@ -162,7 +162,7 @@ export function renderDashboardHome(): HTMLElement {
       title: 'Beta Perks 🎁',
       description: [
       // Use "FREE" for emphasis
-      '**100% Free access** during the entire beta period',
+      '100% Free access during the entire beta period',
       '40% off the subscription for the first 6 months after launch',
       // Grouping related ideas
       'Priority support from the core team',
@@ -175,8 +175,8 @@ export function renderDashboardHome(): HTMLElement {
       title: 'What\'s Live Now ✅',
       description: [
         // Emphasize the core mechanism
-        'AI agent answers questions instantly using **your** business info',
-        'Install anywhere: website embed, direct link, or **QR code**',
+        'AI agent answers questions instantly using your business info',
+        'Install anywhere: website embed, direct link, or QR code',
         'Automatic lead capture, conversation tracking, and data export',
         'Update your business data instantly—AI knowledge base adapts immediately',
         'Seamless conversation handoff to a human agent when needed (if applicable)' // Added useful feature

@@ -211,11 +211,6 @@ export async function renderBusinessEdit(businessId: string): Promise<HTMLElemen
     const wizardContainer = document.createElement('div');
     wizardContainer.className = 'wizard-container';
     
-    const heading = document.createElement('h1');
-    heading.style.textAlign = 'center';
-    heading.textContent = `Edit: ${business.basicInfo.businessName}`;
-    wizardContainer.appendChild(heading);
-
     const progressContainer = document.createElement('div');
     progressContainer.className = 'wizard-progress-bar';
     WIZARD_STEPS.forEach(() => {
