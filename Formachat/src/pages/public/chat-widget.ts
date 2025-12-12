@@ -117,7 +117,7 @@ function injectWidgetStyles() {
     .message-user { align-self: flex-end; background: var(--primary); color: var(--white); border-radius: 18px 18px 2px 18px; margin-left: auto; box-shadow: 0 4px 10px rgba(99, 107, 47, 0.2); }
     .message-system { align-self: center; background: rgba(0,0,0,0.05); color: var(--text-muted); border-radius: 12px; font-size: 13px; padding: 6px 12px; box-shadow: none; margin: 10px auto; text-align: center; }
     .input-wrapper { flex: 1; position: relative; display: flex; align-items: center; }
-    .chat-input { width: 100%; padding: 14px 20px; padding-right: 50px; border: 1px solid #e0e0e0; border-radius: 30px; font-size: 15px; outline: none; background: #f9f9f9; transition: all 0.2s; font-family: inherit; }
+    .chat-input { width: 100%; padding: 14px 20px; padding-right: 50px; border: 1px solid #e0e0e0; border-radius: 30px; font-size: 15px; outline: none; background: #f9f9f9; transition: all 0.2s; font-family: inherit; color: black }
     .chat-input:focus { background: var(--white); border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 107, 47, 0.1); }
     .btn-send { width: 46px; height: 46px; border-radius: 50%; background: var(--primary); color: white; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 10px rgba(99, 107, 47, 0.3); }
     .btn-send:hover:not(:disabled) { background: var(--primary-dark); transform: scale(1.05); }

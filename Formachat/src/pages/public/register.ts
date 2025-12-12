@@ -155,6 +155,7 @@ function injectRegisterStyles() {
             font-weight: bold;
             font-size: 1.5rem !important;
             padding: 15px !important;
+            color: black;
         }
     `;
     document.head.appendChild(style);
@@ -208,7 +209,7 @@ function createRegisterForm(container: HTMLElement): HTMLElement {
     passwordInput.minLength = 8;
     
     const passwordHint = document.createElement('small');
-    passwordHint.textContent = 'Minimum 8 characters';
+    passwordHint.innerHTML = 'Hint: &nbsp;•&nbsp; 8+ characters &nbsp;•&nbsp; Uppercase & Lowercase&nbsp;•&nbsp; 1 Number';
     passwordHint.style.cssText = 'color: var(--text-muted); display: block; margin-top: 5px;';
     passwordDiv.appendChild(passwordHint);
     

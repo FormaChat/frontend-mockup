@@ -170,7 +170,7 @@ function injectWizardStyles() {
 
     .help-text {
       font-size: 0.85rem;
-      color: #888;
+      color: black;
       margin-top: 6px;
       display: block;
     }

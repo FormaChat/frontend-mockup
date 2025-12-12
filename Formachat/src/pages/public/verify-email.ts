@@ -70,6 +70,7 @@ function injectVerifyEmailStyles() {
             border-radius: 8px;
             background: white;
             transition: all 0.3s ease;
+            color: balck;
             
             /* Specific OTP styling */
             font-size: 2rem !important; 

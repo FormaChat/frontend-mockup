@@ -278,7 +278,7 @@ export function renderHome(): HTMLElement {
 
   const subtitle = document.createElement('p');
   subtitle.className = 'hero-subtitle animate-item delay-3';
-  subtitle.textContent = 'AI-powered support that understands your business. Instant answers, 24/7 availability, zero missed opportunities.';
+  subtitle.textContent = 'Automate your support with an AI agent that knows your business. Setup takes 5 minutes, works 24/7, and answers customers instantly so you can focus on growing.';
   hero.appendChild(subtitle);
 
   const buttonSection = document.createElement('div');
@@ -300,7 +300,7 @@ export function renderHome(): HTMLElement {
 
   const trustSignal = document.createElement('p');
   trustSignal.className = 'trust-signal animate-item delay-5';
-  trustSignal.innerHTML = '✓ No credit card required &nbsp;•&nbsp; ✓ Setup in 5 minutes &nbsp;•&nbsp; ✓ Cancel anytime';
+  trustSignal.innerHTML = '✓ No credit card required &nbsp;•&nbsp; ✓ Setup in 5 minutes &nbsp;•&nbsp; ✓ Instant 24/7 responses';
   hero.appendChild(trustSignal);
 
   const visual = document.createElement('div');

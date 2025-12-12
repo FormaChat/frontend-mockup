@@ -161,38 +161,40 @@ export function renderDashboardHome(): HTMLElement {
     {
       title: 'Beta Perks 🎁',
       description: [
-      'Free access during entire beta period',
-      '40% off for first 6 months after launch',
-      'Direct input on feature roadmap',
-      'Priority support from founders',
-      'First access to new features before public release'
-    ],
+      // Use "FREE" for emphasis
+      '**100% Free access** during the entire beta period',
+      '40% off the subscription for the first 6 months after launch',
+      // Grouping related ideas
+      'Priority support from the core team',
+      'Direct input on future feature roadmap and design',
+      'First access to all new features before public release'
+      ],
       status: 'available'
     },
     {
       title: 'What\'s Live Now ✅',
       description: [
-        'AI chat that answers questions using your business info',
-        'Deploy via website embed, direct link, or QR code on flyers',
-        'Track every conversation and capture lead contact details',
-        'Update your business info anytime - AI adapts instantly',
-        'Automatic conversation management and lead organization'
+        // Emphasize the core mechanism
+        'AI agent answers questions instantly using **your** business info',
+        'Install anywhere: website embed, direct link, or **QR code**',
+        'Automatic lead capture, conversation tracking, and data export',
+        'Update your business data instantly—AI knowledge base adapts immediately',
+        'Seamless conversation handoff to a human agent when needed (if applicable)' // Added useful feature
       ],
       status: 'available'
     },
     {
       title: 'Coming Soon 🚀',
       description: [
-        'WhatsApp and Telegram integration',
-        'Voice conversation support',
-        'OAuth login with Google and GitHub',
-        'Payment processing through chat',
-        'Developer API and API key access',
-        'AI agents for autonomous conversations'
+        'Advanced Integrations: WhatsApp and Telegram',
+        'AI agents for voice conversation support',
+        'Direct sales & payment processing through the chat widget',
+        'Developer API and API key access for custom builds',
+        'OAuth login (Google, GitHub) and enhanced team features'
       ],
       status: 'coming-soon'
     }
-  ];
+];
   
   const featuresWrapper = document.createElement('div');
   featuresWrapper.className = 'section-spacing';
