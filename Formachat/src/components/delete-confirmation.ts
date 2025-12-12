@@ -40,8 +40,8 @@ function injectDeleteStyles() {
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.5);
-      width: 90%;
-      max-width: 400px;
+      width: 80%;
+      max-width: 300px;
       padding: 30px;
       border-radius: 12px; /* ✅ Matches your cards */
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); /* ✅ Matches your components */
