@@ -373,16 +373,6 @@ export async function renderBusinessCreate(): Promise<HTMLElement> {
   const wizardContainer = document.createElement('div');
   wizardContainer.className = 'wizard-container';
   
-  const header = document.createElement('div');
-  header.className = 'page-header';
-  
-  const description = document.createElement('p');
-  description.className = 'page-description';
-  description.textContent = 'Complete the questionnaire to set up your AI-powered chatbot';
-  header.appendChild(description);
-  
-  wizardContainer.appendChild(header);
-  
   const progressDots = createProgressDots(4);
   wizardContainer.appendChild(progressDots);
   
