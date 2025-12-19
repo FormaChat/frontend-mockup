@@ -106,10 +106,10 @@ function injectWidgetStyles() {
     .bot-details h3 { margin: 0; font-size: 16px; font-weight: 600; }
     .bot-status { font-size: 12px; opacity: 0.9; display: flex; align-items: center; gap: 4px; }
     .status-dot { width: 8px; height: 8px; background: #4ade80; border-radius: 50%; display: inline-block; }
-    .btn-end-chat { background: #dc2626); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .btn-end-chat { background: #dc2626; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
     .btn-end-chat:hover {
       color: white;
-      border: #b91c1c !important;
+      background: #b91c1c;
       transform: translateY(-1px); }
     .btn-end-chat:disabled { opacity: 0.5; cursor: default; }
     .chat-messages::-webkit-scrollbar { width: 6px; }
