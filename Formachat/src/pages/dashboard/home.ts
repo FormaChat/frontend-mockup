@@ -186,7 +186,7 @@ export function renderDashboardHome(): HTMLElement {
     {
       title: 'Coming Soon 🚀',
       description: [
-        'Business owner and end-user chat: direct real-time engagement with leads and customers.',
+        'Real-time lead alerts: instant notifications when prospects engage and share contact information.',
         'Advanced Integrations: WhatsApp and Telegram',
         'AI agents for voice conversation support',
         'Direct sales & payment processing through the chat widget',
