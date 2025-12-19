@@ -107,7 +107,7 @@ function injectWidgetStyles() {
     .bot-status { font-size: 12px; opacity: 0.9; display: flex; align-items: center; gap: 4px; }
     .status-dot { width: 8px; height: 8px; background: #4ade80; border-radius: 50%; display: inline-block; }
     .btn-end-chat { background: #dc2626); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
-    .btn-end-chat:hover { background: #e48080ff;
+    .btn-end-chat:hover {
       color: white;
       border: #b91c1c !important;
       transform: translateY(-1px); }
