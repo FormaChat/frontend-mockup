@@ -187,6 +187,7 @@ function injectWizardStyles() {
 
     /* --- 5. TILE/CARD CHECKBOXES (The "Modern" Look) --- */
     .checkbox-group {
+      margin-top: 10px;
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
       gap: 12px;

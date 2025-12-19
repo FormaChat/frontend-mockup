@@ -178,7 +178,7 @@ export function renderDashboardHome(): HTMLElement {
         'AI agent answers questions instantly using your business info',
         'Install anywhere: website embed, direct link, or QR code',
         'Automatic lead capture, conversation tracking, and data export',
-        'Update your business data instantly—AI knowledge base adapts immediately',
+        'Instant business data updates with real-time AI knowledge base adaptation',
         'Seamless conversation handoff to a human agent when needed (if applicable)' // Added useful feature
       ],
       status: 'available'
@@ -186,6 +186,7 @@ export function renderDashboardHome(): HTMLElement {
     {
       title: 'Coming Soon 🚀',
       description: [
+        'Business owner and end-user chat: direct real-time engagement with leads and customers.',
         'Advanced Integrations: WhatsApp and Telegram',
         'AI agents for voice conversation support',
         'Direct sales & payment processing through the chat widget',

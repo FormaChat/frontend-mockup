@@ -280,11 +280,11 @@ function createChatHeader(business: any, sessionId: string): HTMLElement {
     
     const cancelBtn = document.createElement('button');
     cancelBtn.textContent = 'Cancel';
-    cancelBtn.style.cssText = 'padding: 10px 20px; border: 1px solid #e0e0e0; background: white; border-radius: 8px; cursor: pointer; font-weight: 600;';
+    cancelBtn.style.cssText = 'padding: 10px 20px; border: none; background: #636b2f; border-radius: 8px; cursor: pointer; font-weight: 600; color: white';
     
     const yesBtn = document.createElement('button');
     yesBtn.textContent = 'Yes, End Chat';
-    yesBtn.style.cssText = 'padding: 10px 20px; border: none; background: #636b2f; color: white; border-radius: 8px; cursor: pointer; font-weight: 600;';
+    yesBtn.style.cssText = 'padding: 10px 20px; border: none; background: #dc2626; color: white; border-radius: 8px; cursor: pointer; font-weight: 600;';
     
     buttonGroup.appendChild(cancelBtn);
     buttonGroup.appendChild(yesBtn);

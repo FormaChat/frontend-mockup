@@ -52,6 +52,8 @@ function injectAnalyticsDetailStyles() {
         }
 
         .page-header {
+            display: flex;
+            flex-direction: Column;
             text-align: center;
             margin: 30px 0;
             padding: 20px;
